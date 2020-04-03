@@ -28,10 +28,10 @@ ArmorJS standards:
 ## Install
 
 ***With yarn (preferred):***
-```yarn add @armorjs/config```
+```yarn add @armorjs/log```
 
 With NPM:
-```npm install @armorjs/config```
+```npm install @armorjs/log```
 
 ## Usage
 
@@ -39,16 +39,16 @@ With NPM:
 
 #### Typescript
 ```
-import { ArmorConfig } from '@armorjs/config';
+import { ArmorLog } from '@armorjs/log';
 ```
 
-#### Node 
+#### Node
 ```
-const ArmorConfig = require('@armorjs/config');
+const ArmorConfig = require('@armorjs/log');
 ```
 
 ## Build
-Build (or rebuild) the config package:
+Build (or rebuild) the log package:
 
 ***With Yarn (preferred):***
 ```
@@ -64,7 +64,7 @@ npm run-script build
 
 ## Testing
 
-Config implements unit tests using jest. Run the following commands from the directory where config has been installed.
+Log implements unit tests using jest. Run the following commands from the directory where log has been installed.
 
 ***With yarn (preferred):***
 ```
