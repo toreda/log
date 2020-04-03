@@ -44,7 +44,7 @@ import { ArmorLog } from '@armorjs/log';
 
 #### Node
 ```
-const ArmorConfig = require('@armorjs/log');
+const ArmorLog = require('@armorjs/log');
 ```
 
 ## Build
