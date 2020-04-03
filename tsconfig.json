@@ -1,0 +1,36 @@
+{
+	"exclude": [
+		"node_modules",
+		"**/*.spec.ts",
+		"tests",
+		"dist/**"
+	],
+	"include": [
+		"**/src/index.ts"
+	],
+	"filesGlob": [
+		"./src/**/*.ts",
+		"!./node_modules/**"
+	],
+	"rootDir": ".",
+	"compilerOptions": {
+		"preserveConstEnums": true,
+		"module": "commonjs",
+		"esModuleInterop": true,
+		"moduleResolution": "node",
+		"target": "es6",
+		"traceResolution": false,
+		"lib": ["es6", "dom"],
+		"isolatedModules": false,
+		"removeComments": true,
+		"declaration": true,
+		"sourceMap": true,
+		"outDir": "./dist",
+		"allowUnreachableCode": false,
+		"strictNullChecks": true,
+		"strictBindCallApply": true,
+		"strictPropertyInitialization": true,
+		"alwaysStrict": true,
+		"noImplicitUseStrict": false
+	}
+}

@@ -1,0 +1,24 @@
+{
+  "name": "@armorjs/log",
+  "version": "0.0.0",
+  "description": "",
+  "main": "./dist/index.js",
+  "scripts": {
+    "test": "yarn jest --coverage"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/armorjs/log.git"
+  },
+  "keywords": [
+    "Logger",
+    "Typescript",
+    "Serverless"
+  ],
+  "author": "Michael Brich",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/armorjs/log/issues"
+  },
+  "homepage": "https://github.com/armorjs/log#readme"
+}
