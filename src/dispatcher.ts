@@ -1,11 +1,14 @@
-import { ArmorLogHandler } from './handler';
-import { ArmorLogLevel } from './level';
+import { ArmorLogGroup } from './group';
+import {ArmorLogLevel} from './level';
+import {ArmorLogListener} from './listener';
+import {ArmorLogProcessor} from './processor';
 import {EventEmitter} from 'events';
 
 export class ArmorLogDispatcher {
 	public readonly events: EventEmitter;
-	public readonly handlers: {[level: string]: ArmorLogHandler[]};
+	public readonly groups: {[level: string]: ArmorLogGroup};
 	public readonly logGroups: string[];
+	public nextListenerId: number;
 
 	constructor(events: EventEmitter) {
 		if (!events) {
@@ -13,23 +16,53 @@ export class ArmorLogDispatcher {
 		}
 
 		if (!(events instanceof EventEmitter)) {
-			throw new Error('Armor Log Dispatcher init failed - events argument was not a valid EventEmitter instance.');
+			throw new Error(
+				'Armor Log Dispatcher init failed - events argument was not a valid EventEmitter instance.'
+			);
 		}
 
+		this.nextListenerId = 0;
 		this.logGroups = [];
-		this.handlers = {};
+		this.groups = {};
 		this.events = events;
 	}
 
+	public getNextListenerId(): number {
+		return this.nextListenerId++;
+	}
 
-	public register(level: ArmorLogLevel, handler: ArmorLogHandler): string {
-		const levelStr = level.toString();
-		if (!this.handlers[levelStr]) {
-			this.handlers[levelStr] = [];
+	public createListener(processor: ArmorLogProcessor): ArmorLogListener | null {
+		if (!processor) {
+			return null;
 		}
 
-		this.handlers[levelStr].push(handler);
-		return '';
+		let listener: ArmorLogListener | null = null;
+		const id = this.getNextListenerId();
+
+		try {
+			listener = new ArmorLogListener(id, processor);
+		} catch (e) {
+			listener = null;
+		}
+
+		return listener;
+	}
+
+	public register(level: ArmorLogLevel, processor: ArmorLogProcessor): number|null {
+		const levelStr = level.toString();
+		if (!this.groups[levelStr]) {
+			this.groups[levelStr] = new ArmorLogGroup(levelStr);
+		}
+
+		const group = this.groups[levelStr];
+		const listener = this.createListener(processor);
+
+		if (!listener) {
+			return null;
+		}
+
+		group.add(listener);
+		return listener.id;
 	}
 
 	public unregister(id: string): boolean {
@@ -37,13 +70,8 @@ export class ArmorLogDispatcher {
 	}
 
 	public dispatch(level: ArmorLogLevel): void {
-
-		for (let i = 0; i < this.logGroups.length; i++) {
-
-		}
+		for (let i = 0; i < this.logGroups.length; i++) {}
 	}
 
-	public createHandlerId(): void {
-
-	}
+	public createHandlerId(): void {}
 }

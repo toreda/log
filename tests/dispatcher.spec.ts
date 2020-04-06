@@ -7,6 +7,7 @@ describe("Dispatcher", () => {
 
 	beforeAll(() => {
 		events = new EventEmitter();
+		instance = new ArmorLogDispatcher(events);
 	});
 
 	describe("Constructor", () => {
@@ -28,9 +29,37 @@ describe("Dispatcher", () => {
 			expect(customInstance.events).toBe(customEvents);
 		});
 
-		it('should initialize the handlers property to an empty object', () => {
+		it('should initialize the groups property to an empty object', () => {
 			const customInstance = new ArmorLogDispatcher(events);
-			expect(customInstance.handlers).toEqual({});
+			expect(customInstance.groups).toEqual({});
+		});
+
+		it('should initialize nextListenerId to 0', () => {
+			const customInstance = new ArmorLogDispatcher(events);
+			expect(customInstance.nextListenerId).toBe(0);
+		});
+	});
+
+	describe("createListener", () => {
+		it('should not throw when processor argument is missing', () => {
+			expect(() => {
+				const result = instance.createListener(undefined as any);
+			}).not.toThrow();
+		});
+
+		it('should return null when processor argument is not a processor', () => {
+			expect(instance.createListener(undefined as any)).toBeNull();
+		});
+	});
+
+	describe("getNextListenerId", () => {
+		it('should increment the listener id after each call', () => {
+			const customInstance = new ArmorLogDispatcher(events);
+			expect(customInstance.nextListenerId).toBe(0);
+			let id = customInstance.getNextListenerId();
+			expect(id).toBe(0);
+			let incremented = customInstance.getNextListenerId();
+			expect(incremented).toBe(1);
 		});
 	});
 });
