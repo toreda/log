@@ -1,4 +1,3 @@
-import { ArmorLogHandler } from './handler';
 import { ArmorLogListener } from './listener';
 
 export class ArmorLogGroup {
