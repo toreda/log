@@ -2,6 +2,10 @@
 # yarn lockfile v1
 
 
+"@armorjs/action-result@^0.0.1":
+  version "0.0.1"
+  resolved "https://registry.yarnpkg.com/@armorjs/action-result/-/action-result-0.0.1.tgz#e1f5094bb160db5e7a8bc8d4781483ae2212d5e3"
+
 "@babel/code-frame@^7.0.0", "@babel/code-frame@^7.8.3":
   version "7.8.3"
   resolved "https://registry.yarnpkg.com/@babel/code-frame/-/code-frame-7.8.3.tgz#33e25903d7481181534e12ec0a25f16b6fcf419e"

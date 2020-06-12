@@ -1,3 +1,4 @@
+import {ArmorActionResult} from '@armorjs/action-result';
 import { ArmorLogGroup } from './group';
 import {ArmorLogLevel} from './level';
 import {ArmorLogListener} from './listener';
@@ -17,7 +18,7 @@ export class ArmorLogDispatcher {
 
 		if (!(events instanceof EventEmitter)) {
 			throw new Error(
-				'Armor Log Dispatcher init failed - events argument was not a valid EventEmitter instance.'
+				'Armor Log Dispatcher init failed - events argument not a valid EventEmitter instance.'
 			);
 		}
 
@@ -48,7 +49,8 @@ export class ArmorLogDispatcher {
 		return listener;
 	}
 
-	public register(level: ArmorLogLevel, processor: ArmorLogProcessor): number|null {
+	public register(level: ArmorLogLevel, processor: ArmorLogProcessor): ArmorActionResult {
+		const result = new ArmorActionResult();
 		const levelStr = level.toString();
 		if (!this.groups[levelStr]) {
 			this.groups[levelStr] = new ArmorLogGroup(levelStr);
@@ -58,11 +60,13 @@ export class ArmorLogDispatcher {
 		const listener = this.createListener(processor);
 
 		if (!listener) {
-			return null;
+			result.fail();
+			return result;
 		}
 
+		result.payload = listener;
 		group.add(listener);
-		return listener.id;
+		return result;
 	}
 
 	public unregister(id: string): boolean {
@@ -72,6 +76,4 @@ export class ArmorLogDispatcher {
 	public dispatch(level: ArmorLogLevel): void {
 		for (let i = 0; i < this.logGroups.length; i++) {}
 	}
-
-	public createHandlerId(): void {}
 }

@@ -20,7 +20,7 @@ describe("Dispatcher", () => {
 		it('should throw when events argument is not an EventEmitter instance', () => {
 			expect(() => {
 				const customInstance = new ArmorLogDispatcher([] as any);
-			}).toThrow('Armor Log Dispatcher init failed - events argument was not a valid EventEmitter instance.');
+			}).toThrow('Armor Log Dispatcher init failed - events argument not a valid EventEmitter instance.');
 		});
 
 		it('should set the events property to the provided events argument', () => {
@@ -38,6 +38,10 @@ describe("Dispatcher", () => {
 			const customInstance = new ArmorLogDispatcher(events);
 			expect(customInstance.nextListenerId).toBe(0);
 		});
+	});
+
+	describe("register", () => {
+
 	});
 
 	describe("createListener", () => {
