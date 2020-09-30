@@ -1,5 +1,6 @@
-import { ArmorLogEvent } from './event';
-import { ArmorLogProcessor } from './processor';
+import {ArmorLogEvent} from './event';
+import {ArmorLogProcessor} from './processor';
+
 export class ArmorLogListener {
 	public readonly processor: ArmorLogProcessor;
 	public readonly id: number;
@@ -17,7 +18,5 @@ export class ArmorLogListener {
 		return false;
 	}
 
-	public process(event: ArmorLogEvent): void {
-
-	}
+	public process(event: ArmorLogEvent): void {}
 }

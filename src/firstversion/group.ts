@@ -1,4 +1,4 @@
-import { ArmorLogListener } from './listener';
+import {ArmorLogListener} from './listener';
 
 export class ArmorLogGroup {
 	public readonly id: string;

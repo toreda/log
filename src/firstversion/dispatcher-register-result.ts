@@ -6,6 +6,4 @@ export class ArmorDispatcherRegisterResult {
 		this.success = false;
 		this.errors = [];
 	}
-
-
 }

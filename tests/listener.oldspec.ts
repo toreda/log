@@ -25,15 +25,11 @@ describe('ArmorLogListener', () => {
 		});
 	});
 
-	describe("Implementation", () => {
-		describe("process", () => {
+	describe('Implementation', () => {
+		describe('process', () => {});
 
-		});
-
-		describe("canProcessEvent", () => {
-			it('should return false when processor property is missing', () => {
-
-			});
+		describe('canProcessEvent', () => {
+			it('should return false when processor property is missing', () => {});
 		});
 	});
 });

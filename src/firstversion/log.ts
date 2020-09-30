@@ -43,32 +43,33 @@ export class ArmorLog {
 		return this;
 	}
 
-	public warn(...args: any[]): ArmorLog {
-		this.dispatcher.dispatch(ArmorLogLevel.WARN);
-		return this;
-	}
-
-	public debug(...args: any[]): ArmorLog {
-		this.dispatcher.dispatch(ArmorLogLevel.DEBUG);
-		return this;
-	}
-
 	public trace(...args: any[]): ArmorLog {
-		this.dispatcher.dispatch(ArmorLogLevel.TRACE);
+		this.log(ArmorLogLevel.TRACE, args);
+		return this;
+	}
+
+	public warn(...args: any[]): ArmorLog {
+		this.log(ArmorLogLevel.WARN, args);
 		return this;
 	}
 
 	public info(...args: any[]): ArmorLog {
-		this.dispatcher.dispatch(ArmorLogLevel.INFO);
+		this.log(ArmorLogLevel.INFO, args);
+		return this;
+	}
+
+	public debug(...args: any[]): ArmorLog {
+		this.log(ArmorLogLevel.DEBUG, args);
 		return this;
 	}
 
 	public error(...args: any[]): ArmorLog {
-		this.dispatcher.dispatch(ArmorLogLevel.ERROR);
+		this.log(ArmorLogLevel.ERROR, args);
 		return this;
 	}
 
 	public custom(level: any, ...args: any[]): ArmorLog {
+		this.log(level, args);
 		return this;
 	}
 }

@@ -1,4 +1,4 @@
-import { ArmorLogLevel } from './level';
+import {ArmorLogLevel} from './level';
 
 export class ArmorLogEvent {
 	public readonly level: ArmorLogLevel;

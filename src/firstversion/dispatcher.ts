@@ -1,5 +1,5 @@
 import {ArmorActionResult} from '@armorjs/action-result';
-import { ArmorLogGroup } from './group';
+import {ArmorLogGroup} from './group';
 import {ArmorLogLevel} from './level';
 import {ArmorLogListener} from './listener';
 import {ArmorLogProcessor} from './processor';
@@ -15,11 +15,8 @@ export class ArmorLogDispatcher {
 		if (!events) {
 			throw new Error('Armor Log Dispatcher init failed - no events argument provided.');
 		}
-
 		if (!(events instanceof EventEmitter)) {
-			throw new Error(
-				'Armor Log Dispatcher init failed - events argument not a valid EventEmitter instance.'
-			);
+			throw new Error('Armor Log Dispatcher init failed - events argument not a valid EventEmitter instance.');
 		}
 
 		this.nextListenerId = 0;
