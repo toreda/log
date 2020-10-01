@@ -122,7 +122,7 @@ export class Logger {
 			if (Math.abs(num) < max) {
 				num = (num + max) % max;
 			} else {
-				num = num >= 0 ? max - 1 : 0
+				num = num >= 0 ? max - 1 : 0;
 			}
 			name = this.listenerNames[num];
 		} else {
