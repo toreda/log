@@ -82,14 +82,6 @@ describe('LogLogger', () => {
 				expect(custom.action(undefined!)).toBe(expectedV(undefined));
 			});
 
-			it('should bind this to action', () => {
-				let expectedV = function (arg) {
-					return this;
-				};
-				let custom = new LogListener(events, parent, undefined, undefined, expectedV);
-				expect(custom.action(undefined!)).toBe(custom);
-			});
-
 			it('should call enable', () => {
 				events.removeAllListeners();
 				let custom = new LogListener(events, parent);
@@ -101,9 +93,16 @@ describe('LogLogger', () => {
 	});
 
 	describe('Helpers', () => {
-		describe('action', () => {
+		describe('handleMessage', () => {
+			it('should have a bound this', () => {
+				let {handleMessage} = instance;
+				expect(() => {
+					handleMessage(undefined!);
+				}).not.toThrow();
+			});
+
 			it('should skip message if message level < listener level', () => {
-				instance.action({
+				instance.handleMessage({
 					message: 'message 1',
 					levelNum: 0,
 					levelStr: 'error'
@@ -112,7 +111,7 @@ describe('LogLogger', () => {
 			});
 
 			it('should add message if message level >= listener level', () => {
-				instance.action({
+				instance.handleMessage({
 					message: 'message 1',
 					levelNum: 4,
 					levelStr: 'trace'
@@ -185,7 +184,10 @@ describe('LogLogger', () => {
 				instance.levelStr = instance.parent.levels[0];
 
 				for (; expectedCount < 10; expectedCount++) {
-					instance.parent.log(expectedCount % instance.parent.levels.length, 'test message ' + expectedCount);
+					instance.parent.log(
+						expectedCount % instance.parent.levels.length,
+						'logger test message ' + expectedCount
+					);
 				}
 				expect(instance.logs.length).toBe(expectedCount);
 

@@ -4,12 +4,13 @@ import {LogMessage} from './log-message';
 import {Logger} from './logger';
 
 export class LogListener {
+	public action: LogEvent;
 	public events: EventEmitter;
 	public levelNum: number;
 	public levelStr: string;
+	public logs: LogMessage[] = [];
 	public name: string;
 	public parent: Logger;
-	public logs: LogMessage[] = [];
 
 	constructor(events: EventEmitter, parent: Logger, level?: number | string, name?: string, action?: LogEvent) {
 		if (!events) {
@@ -47,16 +48,28 @@ export class LogListener {
 			this.name = name;
 		}
 
-		if (action != null) {
+		if (action == null) {
+			this.action = (message) => {
+				console.log(message);
+			};
+		} else {
 			this.action = action;
 		}
 
-		this.action = this.action.bind(this);
-
+		this.handleMessage = this.handleMessage.bind(this);
 		this.enable();
 	}
 
-	public action(logMessage: LogMessage): void {
+	// public handleMessage = (logMessage: LogMessage): void => {
+	public handleMessage(logMessage: LogMessage): void {
+		if (this instanceof LogListener !== true) {
+			throw new Error('LogListener handleMessage failed - this context is not a LogListener');
+		}
+
+		if (logMessage == null) {
+			return;
+		}
+
 		if (logMessage.levelNum < this.levelNum) {
 			return;
 		}
@@ -65,11 +78,11 @@ export class LogListener {
 	}
 
 	public enable(): void {
-		this.events.on('LogEvent', this.action);
+		this.events.on('LogEvent', this.handleMessage);
 	}
 
 	public disable(): void {
-		this.events.off('LogEvent', this.action);
+		this.events.off('LogEvent', this.handleMessage);
 	}
 
 	public showLogs(level?: number | string): void {
@@ -89,6 +102,6 @@ export class LogListener {
 			logList.push(logStr);
 		});
 
-		console.log(logList.join('\n'));
+		this.action(logList.join('\n'));
 	}
 }

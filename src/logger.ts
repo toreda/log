@@ -7,13 +7,15 @@ import {LogState} from './log-state';
 
 export class Logger {
 	public events: EventEmitter;
+	public id: string;
 	public levels: string[];
-	public listeners: {[name: string]: LogListener};
 	public listenerNames: string[];
+	public listeners: {[name: string]: LogListener};
 
 	public constructor(events?: EventEmitter, options?: LogOptions) {
 		this.listeners = {};
 		this.listenerNames = [];
+		this.id = ('0'.repeat(5) + Math.floor(Math.random() * 99999).toString()).slice(-5);
 
 		this.events = this.parseEvents(events);
 

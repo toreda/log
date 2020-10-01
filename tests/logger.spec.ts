@@ -292,11 +292,11 @@ describe('LogLogger', () => {
 				let logs = listener.payload.logs;
 				expect(logs.length).toBe(0);
 
-				instance.log(0, 'test message 1');
+				instance.log(0, 'log-listener test message 1');
 				expect(logs.length).toBe(1);
 
 				instance.removeListener(listener.payload);
-				instance.log(0, 'test message 2');
+				instance.log(0, 'log-listener test message 2');
 				expect(logs.length).toBe(1);
 			});
 		});
