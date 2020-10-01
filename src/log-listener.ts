@@ -48,7 +48,7 @@ export class LogListener {
 		}
 
 		if (action != null) {
-			this.action = action.bind(this);
+			this.action = action;
 		}
 
 		this.action = this.action.bind(this);
@@ -84,13 +84,7 @@ export class LogListener {
 				return;
 			}
 
-			let logStr: string;
-
-			if (typeof log.message === 'string') {
-				logStr = log.message;
-			} else {
-				logStr = JSON.stringify(log.message);
-			}
+			let logStr = `${log.levelStr.toUpperCase()}: ${JSON.stringify(log.message)}`;
 
 			logList.push(logStr);
 		});
