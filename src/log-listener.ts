@@ -48,7 +48,7 @@ export class LogListener {
 		}
 
 		if (action != null) {
-			this.action = action;
+			this.action = action.bind(this);
 		}
 
 		this.action = this.action.bind(this);

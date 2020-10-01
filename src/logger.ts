@@ -8,10 +8,12 @@ import {LogState} from './log-state';
 export class Logger {
 	public events: EventEmitter;
 	public levels: string[];
-	public listeners: LogListener[];
+	public listeners: {[name: string]: LogListener};
+	public listenerNames: string[];
 
 	public constructor(events?: EventEmitter, options?: LogOptions) {
-		this.listeners = [];
+		this.listeners = {};
+		this.listenerNames = [];
 
 		this.events = this.parseEvents(events);
 
@@ -81,7 +83,7 @@ export class Logger {
 		};
 	}
 
-	public attachListener(target: number | string | LogListener, name?: string): ArmorActionResult {
+	public attachListener(target?: number | string | LogListener, name?: string): ArmorActionResult {
 		const result = new ArmorActionResult();
 
 		let listener: LogListener;
@@ -89,19 +91,12 @@ export class Logger {
 		if (target instanceof LogListener) {
 			listener = target;
 		} else {
-			const {levelNum, levelStr} = this.parseLevel(target);
-
 			let n = name;
-			if (!name) {
-				n = this.listeners.length.toString();
+			if (name == null) {
+				n = this.listenerNames.length.toString();
 			}
 
-			listener = new LogListener(this.events, this, levelNum, levelStr, n);
-		}
-
-		if (!listener) {
-			result.fail();
-			return result;
+			listener = new LogListener(this.events, this, target, n);
 		}
 
 		if (this.listeners[listener.name]) {
@@ -111,21 +106,40 @@ export class Logger {
 		}
 
 		this.listeners[listener.name] = listener;
+		this.listenerNames.push(listener.name);
 		result.payload = listener;
+		result.succeed();
 		return result;
 	}
 
-	public chooseListener(name: number | string): LogListener {
+	public chooseListener(target: number | string): LogListener {
 		let result: LogListener;
+		let name: string;
+
+		if (typeof target === 'number') {
+			let num = Math.round(target);
+			let max = this.listenerNames.length;
+			if (Math.abs(num) < max) {
+				num = (num + max) % max;
+			} else {
+				num = num >= 0 ? max - 1 : 0
+			}
+			name = this.listenerNames[num];
+		} else {
+			name = target;
+		}
 
 		result = this.listeners[name];
 
 		return result;
 	}
 
-	public removeListener(target: number | string | LogListener): LogListener | null {
+	public removeListener(target: number | string | LogListener): ArmorActionResult {
+		const result = new ArmorActionResult();
+
 		if (target == null) {
-			return null;
+			result.fail();
+			return result;
 		}
 
 		let listener: LogListener;
@@ -136,9 +150,17 @@ export class Logger {
 			listener = this.chooseListener(target);
 		}
 
+		if (!listener) {
+			result.fail();
+			return result;
+		}
+
 		listener.disable();
-		this.listeners[listener.name] = undefined;
-		return listener;
+		this.listenerNames = this.listenerNames.filter((name) => name !== listener.name);
+		delete this.listeners[listener.name];
+		result.payload = listener;
+		result.succeed();
+		return result;
 	}
 
 	public log(level: number | string, ...args: any[]): Logger {
