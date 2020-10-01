@@ -2,35 +2,33 @@ import {ArmorActionResult} from '@armorjs/action-result';
 import {EventEmitter} from 'events';
 import {LogListener} from './log-listener';
 import {LogMessage} from './log-message';
-import {LogOptions} from './log-options';
-import {LogState} from './log-state';
+import {LoggerOptions} from './logger-options';
+import {LoggerState} from './logger-state';
 
 export class Logger {
-	public events: EventEmitter;
-	public id: string;
-	public levels: string[];
-	public listenerNames: string[];
-	public listeners: {[name: string]: LogListener};
+	public state: LoggerState;
 
-	public constructor(events?: EventEmitter, options?: LogOptions) {
-		this.listeners = {};
-		this.listenerNames = [];
-		this.id = ('0'.repeat(5) + Math.floor(Math.random() * 99999).toString()).slice(-5);
+	public constructor(options?: LoggerOptions) {
+		this.state = this.parseOptions(options);
 
-		this.events = this.parseEvents(events);
-
-		const state = this.parseOptions(options);
-
-		this.levels = state.levels;
-
-		this.levels.forEach((level) => {
+		this.state.levels.forEach((level) => {
 			this[level] = function (...args: any): Logger {
 				return this.log.apply(this, [level].concat(args));
 			};
 		});
 	}
 
-	public parseEvents(events?: EventEmitter): EventEmitter {
+	public parseOptions(options: LoggerOptions = {}): LoggerState {
+		return {
+			events: this.parseOptionsEvents(options.events),
+			id: this.parseOptionsId(options.id),
+			levels: this.parseOptionsLevels(options.levels),
+			listenerNames: [],
+			listeners: {}
+		};
+	}
+
+	public parseOptionsEvents(events?: EventEmitter): EventEmitter {
 		if (!events) {
 			return new EventEmitter();
 		}
@@ -42,23 +40,33 @@ export class Logger {
 		return events;
 	}
 
-	public parseOptions(options?: LogOptions): LogState {
-		const state: LogState = {
-			levels: ['error', 'warn', 'info', 'debug', 'trace']
-		};
-
-		if (options?.levels && Array.isArray(options.levels)) {
-			state.levels = options.levels;
+	public parseOptionsId(id?: string): string {
+		if (typeof id !== 'string') {
+			return ('0'.repeat(5) + Math.floor(Math.random() * 99999).toString()).slice(-5);
 		}
 
-		return state;
+		return id;
+	}
+
+	public parseOptionsLevels(levels?: string[]): string[] {
+		let defaultLevels = ['error', 'warn', 'info', 'debug', 'trace'];
+
+		if (!levels) {
+			return defaultLevels;
+		}
+
+		if (!Array.isArray(levels)) {
+			return defaultLevels;
+		}
+
+		return levels;
 	}
 
 	public parseLevel(level?: number | string): {levelNum: number; levelStr: string} {
 		if (level == null) {
 			return {
-				levelNum: this.levels.length - 1,
-				levelStr: this.levels[this.levels.length - 1]
+				levelNum: this.state.levels.length - 1,
+				levelStr: this.state.levels[this.state.levels.length - 1]
 			};
 		}
 
@@ -67,7 +75,7 @@ export class Logger {
 
 		if (typeof level === 'string') {
 			levelStr = level;
-			levelNum = this.levels.findIndex((value) => {
+			levelNum = this.state.levels.findIndex((value) => {
 				return value === levelStr;
 			});
 		} else {
@@ -76,8 +84,8 @@ export class Logger {
 
 		levelNum = Math.round(levelNum);
 		levelNum = Math.max(levelNum, 0);
-		levelNum = Math.min(levelNum, this.levels.length - 1);
-		levelStr = this.levels[levelNum];
+		levelNum = Math.min(levelNum, this.state.levels.length - 1);
+		levelStr = this.state.levels[levelNum];
 
 		return {
 			levelNum: levelNum,
@@ -95,20 +103,20 @@ export class Logger {
 		} else {
 			let n = name;
 			if (name == null) {
-				n = this.listenerNames.length.toString();
+				n = this.state.listenerNames.length.toString();
 			}
 
-			listener = new LogListener(this.events, this, target, n);
+			listener = new LogListener(this, this.state.events, {level: target, name: n});
 		}
 
-		if (this.listeners[listener.name]) {
+		if (this.state.listeners[listener.state.name]) {
 			result.fail();
 			listener.disable();
 			return result;
 		}
 
-		this.listeners[listener.name] = listener;
-		this.listenerNames.push(listener.name);
+		this.state.listeners[listener.state.name] = listener;
+		this.state.listenerNames.push(listener.state.name);
 		result.payload = listener;
 		result.succeed();
 		return result;
@@ -120,18 +128,18 @@ export class Logger {
 
 		if (typeof target === 'number') {
 			let num = Math.round(target);
-			let max = this.listenerNames.length;
+			let max = this.state.listenerNames.length;
 			if (Math.abs(num) < max) {
 				num = (num + max) % max;
 			} else {
 				num = num >= 0 ? max - 1 : 0;
 			}
-			name = this.listenerNames[num];
+			name = this.state.listenerNames[num];
 		} else {
 			name = target;
 		}
 
-		result = this.listeners[name];
+		result = this.state.listeners[name];
 
 		return result;
 	}
@@ -158,8 +166,8 @@ export class Logger {
 		}
 
 		listener.disable();
-		this.listenerNames = this.listenerNames.filter((name) => name !== listener.name);
-		delete this.listeners[listener.name];
+		this.state.listenerNames = this.state.listenerNames.filter((name) => name !== listener.state.name);
+		delete this.state.listeners[listener.state.name];
 		result.payload = listener;
 		result.succeed();
 		return result;
@@ -174,7 +182,7 @@ export class Logger {
 			message: args
 		};
 
-		this.events.emit('LogEvent', logMessage);
+		this.state.events.emit('LogEvent', logMessage);
 
 		return this;
 	}

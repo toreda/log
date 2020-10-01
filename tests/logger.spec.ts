@@ -20,66 +20,47 @@ describe('LogLogger', () => {
 				let custom = new Logger();
 				expect(custom).toBeInstanceOf(Logger);
 			});
-
-			it('should instantiate when events is not an EventEmitter', () => {
-				let custom = new Logger(undefined);
-				expect(custom.events).toBeInstanceOf(EventEmitter);
-			});
-
-			it('should instantiate and use events when it is given', () => {
-				let expectedV = new EventEmitter();
-				let custom = new Logger(expectedV);
-				expect(custom.events).toBe(expectedV);
-			});
-
-			it('should start with empty listeners', () => {
-				let custom = new Logger();
-				expect(custom.listeners).toStrictEqual({});
-				expect(custom.listenerNames).toStrictEqual([]);
-			});
-
-			it('should use defaults levels if not given custom ones', () => {
-				let custom = new Logger();
-				expect(custom.levels).toStrictEqual(DEFAULT_STATE.levels);
-			});
-
-			it('should use levels given in options', () => {
-				let expectedV = ['fatal', 'issue', 'info'];
-				let custom = new Logger(undefined, {levels: expectedV});
-				expect(custom.levels).toStrictEqual(expectedV);
-			});
-
-			it.todo('should create function for each level');
-		});
-
-		describe('parseEvents', () => {
-			it.each`
-				events  | expected              | because
-				${null} | ${'new EventEmitter'} | ${'null'}
-				${{}}   | ${'new EventEmitter'} | ${'not an EventEmitter'}
-			`('should return $expected when events is $because', ({events}) => {
-				let result = instance.parseEvents(events as any);
-				expect(result).toBeInstanceOf(EventEmitter);
-				expect(result).not.toBe(events);
-			});
-
-			it('should return events when events is an EventEmitter', () => {
-				let events = new EventEmitter();
-				let result = instance.parseEvents(events);
-				expect(result).toBe(events);
-			});
 		});
 
 		describe('parseOptions', () => {
-			it('should return default state if options is undefined', () => {
-				expect(instance.parseOptions(null!)).toStrictEqual(DEFAULT_STATE);
-				expect(instance.parseOptions(undefined)).toStrictEqual(DEFAULT_STATE);
-			});
+			it('should always return a LoggerState', () => {
+				let result = instance.parseOptions(undefined);
 
-			it('should return edited default state', () => {
-				let expectedV = {...DEFAULT_STATE};
-				expectedV.levels = ['crash', 'debug', 'basic'];
-				expect(instance.parseOptions(expectedV)).toStrictEqual(expectedV);
+				expect(result.events).toBeInstanceOf(EventEmitter);
+				expect(typeof result.id).toBe('string');
+				expect(Array.isArray(result.levels)).toBe(true);
+				expect(result.listenerNames).toStrictEqual([]);
+				expect(result.listeners).toStrictEqual({});
+			});
+		});
+
+		describe('parseOptionsEvents', () => {
+			it('should always return an EventEmitter', () => {
+				expect(instance.parseOptionsEvents(undefined)).toBeInstanceOf(EventEmitter);
+				expect(instance.parseOptionsEvents({} as any)).toBeInstanceOf(EventEmitter);
+
+				let expectedV = new EventEmitter();
+				expect(instance.parseOptionsEvents(expectedV)).toBe(expectedV);
+			});
+		});
+
+		describe('parseOptionsId', () => {
+			it('should always return a string', () => {
+				expect(typeof instance.parseOptionsId(undefined)).toBe('string');
+				expect(typeof instance.parseOptionsId({} as any)).toBe('string');
+
+				let expectedV = 'testing id';
+				expect(instance.parseOptionsId(expectedV)).toBe(expectedV);
+			});
+		});
+
+		describe('parseOptionsLevels', () => {
+			it('should always return an array', () => {
+				expect(Array.isArray(instance.parseOptionsLevels(undefined))).toBe(true);
+				expect(Array.isArray(instance.parseOptionsLevels({} as any))).toBe(true);
+
+				let expectedV = ['test level 1', 'test level 2'];
+				expect(instance.parseOptionsLevels(expectedV)).toBe(expectedV);
 			});
 		});
 	});
@@ -87,8 +68,8 @@ describe('LogLogger', () => {
 	describe('Helpers', () => {
 		describe('parseLevel', () => {
 			it('should return max levelNum and its levelStr if level is null', () => {
-				let expectedNum = instance.levels.length - 1;
-				let expectedStr = instance.levels[expectedNum];
+				let expectedNum = instance.state.levels.length - 1;
+				let expectedStr = instance.state.levels[expectedNum];
 				let {levelNum: resultNum, levelStr: resultStr} = instance.parseLevel(undefined);
 				expect(resultNum).toBe(expectedNum);
 				expect(resultStr).toBe(expectedStr);
@@ -100,7 +81,7 @@ describe('LogLogger', () => {
 				${'string'} | ${'Str'}
 			`('should return levelNum and levelStr if level is a $type', ({arg}) => {
 				it.each([0, 1, 2, 3, 4])('level[%p]', (expectedNum) => {
-					let expectedV = {Num: expectedNum, Str: instance.levels[expectedNum]};
+					let expectedV = {Num: expectedNum, Str: instance.state.levels[expectedNum]};
 					let {levelNum: resultNum, levelStr: resultStr} = instance.parseLevel(expectedV[arg]);
 					expect(resultNum).toBe(expectedV.Num);
 					expect(resultStr).toBe(expectedV.Str);
@@ -110,7 +91,7 @@ describe('LogLogger', () => {
 			it.each([-50, -1, 0, 1, 50])('should always return a levelNum in levels range, %p', (level) => {
 				let result = instance.parseLevel(level);
 				expect(result.levelNum).toBeGreaterThanOrEqual(0);
-				expect(result.levelNum).toBeLessThan(instance.levels.length);
+				expect(result.levelNum).toBeLessThan(instance.state.levels.length);
 			});
 		});
 	});
@@ -133,24 +114,24 @@ describe('LogLogger', () => {
 		];
 
 		beforeEach(() => {
-			instance.listenerNames.forEach((lsn, idx, arr) => {
+			instance.state.listenerNames.forEach((lsn, idx, arr) => {
 				instance.removeListener(lsn);
 			});
 		});
 
 		describe('attachListener', () => {
 			it('should add listener to Logger.listeners', () => {
-				expect(instance.listenerNames.length).toBe(0);
+				expect(instance.state.listenerNames.length).toBe(0);
 
 				instance.attachListener(0);
-				expect(instance.listenerNames.length).toBe(1);
+				expect(instance.state.listenerNames.length).toBe(1);
 
 				instance.attachListener(1);
-				expect(instance.listenerNames.length).toBe(2);
+				expect(instance.state.listenerNames.length).toBe(2);
 			});
 
 			it.each(testSuite)('should return new LogListener, target is %p: %p', (type: any, target: any) => {
-				expect(instance.listenerNames.length).toBe(0);
+				expect(instance.state.listenerNames.length).toBe(0);
 
 				let result = instance.attachListener(target);
 				expect(result.code).toBe(ArmorActionResultCode.SUCCESS);
@@ -158,9 +139,9 @@ describe('LogLogger', () => {
 			});
 
 			it('should return with target as payload if target is LogListener', () => {
-				expect(instance.listenerNames.length).toBe(0);
+				expect(instance.state.listenerNames.length).toBe(0);
 
-				let expectedV = new LogListener(instance.events, instance);
+				let expectedV = new LogListener(instance, instance.state.events);
 
 				let result = instance.attachListener(expectedV);
 				expect(result.code).toBe(ArmorActionResultCode.SUCCESS);
@@ -168,17 +149,17 @@ describe('LogLogger', () => {
 			});
 
 			it('should use name if name is defined and target is not a LogListener', () => {
-				expect(instance.listenerNames.length).toBe(0);
+				expect(instance.state.listenerNames.length).toBe(0);
 
 				let expectedV = 'test name';
 
 				let result = instance.attachListener(0, expectedV);
 				expect(result.code).toBe(ArmorActionResultCode.SUCCESS);
-				expect(result.payload.name).toBe(expectedV);
+				expect(result.payload.state.name).toBe(expectedV);
 			});
 
 			it('should return a failure if new collides with preexisting listener', () => {
-				expect(instance.listenerNames.length).toBe(0);
+				expect(instance.state.listenerNames.length).toBe(0);
 
 				let collision = 'testname';
 
@@ -194,7 +175,7 @@ describe('LogLogger', () => {
 			it.each(testSuite.filter((v) => v[0] === 'string'))(
 				'should return a LogListener if one exists, %p: %p',
 				(type: any, name: any) => {
-					expect(instance.listenerNames.length).toBe(0);
+					expect(instance.state.listenerNames.length).toBe(0);
 					expect(instance.chooseListener(name)).toBeUndefined();
 					let expectedV = instance.attachListener(0, name);
 					expect(expectedV.code).toBe(ArmorActionResultCode.SUCCESS);
@@ -209,7 +190,7 @@ describe('LogLogger', () => {
 				[1, 1],
 				[5, 2]
 			])('should return a LogListener if one exists, "number": %p', (index: any, fixed: any) => {
-				expect(instance.listenerNames.length).toBe(0);
+				expect(instance.state.listenerNames.length).toBe(0);
 
 				expect(instance.chooseListener(index)).toBeUndefined();
 
@@ -218,10 +199,10 @@ describe('LogLogger', () => {
 					instance.attachListener();
 				}
 
-				expect(instance.listenerNames.length).toBe(limit);
-				let expectedV = instance.listenerNames[fixed];
+				expect(instance.state.listenerNames.length).toBe(limit);
+				let expectedV = instance.state.listenerNames[fixed];
 
-				expect(instance.chooseListener(index).name).toBe(expectedV);
+				expect(instance.chooseListener(index).state.name).toBe(expectedV);
 			});
 		});
 
@@ -254,7 +235,7 @@ describe('LogLogger', () => {
 			});
 
 			it('should return null if it not found', () => {
-				expect(instance.listenerNames.length).toBe(0);
+				expect(instance.state.listenerNames.length).toBe(0);
 
 				let spy = jest.spyOn(instance, 'chooseListener').mockReturnValueOnce(null!);
 
@@ -264,7 +245,7 @@ describe('LogLogger', () => {
 			});
 
 			it('should return null if target is null', () => {
-				expect(instance.listenerNames.length).toBe(0);
+				expect(instance.state.listenerNames.length).toBe(0);
 
 				let result = instance.removeListener(null!);
 				expect(result.code).toBe(ArmorActionResultCode.FAILURE);
@@ -272,24 +253,24 @@ describe('LogLogger', () => {
 			});
 
 			it('should remove target from listeners and listenerNames', () => {
-				expect(instance.listenerNames.length).toBe(0);
+				expect(instance.state.listenerNames.length).toBe(0);
 
 				let listener = instance.attachListener();
-				expect(instance.listenerNames.length).toBe(1);
+				expect(instance.state.listenerNames.length).toBe(1);
 				expect(listener.code).toBe(ArmorActionResultCode.SUCCESS);
-				expect(instance.chooseListener(listener.payload.name)).toBeDefined();
+				expect(instance.chooseListener(listener.payload.state.name)).toBeDefined();
 
 				let result = instance.removeListener(listener.payload);
-				expect(instance.listenerNames.length).toBe(0);
+				expect(instance.state.listenerNames.length).toBe(0);
 				expect(result.code).toBe(ArmorActionResultCode.SUCCESS);
-				expect(instance.chooseListener(result.payload.name)).toBeUndefined();
+				expect(instance.chooseListener(result.payload.state.name)).toBeUndefined();
 			});
 
 			it('should disable target listener', () => {
-				expect(instance.listenerNames.length).toBe(0);
+				expect(instance.state.listenerNames.length).toBe(0);
 
 				let listener = instance.attachListener();
-				let logs = listener.payload.logs;
+				let logs = listener.payload.state.logs;
 				expect(logs.length).toBe(0);
 
 				instance.log(0, 'log-listener test message 1');
@@ -325,7 +306,7 @@ describe('LogLogger', () => {
 			});
 
 			it('should emit a "LogEvent" with a message containing {levelNum, levelStr, message}', () => {
-				let spy = jest.spyOn(instance.events, 'emit');
+				let spy = jest.spyOn(instance.state.events, 'emit');
 				instance.log('');
 				expect(spy).toBeCalled();
 			});

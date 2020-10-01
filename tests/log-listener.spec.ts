@@ -7,87 +7,97 @@ describe('LogLogger', () => {
 
 	beforeAll(() => {
 		let logger = new Logger();
-		instance = new LogListener(logger.events, logger, 2, 'test listener');
+		instance = new LogListener(logger, logger.state.events, {level: 2});
 	});
 
 	beforeEach(() => {
-		instance.logs.length = 0;
+		instance.state.logs.length = 0;
 	});
 
 	describe('Constructor', () => {
 		describe('contructor', () => {
 			let events = new EventEmitter();
-			let parent = new Logger(events);
-
-			it('should throw if events is missing', () => {
-				expect(() => {
-					let custom = new LogListener(undefined!, parent);
-				}).toThrow('LogListener init failed - no events argument provided.');
-			});
-
-			it('should throw if event is not an EventEmitter', () => {
-				expect(() => {
-					let custom = new LogListener({} as EventEmitter, parent);
-				}).toThrow('LogListener init failed - events argument not a valid EventEmitter instance.');
-			});
+			let parent = new Logger({events: events});
 
 			it('should throw if parent is missing', () => {
 				expect(() => {
-					let custom = new LogListener(events, undefined!);
+					let custom = new LogListener(undefined!, events);
 				}).toThrow('LogListener init failed - no parent argument provided.');
 			});
 
 			it('should throw if parent is not a Logger', () => {
 				expect(() => {
-					let custom = new LogListener(events, {} as Logger);
+					let custom = new LogListener({} as Logger, events);
 				}).toThrow('LogListener init failed - parent argument not a valid Logger instance.');
 			});
 
-			it('should default to 0 if level is undefined', () => {
-				let expectedV = 0;
-				let custom = new LogListener(events, parent);
-				expect(custom.levelNum).toBe(expectedV);
-				expect(custom.levelStr).toBe(parent.levels[expectedV]);
+			it('should throw if events is missing', () => {
+				expect(() => {
+					let custom = new LogListener(parent, undefined!);
+				}).toThrow('LogListener init failed - no events argument provided.');
 			});
 
-			it('should use level if it is given as number', () => {
-				let expectedV = 2;
-				let custom = new LogListener(events, parent, expectedV);
-				expect(custom.levelNum).toBe(expectedV);
-				expect(custom.levelStr).toBe(parent.levels[expectedV]);
-			});
-
-			it('should use level if it is given as string', () => {
-				let expectedV = 'info';
-				let custom = new LogListener(events, parent, 'info');
-				expect(custom.levelStr).toBe(expectedV);
-				expect(custom.levelNum).toBe(parent.levels.findIndex((level) => level == expectedV));
-			});
-
-			it('should default to "" if name is undefined', () => {
-				let expectedV = '';
-				let custom = new LogListener(events, parent);
-				expect(custom.name).toBe(expectedV);
-			});
-
-			it('should use name if it is given', () => {
-				let expectedV = 'test-name';
-				let custom = new LogListener(events, parent, undefined, expectedV);
-				expect(custom.name).toBe(expectedV);
-			});
-
-			it('should replace this.action if action is given', () => {
-				let expectedV = (arg) => 'test return';
-				let custom = new LogListener(events, parent, undefined, undefined, expectedV);
-				expect(custom.action(undefined!)).toBe(expectedV(undefined));
+			it('should throw if event is not an EventEmitter', () => {
+				expect(() => {
+					let custom = new LogListener(parent, {} as EventEmitter);
+				}).toThrow('LogListener init failed - events argument not a valid EventEmitter instance.');
 			});
 
 			it('should call enable', () => {
 				events.removeAllListeners();
-				let custom = new LogListener(events, parent);
+				let custom = new LogListener(parent, events);
 				expect(custom.events.listenerCount('LogEvent')).toBe(1);
 				custom.disable();
 				expect(custom.events.listenerCount('LogEvent')).toBe(0);
+			});
+		});
+
+		describe('parseOptions', () => {
+			it('should always return a LogListenerState', () => {
+				let result = instance.parseOptions(undefined);
+
+				expect(typeof result.action).toBe('function');
+				expect(result.levelNum).toBe(0);
+				expect(result.levelStr).toBe('error');
+				expect(result.logs).toStrictEqual([]);
+				expect(result.name).toBe('');
+			});
+		});
+
+		describe('parseOptionsAction', () => {
+			it('should always return a function', () => {
+				expect(typeof instance.parseOptionsAction(undefined)).toBe('function');
+
+				let expectedV = () => {};
+				expect(instance.parseOptionsAction(expectedV)).toBe(expectedV);
+			});
+		});
+
+		describe('parseOptionsLevelNum', () => {
+			it('should always return a number', () => {
+				let expectInfoNum = 2;
+				expect(instance.parseOptionsLevelNum(undefined)).toBe(0);
+				expect(instance.parseOptionsLevelNum('1')).toBe(0);
+				expect(instance.parseOptionsLevelNum(2)).toBe(expectInfoNum);
+				expect(instance.parseOptionsLevelNum('info')).toBe(expectInfoNum);
+			});
+		});
+
+		describe('parseOptionsLevelStr', () => {
+			it('should always return a string', () => {
+				let expectInfoStr = 'info';
+				expect(instance.parseOptionsLevelStr(undefined)).toBe('error');
+				expect(instance.parseOptionsLevelStr('1')).toBe('error');
+				expect(instance.parseOptionsLevelStr(2)).toBe(expectInfoStr);
+				expect(instance.parseOptionsLevelStr('info')).toBe(expectInfoStr);
+			});
+		});
+
+		describe('parseOptionsName', () => {
+			it('should always return a string', () => {
+				expect(instance.parseOptionsName(undefined)).toBe('');
+				expect(instance.parseOptionsName(2 as any)).toBe('');
+				expect(instance.parseOptionsName('testing name')).toBe('testing name');
 			});
 		});
 	});
@@ -107,7 +117,7 @@ describe('LogLogger', () => {
 					levelNum: 0,
 					levelStr: 'error'
 				});
-				expect(instance.logs.length).toBe(0);
+				expect(instance.state.logs.length).toBe(0);
 			});
 
 			it('should add message if message level >= listener level', () => {
@@ -116,7 +126,7 @@ describe('LogLogger', () => {
 					levelNum: 4,
 					levelStr: 'trace'
 				});
-				expect(instance.logs.length).toBe(1);
+				expect(instance.state.logs.length).toBe(1);
 			});
 		});
 	});
@@ -179,20 +189,20 @@ describe('LogLogger', () => {
 			it('should create string[] of messages with levelNum < level', () => {
 				let expectedCount = 0;
 				let expectedLog = '';
-				expect(instance.logs.length).toBe(expectedCount);
-				instance.levelNum = 0;
-				instance.levelStr = instance.parent.levels[0];
+				expect(instance.state.logs.length).toBe(expectedCount);
+				instance.state.levelNum = 0;
+				instance.state.levelStr = instance.parent.state.levels[0];
 
 				for (; expectedCount < 10; expectedCount++) {
 					instance.parent.log(
-						expectedCount % instance.parent.levels.length,
+						expectedCount % instance.parent.state.levels.length,
 						'logger test message ' + expectedCount
 					);
 				}
-				expect(instance.logs.length).toBe(expectedCount);
+				expect(instance.state.logs.length).toBe(expectedCount);
 
 				let filterLevel = 2;
-				let logs = instance.logs
+				let logs = instance.state.logs
 					.filter((log) => {
 						return log.levelNum <= filterLevel;
 					})
@@ -200,7 +210,7 @@ describe('LogLogger', () => {
 						return `${log.levelStr.toUpperCase()}: ${JSON.stringify(log.message)}`;
 					});
 
-				expectedLog = `${instance.name}: ${instance.levelStr}\n`;
+				expectedLog = `${instance.state.name}: ${instance.state.levelStr}\n`;
 				expectedLog += logs.join('\n');
 				instance.showLogs(filterLevel);
 				expect(logOutput).toStrictEqual(expectedLog);
