@@ -1,6 +1,7 @@
 import {ArmorActionResult} from '@armorjs/action-result';
 import {EventEmitter} from 'events';
 import {LogListener} from './log-listener';
+import {LogListenerOptions} from './log-listener-options';
 import {LogMessage} from './log-message';
 import {LoggerOptions} from './logger-options';
 import {LoggerState} from './logger-state';
@@ -93,7 +94,7 @@ export class Logger {
 		};
 	}
 
-	public attachListener(target?: number | string | LogListener, name?: string): ArmorActionResult {
+	public attachListener(target?: number | string | LogListener, opts?: LogListenerOptions): ArmorActionResult {
 		const result = new ArmorActionResult();
 
 		let listener: LogListener;
@@ -101,12 +102,17 @@ export class Logger {
 		if (target instanceof LogListener) {
 			listener = target;
 		} else {
-			let n = name;
-			if (name == null) {
-				n = this.state.listenerNames.length.toString();
+			let options: LogListenerOptions = {};
+
+			if (opts != null) {
+				options = opts;
 			}
 
-			listener = new LogListener(this, this.state.events, {level: target, name: n});
+			if (options.name == null) {
+				options.name = this.state.listenerNames.length.toString();
+			}
+
+			listener = new LogListener(this, this.state.events, options);
 		}
 
 		if (this.state.listeners[listener.state.name]) {
@@ -182,7 +188,7 @@ export class Logger {
 			message: args
 		};
 
-		this.state.events.emit('LogEvent', logMessage);
+		this.state.events.emit('LogEvent' + this.state.id, logMessage);
 
 		return this;
 	}

@@ -46,17 +46,23 @@ describe('LogLogger', () => {
 			it('should call enable', () => {
 				events.removeAllListeners();
 				let custom = new LogListener(parent, events);
-				expect(custom.events.listenerCount('LogEvent')).toBe(1);
+				expect(custom.events.listenerCount(custom.state.eventId)).toBe(1);
 				custom.disable();
-				expect(custom.events.listenerCount('LogEvent')).toBe(0);
+				expect(custom.events.listenerCount(custom.state.eventId)).toBe(0);
 			});
 		});
 
 		describe('parseOptions', () => {
 			it('should always return a LogListenerState', () => {
 				let result = instance.parseOptions(undefined);
+				let expectedV = ['action', 'eventId', 'levelNum', 'levelStr', 'logs', 'name'];
+
+				let resultKeys = Object.keys(result).sort((a, b) => (a < b ? -1 : +1));
+
+				expect(resultKeys).toStrictEqual(expectedV);
 
 				expect(typeof result.action).toBe('function');
+				expect(result.eventId).toContain('LogEvent');
 				expect(result.levelNum).toBe(0);
 				expect(result.levelStr).toBe('error');
 				expect(result.logs).toStrictEqual([]);

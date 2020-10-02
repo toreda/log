@@ -39,6 +39,7 @@ export class LogListener {
 	public parseOptions(options: LogListenerOptions = {}): LogListenerState {
 		return {
 			action: this.parseOptionsAction(options.action),
+			eventId: 'LogEvent' + this.parent.state.id,
 			levelNum: this.parseOptionsLevelNum(options.level),
 			levelStr: this.parseOptionsLevelStr(options.level),
 			logs: [],
@@ -102,11 +103,11 @@ export class LogListener {
 	}
 
 	public enable(): void {
-		this.events.on('LogEvent', this.handleMessage);
+		this.events.on(this.state.eventId, this.handleMessage);
 	}
 
 	public disable(): void {
-		this.events.off('LogEvent', this.handleMessage);
+		this.events.off(this.state.eventId, this.handleMessage);
 	}
 
 	public showLogs(level?: number | string): void {

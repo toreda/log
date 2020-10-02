@@ -5,6 +5,7 @@ import {Logger} from './logger';
 
 export interface LogListenerState {
 	action: LogEvent;
+	eventId: string;
 	levelNum: number;
 	levelStr: string;
 	logs: LogMessage[];
