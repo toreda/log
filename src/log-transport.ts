@@ -1,5 +1,5 @@
 import {LogMessage} from './log-message';
-import {LogTransportAction} from './log-transport-Action';
+import {LogTransportAction} from './log-transport-action';
 import {LogTransportOptions} from './log-transport-options';
 import {LogTransportState} from './log-transport-state';
 import {makeString} from '@toreda/type-box';
