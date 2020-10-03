@@ -26,6 +26,7 @@ describe('Logger', () => {
 		describe('parseOptions', () => {
 			it('should always return a LoggerState', () => {
 				let result = instance.parseOptions(undefined);
+
 				let expectedV = ['id', 'consoleEnabled', 'transportNames', 'transportGroups'];
 				expectedV.sort((a, b) => (a < b ? -1 : +1));
 

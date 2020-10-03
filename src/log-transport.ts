@@ -10,7 +10,7 @@ export class LogTransport {
 
 	constructor(action: LogTransportAction, options?: LogTransportOptions) {
 		if (typeof action !== 'function') {
-			throw new Error('LogTransport init failed - callback should be a function');
+			throw new Error('LogTransport init failed - action should be a function');
 		}
 
 		this.action = action;
@@ -32,7 +32,7 @@ export class LogTransport {
 		try {
 			await this.action(logMessage);
 		} catch (error) {
-			console.error(`Transport (${this.state.id}) execute failed - ${error.message}`);
+			console.error(`Transport (${this.state.id()}) execute failed - ${error.message}`);
 		}
 	}
 }
