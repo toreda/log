@@ -1,9 +1,12 @@
+import {appendFileSync, unlinkSync} from 'fs';
+
 import {ArmorActionResultCode} from '@armorjs/action-result';
-import {EventEmitter} from 'events';
-import {LogListener} from '../src/log-listener';
+import {LogLevels} from '../src/log-levels';
+import {LogTransport} from '../src/log-transport';
+import {LogTransportAction} from '../src/log-transport-action';
 import {Logger} from '../src/logger';
 
-describe('LogLogger', () => {
+describe('Logger', () => {
 	let instance: Logger;
 
 	beforeAll(() => {
@@ -23,317 +26,223 @@ describe('LogLogger', () => {
 		describe('parseOptions', () => {
 			it('should always return a LoggerState', () => {
 				let result = instance.parseOptions(undefined);
-				let expectedV = ['events', 'id', 'levels', 'listenerNames', 'listeners'];
+				let expectedV = ['id', 'consoleEnabled', 'transportNames', 'transportGroups'];
+				expectedV.sort((a, b) => (a < b ? -1 : +1));
 
 				let resultKeys = Object.keys(result).sort((a, b) => (a < b ? -1 : +1));
 
 				expect(resultKeys).toStrictEqual(expectedV);
 
-				expect(result.events).toBeInstanceOf(EventEmitter);
-				expect(typeof result.id).toBe('string');
-				expect(Array.isArray(result.levels)).toBe(true);
-				expect(result.listenerNames).toStrictEqual([]);
-				expect(result.listeners).toStrictEqual({});
-			});
-		});
-
-		describe('parseOptionsEvents', () => {
-			it('should always return an EventEmitter', () => {
-				expect(instance.parseOptionsEvents(undefined)).toBeInstanceOf(EventEmitter);
-				expect(instance.parseOptionsEvents({} as any)).toBeInstanceOf(EventEmitter);
-
-				let expectedV = new EventEmitter();
-				expect(instance.parseOptionsEvents(expectedV)).toBe(expectedV);
-			});
-		});
-
-		describe('parseOptionsId', () => {
-			it('should always return a string', () => {
-				expect(typeof instance.parseOptionsId(undefined)).toBe('string');
-				expect(typeof instance.parseOptionsId({} as any)).toBe('string');
-
-				let expectedV = 'testing id';
-				expect(instance.parseOptionsId(expectedV)).toBe(expectedV);
-			});
-		});
-
-		describe('parseOptionsLevels', () => {
-			it('should always return an array', () => {
-				expect(Array.isArray(instance.parseOptionsLevels(undefined))).toBe(true);
-				expect(Array.isArray(instance.parseOptionsLevels({} as any))).toBe(true);
-
-				let expectedV = ['test level 1', 'test level 2'];
-				expect(instance.parseOptionsLevels(expectedV)).toBe(expectedV);
+				expect(result.transportNames).toStrictEqual({});
+				expect(result.transportGroups).toStrictEqual({});
 			});
 		});
 	});
 
-	describe('Helpers', () => {
-		describe('parseLevel', () => {
-			let testSuite = [
-				['number', 'Num'],
-				['string', 'Str']
-			];
-
-			it('should return max levelNum and its levelStr if level is null', () => {
-				let expectedNum = instance.state.levels.length - 1;
-				let expectedStr = instance.state.levels[expectedNum];
-				let {levelNum: resultNum, levelStr: resultStr} = instance.parseLevel(undefined);
-				expect(resultNum).toBe(expectedNum);
-				expect(resultStr).toBe(expectedStr);
-			});
-
-			describe.each(testSuite)('should return levelNum and levelStr if level is a $p', (type, arg) => {
-				it.each([0, 1, 2, 3, 4])('level[%p]', (expectedNum) => {
-					let expectedV = {Num: expectedNum, Str: instance.state.levels[expectedNum]};
-					let {levelNum: resultNum, levelStr: resultStr} = instance.parseLevel(expectedV[arg]);
-					expect(resultNum).toBe(expectedV.Num);
-					expect(resultStr).toBe(expectedV.Str);
-				});
-			});
-
-			it.each([-50, -1, 0, 1, 50])('should always return a levelNum in levels range, %p', (level) => {
-				let result = instance.parseLevel(level);
-				expect(result.levelNum).toBeGreaterThanOrEqual(0);
-				expect(result.levelNum).toBeLessThan(instance.state.levels.length);
-			});
-		});
-	});
+	describe('Helpers', () => {});
 
 	describe('Implementation', () => {
-		let testSuite = [
-			['null', null],
-			['number', -9],
-			['number', -1],
-			['number', 0],
-			['number', 1],
-			['number', 9],
-			['string', ''],
-			['string', '-5'],
-			['string', '-1'],
-			['string', '0'],
-			['string', '1'],
-			['string', '5'],
-			['string', 'abc'],
-			[-5, 0],
-			[-1, 2],
-			[0, 0],
-			[1, 1],
-			[5, 2]
-		];
+		let reuseTransport: LogTransport;
+		let groupsForEach: Function;
+		let spy: jest.SpyInstance;
+
+		beforeAll(() => {
+			let action: LogTransportAction = () => {
+				return new Promise((resolve, reject) => {
+					return resolve();
+				});
+			};
+
+			reuseTransport = new LogTransport(action);
+
+			spy = jest.spyOn(reuseTransport, 'execute');
+
+			groupsForEach = (func) => {
+				Object.keys(instance.state.transportGroups).forEach((key) => {
+					func(instance.state.transportGroups[key]);
+				});
+			};
+		});
 
 		beforeEach(() => {
-			instance.state.listenerNames.forEach((lsn) => {
-				instance.removeListener(lsn);
-			});
+			instance.state.transportNames = {};
+			instance.state.transportGroups = {};
+
+			spy.mockClear();
+
+			expect(Object.keys(instance.state.transportNames).length).toBe(0);
+			groupsForEach((group) => expect(group.length).toBe(0));
 		});
 
-		describe('attachListener', () => {
-			it('should add listener to Logger.listeners', () => {
-				expect(instance.state.listenerNames.length).toBe(0);
-
-				instance.attachListener(0);
-				expect(instance.state.listenerNames.length).toBe(1);
-
-				instance.attachListener(1);
-				expect(instance.state.listenerNames.length).toBe(2);
-			});
-
-			it.each(testSuite.filter((v) => typeof v[0] === 'string'))(
-				'should return new LogListener, target is %p: %p',
-				(type: any, target: any) => {
-					expect(instance.state.listenerNames.length).toBe(0);
-
-					let result = instance.attachListener(target);
-					expect(result.code).toBe(ArmorActionResultCode.SUCCESS);
-					expect(result.payload).toBeInstanceOf(LogListener);
-				}
-			);
-
-			it('should return with target as payload if target is LogListener', () => {
-				expect(instance.state.listenerNames.length).toBe(0);
-
-				let expectedV = new LogListener(instance, instance.state.events);
-
-				let result = instance.attachListener(expectedV);
+		describe('attachTransport', () => {
+			it('should succeed and increase transportNames.length if transport was a LogTransport', () => {
+				let result = instance.attachTransport(reuseTransport);
 				expect(result.code).toBe(ArmorActionResultCode.SUCCESS);
-				expect(result.payload).toBe(expectedV);
+				expect(Object.keys(instance.state.transportNames).length).toBe(1);
 			});
 
-			it('should use options if defined and target is not a LogListener', () => {
-				let mockParseOptions = jest.fn().mockImplementation(() => {});
-				let origParseOptions = LogListener.prototype.parseOptions;
-
-				LogListener.prototype.parseOptions = mockParseOptions;
-
-				let expectedV = {
-					action: 'mock action',
-					level: 'mock level',
-					name: 'mock name'
-				};
-
-				expect(() => {
-					instance.attachListener(0, expectedV as any);
-				}).toThrow();
-				expect(mockParseOptions).toBeCalledWith(expectedV);
-				mockParseOptions.mockRestore();
-
-				LogListener.prototype.parseOptions = origParseOptions;
-			});
-
-			it('should return a failure if options.name collides with preexisting listener', () => {
-				expect(instance.state.listenerNames.length).toBe(0);
-
-				let collision = 'testname';
-
-				let resultPass = instance.attachListener(0, {name: collision});
-				expect(resultPass.code).toBe(ArmorActionResultCode.SUCCESS);
-
-				let resultFail = instance.attachListener(0, {name: collision});
-				expect(resultFail.code).toBe(ArmorActionResultCode.FAILURE);
-			});
-		});
-
-		describe('chooseListener', () => {
-			it.each(testSuite.filter((v) => v[0] === 'string'))(
-				'should return a LogListener if one exists, %p: %p',
-				(type: any, name: any) => {
-					expect(instance.state.listenerNames.length).toBe(0);
-					expect(instance.chooseListener(name)).toBeUndefined();
-					let expectedV = instance.attachListener(0, {name: name});
-					expect(expectedV.code).toBe(ArmorActionResultCode.SUCCESS);
-					expect(instance.chooseListener(name)).toBe(expectedV.payload);
-				}
-			);
-
-			it.each(testSuite.filter((v) => typeof v[0] === 'number'))(
-				'should return a LogListener if one exists, "number": %p',
-				(index: any, fixed: any) => {
-					expect(instance.state.listenerNames.length).toBe(0);
-
-					expect(instance.chooseListener(index)).toBeUndefined();
-
-					let limit = 3;
-					for (let i = 0; i < limit; i++) {
-						instance.attachListener();
-					}
-
-					expect(instance.state.listenerNames.length).toBe(limit);
-					let expectedV = instance.state.listenerNames[fixed];
-
-					expect(instance.chooseListener(index).state.name).toBe(expectedV);
-				}
-			);
-		});
-
-		describe('removeListener', () => {
-			it('should return removed listener if target is LogListener', () => {
-				let expectedV = instance.attachListener();
-				let result = instance.removeListener(expectedV.payload);
-				expect(result.payload).toBe(expectedV.payload);
-			});
-
-			it('should call chooseListener if target is a number or string', () => {
-				let spy = jest.spyOn(instance, 'chooseListener');
-				let expectedCalls = 0;
-
-				instance.removeListener('');
-				expectedCalls++;
-				expect(spy).toBeCalledTimes(expectedCalls);
-
-				instance.removeListener('abc');
-				expectedCalls++;
-				expect(spy).toBeCalledTimes(expectedCalls);
-
-				instance.removeListener(0);
-				expectedCalls++;
-				expect(spy).toBeCalledTimes(expectedCalls);
-
-				instance.removeListener(1);
-				expectedCalls++;
-				expect(spy).toBeCalledTimes(expectedCalls);
-			});
-
-			it('should return null if it not found', () => {
-				expect(instance.state.listenerNames.length).toBe(0);
-
-				let spy = jest.spyOn(instance, 'chooseListener').mockReturnValueOnce(null!);
-
-				let result = instance.removeListener(0);
-				expect(result.code).toBe(ArmorActionResultCode.FAILURE);
-				expect(result.payload).toBeNull();
-			});
-
-			it('should return null if target is null', () => {
-				expect(instance.state.listenerNames.length).toBe(0);
-
-				let result = instance.removeListener(null!);
-				expect(result.code).toBe(ArmorActionResultCode.FAILURE);
-				expect(result.payload).toBeNull();
-			});
-
-			it('should remove target from listeners and listenerNames', () => {
-				expect(instance.state.listenerNames.length).toBe(0);
-
-				let listener = instance.attachListener();
-				expect(instance.state.listenerNames.length).toBe(1);
-				expect(listener.code).toBe(ArmorActionResultCode.SUCCESS);
-				expect(instance.chooseListener(listener.payload.state.name)).toBeDefined();
-
-				let result = instance.removeListener(listener.payload);
-				expect(instance.state.listenerNames.length).toBe(0);
+			it('should succeed and increase transportGroups[level].length if transport was a LogTransport', () => {
+				let result = instance.attachTransport(reuseTransport);
 				expect(result.code).toBe(ArmorActionResultCode.SUCCESS);
-				expect(instance.chooseListener(result.payload.state.name)).toBeUndefined();
+				groupsForEach((group) => expect(group.length).toBe(1));
 			});
 
-			it('should disable target listener', () => {
-				expect(instance.state.listenerNames.length).toBe(0);
+			it('should succeed and return LogTransport if transport was a LogTransport', () => {
+				let result = instance.attachTransport(reuseTransport);
+				expect(result.code).toBe(ArmorActionResultCode.SUCCESS);
+				expect(result.payload).toBe(reuseTransport);
+			});
 
-				let listener = instance.attachListener();
-				let logs = listener.payload.state.logs;
-				expect(logs.length).toBe(0);
+			it('should fail if transport was not a LogTransport', () => {
+				let result = instance.attachTransport(undefined!);
 
-				instance.log(0, 'logger test message 1');
-				expect(logs.length).toBe(1);
+				expect(result.code).toBe(ArmorActionResultCode.FAILURE);
+				expect(result.state.errors.map((err) => err.message)).toContain('transport is not a LogTransport');
+			});
+		});
 
-				instance.removeListener(listener.payload);
-				instance.log(0, 'logger test message 2');
-				expect(logs.length).toBe(1);
+		describe('removeTransport', () => {
+			it('should succeed and decrease transportNames.length if transport was removed', () => {
+				expect(instance.attachTransport(reuseTransport).code).toBe(ArmorActionResultCode.SUCCESS);
+				expect(Object.keys(instance.state.transportNames).length).toBe(1);
+
+				let result = instance.removeTransport(reuseTransport);
+				expect(result.code).toBe(ArmorActionResultCode.SUCCESS);
+				expect(Object.keys(instance.state.transportNames).length).toBe(0);
+			});
+
+			it('should succeed and decrease transportGroups[level].length if transport was removed', () => {
+				expect(instance.attachTransport(reuseTransport).code).toBe(ArmorActionResultCode.SUCCESS);
+				groupsForEach((group) => expect(group.length).toBe(1));
+
+				let result = instance.removeTransport(reuseTransport);
+				expect(result.code).toBe(ArmorActionResultCode.SUCCESS);
+				groupsForEach((group) => expect(group.length).toBe(0));
+			});
+
+			it('should succeed and return LogTransport if transport was removed', () => {
+				expect(instance.attachTransport(reuseTransport).code).toBe(ArmorActionResultCode.SUCCESS);
+
+				let result = instance.removeTransport(reuseTransport);
+				expect(result.code).toBe(ArmorActionResultCode.SUCCESS);
+				expect(result.payload).toBe(reuseTransport);
+			});
+
+			it('should fail if transport was not a LogTransport', () => {
+				expect(instance.attachTransport(reuseTransport).code).toBe(ArmorActionResultCode.SUCCESS);
+
+				let result = instance.removeTransport(undefined!);
+				expect(result.code).toBe(ArmorActionResultCode.FAILURE);
+				expect(result.state.errors.map((err) => err.message)).toContain('transport is not a LogTransport');
 			});
 		});
 
 		describe('log', () => {
-			it('should call parseLevel with level arg', () => {
-				let spy = jest.spyOn(instance, 'parseLevel');
-				let expectedV = 0;
-				expect(spy).toBeCalledTimes(expectedV);
-
-				instance.log('');
-				expectedV++;
-				expect(spy).toBeCalledTimes(expectedV);
-
-				instance.log(4);
-				expectedV++;
-				expect(spy).toBeCalledTimes(expectedV);
-
-				instance.log('warn');
-				expectedV++;
-				expect(spy).toBeCalledTimes(expectedV);
-
-				instance.log('not valid');
-				expectedV++;
-				expect(spy).toBeCalledTimes(expectedV);
+			it('should not throw if not args are passed', () => {
+				expect(() => {
+					instance.log(undefined!);
+				}).not.toThrow();
 			});
 
-			it('should emit a "LogEvent" with a message containing {levelNum, levelStr, message}', () => {
-				let spy = jest.spyOn(instance.state.events, 'emit');
-				instance.log('');
-				expect(spy).toBeCalled();
+			it('should execute transport action if transport level matches args', () => {
+				let expectedCalls = 0;
+
+				instance.attachTransport(reuseTransport, [LogLevels.ERROR, LogLevels.DEBUG]);
+
+				expectedCalls++;
+				instance.debug('debug test message - seen');
+				expect(spy).toBeCalledTimes(expectedCalls);
+
+				expectedCalls++;
+				instance.error('error test message - seen');
+				expect(spy).toBeCalledTimes(expectedCalls);
+
+				instance.info('info test message - unseen');
+				expect(spy).toBeCalledTimes(expectedCalls);
+
+				instance.warn('warn test message - unseen');
+				expect(spy).toBeCalledTimes(expectedCalls);
 			});
 
-			it('should return Logger', () => {
-				expect(instance.log('')).toBe(instance);
+			it.each`
+				toLog
+				${'string test message'}
+				${1357924680}
+				${[1, 2, 3, 4]}
+				${{test: 'object message'}}
+			`('should call execute with logMessage, $toLog', ({toLog}) => {
+				instance.attachTransport(reuseTransport);
+				let funcCalls = 0;
+				let result: any;
+				let expectedV = {
+					level: LogLevels[1],
+					message: '' as any
+				};
+
+				instance.log(LogLevels[expectedV.level]);
+				result = spy.mock.calls[funcCalls][0];
+				delete result.date;
+				expect(result).toStrictEqual(expectedV);
+				funcCalls++;
+
+				expectedV.message = toLog;
+				instance.log(LogLevels[expectedV.level], toLog);
+				result = spy.mock.calls[funcCalls][0];
+				delete result.date;
+				expect(result).toStrictEqual(expectedV);
+				funcCalls++;
+
+				let secondParam = 'second test string';
+				expectedV.message = [expectedV.message].concat(secondParam);
+				instance.log(LogLevels[expectedV.level], toLog, secondParam);
+				result = spy.mock.calls[funcCalls][0];
+				delete result.date;
+				expect(result).toStrictEqual(expectedV);
+				funcCalls++;
 			});
+		});
+	});
+
+	describe('Total Functionality', () => {
+		let name: string;
+		let path: string;
+
+		beforeAll(() => {
+			name = 'Log File';
+			path = 'tests/' + name + '.txt';
+			try {
+				unlinkSync(path);
+			} catch (err) {}
+			appendFileSync(path, '[{},' + '\n');
+		});
+
+		afterAll(() => {
+			appendFileSync(path, '{}]' + '\n');
+		});
+
+		it('should create/find file and post logs there', () => {
+			const action: LogTransportAction = (logMessage) => {
+				return new Promise((resolve, reject) => {
+					const message = JSON.stringify(logMessage);
+					// console.log(message);
+					appendFileSync(path, message + ',\n');
+					return resolve();
+				});
+			};
+
+			expect(typeof action).toBe('function');
+			const transport = new LogTransport(action);
+
+			let result = instance.attachTransport(transport, LogLevels.INFO);
+
+			expect(result.code).toBe(ArmorActionResultCode.SUCCESS);
+			expect(result.payload).toBeInstanceOf(LogTransport);
+
+			instance.error('message 0');
+			instance.warn('message 1');
+			instance.info({mes: 'sage'});
+			instance.debug([12, 3, 4, 5]);
+			instance.trace('message 4');
 		});
 	});
 });

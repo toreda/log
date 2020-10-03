@@ -1,10 +1,10 @@
-import {EventEmitter} from 'events';
-import {LogListener} from './log-listener';
+import {TBBool, TBString} from '@toreda/type-box';
+
+import {LogTransport} from './log-transport';
 
 export interface LoggerState {
-	events: EventEmitter;
-	id: string;
-	levels: string[];
-	listenerNames: string[];
-	listeners: {[name: string]: LogListener};
+	id: TBString;
+	consoleEnabled: TBBool;
+	transportNames: {[id: string]: LogTransport};
+	transportGroups: {[name: number]: string[]};
 }
