@@ -29,10 +29,6 @@ export class LogTransport {
 	}
 
 	public async execute(logMessage: LogMessage): Promise<any> {
-		try {
-			await this.action(logMessage);
-		} catch (error) {
-			console.error(`Transport (${this.state.id()}) execute failed - ${error.message}`);
-		}
+		return await this.action(logMessage);
 	}
 }
