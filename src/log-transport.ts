@@ -13,15 +13,6 @@ export class LogTransport {
 			throw new Error('LogTransport init failed - execute should be a function');
 		}
 
-		try {
-			let executeType = execute({} as any).catch(() => {});
-			if (!(executeType instanceof Promise)) {
-				throw '';
-			}
-		} catch (error) {
-			throw new Error('LogTransport init failed - execute should return a Promise');
-		}
-
 		this.execute = execute;
 		this.state = this.parseOptions(options);
 	}

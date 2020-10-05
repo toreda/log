@@ -61,13 +61,13 @@ describe('Logger', () => {
 				});
 			};
 
-			reuseTransport = new LogTransport(action);
+			reuseTransport = new LogTransport(action, {id: 'reusable'});
 
 			spy = jest.spyOn(reuseTransport, 'execute');
 
 			groupsForEach = (func: Function) => {
-				Object.keys(instance.state.transportGroups).forEach((key) => {
-					func(instance.state.transportGroups[key]);
+				Object.keys(instance.state.transportGroups).forEach((key, index) => {
+					func(instance.state.transportGroups[key], index);
 				});
 			};
 		});
@@ -161,6 +161,45 @@ describe('Logger', () => {
 				let result = instance.removeTransport(undefined!);
 				expect(result.code).toBe(ArmorActionResultCode.FAILURE);
 				expect(result.state.errors.map((err) => err.message)).toContain('transport is not a LogTransport');
+			});
+
+			it('should succeed but not remove anything if transport was not attached', () => {
+				expect(instance.attachTransport(new LogTransport(action)).code).toBe(ArmorActionResultCode.SUCCESS);
+
+				expect(Object.keys(instance.state.transportNames).length).toBe(1);
+				groupsForEach((group) => expect(group.length).toBe(1));
+
+				let result = instance.removeTransport(reuseTransport);
+				expect(result.code).toBe(ArmorActionResultCode.SUCCESS);
+				expect(result.payload).toBe(reuseTransport);
+
+				expect(Object.keys(instance.state.transportNames).length).toBe(1);
+				groupsForEach((group) => expect(group.length).toBe(1));
+			});
+
+			it('should succeed only call splice on groups transport is in', () => {
+				expect(instance.attachTransport(reuseTransport, LogLevels.ERROR).code).toBe(
+					ArmorActionResultCode.SUCCESS
+				);
+				let expectedGroupSize = [1, 0, 0, 0, 0];
+
+				expect(Object.keys(instance.state.transportNames).length).toBe(1);
+				groupsForEach((group, index) => expect(group.length).toBe(expectedGroupSize[index]));
+
+				let spies: jest.SpyInstance[] = [];
+				groupsForEach((group) => {
+					spies.push(jest.spyOn(group, 'splice'));
+				});
+
+				let result = instance.removeTransport(reuseTransport);
+				expect(result.code).toBe(ArmorActionResultCode.SUCCESS);
+				expect(result.payload).toBe(reuseTransport);
+
+				expect(Object.keys(instance.state.transportNames).length).toBe(0);
+				groupsForEach((group) => expect(group.length).toBe(0));
+				spies.forEach((spliceSpy, index) => {
+					expect(spliceSpy).toBeCalledTimes(expectedGroupSize[index]);
+				});
 			});
 		});
 

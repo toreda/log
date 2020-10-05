@@ -46,12 +46,6 @@ describe('Logger', () => {
 				}).toThrow('LogTransport init failed - execute should be a function');
 			});
 
-			it('should throw if execute does not return a promise', () => {
-				expect(() => {
-					new LogTransport((): any => {});
-				}).toThrow('LogTransport init failed - execute should return a Promise');
-			});
-
 			it('should call parseOptions', () => {
 				let spy = jest.spyOn(LogTransport.prototype, 'parseOptions').mockReturnValueOnce(null!);
 				new LogTransport(execute);
