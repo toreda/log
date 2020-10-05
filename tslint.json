@@ -4,9 +4,7 @@
 		"indent": [true, "tabs"],
 		"interface-name": [false],
 		"max-line-length": {
-			"options": [
-				90
-			]
+			"options": [90]
 		},
 		"member-ordering": {
 			"severity": "warning",
@@ -15,10 +13,7 @@
 					"order": [
 						{
 							"name": "static non-private",
-							"kinds": [
-								"public-static-field",
-								"protected-static-field"
-							]
+							"kinds": ["public-static-field", "protected-static-field"]
 						}
 					]
 				}
@@ -27,7 +22,7 @@
 		"new-parens": true,
 		"no-arg": true,
 		"no-bitwise": {
-			"severity": "error",
+			"severity": "warning",
 			"options": [true]
 		},
 		"no-conditional-assignment": {
@@ -40,14 +35,7 @@
 		},
 		"no-console": {
 			"severity": "none",
-			"options": [
-				"debug",
-				"info",
-				"log",
-				"time",
-				"timeEnd",
-				"trace"
-			]
+			"options": ["debug", "info", "log", "time", "timeEnd", "trace"]
 		},
 		"no-duplicate-variable": {
 			"severity": "error",
@@ -87,9 +75,7 @@
 	"defaultSeverity": "warning",
 	"jsRules": {
 		"max-line-length": {
-			"options": [
-				120
-			]
+			"options": [120]
 		}
 	}
 }
