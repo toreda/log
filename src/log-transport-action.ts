@@ -1,5 +1,3 @@
 import {LogMessage} from './log-message';
 
-export interface LogTransportAction {
-	(logMessage: LogMessage): Promise<any>;
-}
+export type LogTransportAction = (logMessage: LogMessage) => Promise<any>;

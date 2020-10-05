@@ -71,10 +71,10 @@ export class Logger {
 			return result.complete();
 		}
 
-		let target = this.state.transportNames[transport.state.id()];
+		const target = this.state.transportNames[transport.state.id()];
 		if (target === transport) {
-			for (let level in this.state.transportGroups) {
-				let index = this.state.transportGroups[level].indexOf(transport.state.id());
+			for (const level in this.state.transportGroups) {
+				const index = this.state.transportGroups[level].indexOf(transport.state.id());
 				if (index >= 0) {
 					this.state.transportGroups[level].splice(index, 1);
 				}

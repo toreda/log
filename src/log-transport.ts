@@ -34,9 +34,13 @@ export class LogTransport {
 		return execute;
 	}
 
-	public defaultAction: LogTransportAction = (msg) => {
+	public defaultAction: LogTransportAction = function (logMessage) {
 		return new Promise((resolve) => {
-			console.log(`[${msg.date}] ${msg.level.toUpperCase()}: ${msg.message}`);
+			let logString = '';
+			logString += `[${logMessage.date}]`;
+			logString += ` ${logMessage.level.toUpperCase()}:`;
+			logString += ` ${logMessage.message}`;
+			console.log(logString);
 			resolve();
 		});
 	};
