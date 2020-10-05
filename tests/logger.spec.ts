@@ -17,6 +17,12 @@ describe('Logger', () => {
 
 	describe('Constructor', () => {
 		describe('contructor', () => {
+			it('should call parseOptions', () => {
+				let spy = jest.spyOn(Logger.prototype, 'parseOptions').mockReturnValueOnce(null!);
+				new Logger();
+				expect(spy).toBeCalledTimes(1);
+			});
+
 			it('should instantiate when no args are given', () => {
 				let custom = new Logger();
 				expect(custom).toBeInstanceOf(Logger);
@@ -46,9 +52,10 @@ describe('Logger', () => {
 		let reuseTransport: LogTransport;
 		let groupsForEach: Function;
 		let spy: jest.SpyInstance;
+		let action: LogTransportAction;
 
 		beforeAll(() => {
-			let action: LogTransportAction = () => {
+			action = () => {
 				return new Promise((resolve, reject) => {
 					return resolve();
 				});
@@ -58,7 +65,7 @@ describe('Logger', () => {
 
 			spy = jest.spyOn(reuseTransport, 'execute');
 
-			groupsForEach = (func) => {
+			groupsForEach = (func: Function) => {
 				Object.keys(instance.state.transportGroups).forEach((key) => {
 					func(instance.state.transportGroups[key]);
 				});
@@ -127,6 +134,25 @@ describe('Logger', () => {
 				let result = instance.removeTransport(reuseTransport);
 				expect(result.code).toBe(ArmorActionResultCode.SUCCESS);
 				expect(result.payload).toBe(reuseTransport);
+			});
+
+			it('should succeed when multiple LogTransports exist', () => {
+				let limit = 5;
+				for (let i = 0; i < limit; i++) {
+					expect(instance.attachTransport(new LogTransport(action)).code).toBe(ArmorActionResultCode.SUCCESS);
+				}
+
+				expect(instance.attachTransport(reuseTransport).code).toBe(ArmorActionResultCode.SUCCESS);
+
+				expect(Object.keys(instance.state.transportNames).length).toBe(limit + 1);
+				groupsForEach((group) => expect(group.length).toBe(limit + 1));
+
+				let result = instance.removeTransport(reuseTransport);
+				expect(result.code).toBe(ArmorActionResultCode.SUCCESS);
+				expect(result.payload).toBe(reuseTransport);
+
+				expect(Object.keys(instance.state.transportNames).length).toBe(limit);
+				groupsForEach((group) => expect(group.length).toBe(limit));
 			});
 
 			it('should fail if transport was not a LogTransport', () => {

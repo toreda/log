@@ -5,15 +5,24 @@ import {LogTransportState} from './log-transport-state';
 import {makeString} from '@toreda/type-box';
 
 export class LogTransport {
-	public readonly action: LogTransportAction;
+	public readonly execute: LogTransportAction;
 	public readonly state: LogTransportState;
 
-	constructor(action: LogTransportAction, options?: LogTransportOptions) {
-		if (typeof action !== 'function') {
-			throw new Error('LogTransport init failed - action should be a function');
+	constructor(execute: LogTransportAction, options?: LogTransportOptions) {
+		if (typeof execute !== 'function') {
+			throw new Error('LogTransport init failed - execute should be a function');
 		}
 
-		this.action = action;
+		try {
+			let executeType = execute({} as any).catch(() => {});
+			if (!(executeType instanceof Promise)) {
+				throw '';
+			}
+		} catch (error) {
+			throw new Error('LogTransport init failed - execute should return a Promise');
+		}
+
+		this.execute = execute;
 		this.state = this.parseOptions(options);
 	}
 
@@ -26,9 +35,5 @@ export class LogTransport {
 			id: makeString(options.id, randomId),
 			logs: []
 		};
-	}
-
-	public async execute(logMessage: LogMessage): Promise<any> {
-		return await this.action(logMessage);
 	}
 }
