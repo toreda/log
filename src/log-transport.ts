@@ -1,19 +1,12 @@
-import {LogMessage} from './log-message';
 import {LogTransportAction} from './log-transport-action';
 import {LogTransportOptions} from './log-transport-options';
 import {LogTransportState} from './log-transport-state';
 import {makeString} from '@toreda/type-box';
 
 export class LogTransport {
-	public readonly execute: LogTransportAction;
 	public readonly state: LogTransportState;
 
-	constructor(execute: LogTransportAction, options?: LogTransportOptions) {
-		if (typeof execute !== 'function') {
-			throw new Error('LogTransport init failed - execute should be a function');
-		}
-
-		this.execute = execute;
+	constructor(options?: LogTransportOptions) {
 		this.state = this.parseOptions(options);
 	}
 
@@ -23,8 +16,28 @@ export class LogTransport {
 		const randomId = ('0'.repeat(size) + randomInt.toString()).slice(-1 * size);
 
 		return {
+			execute: this.parseOptionsExecute(options.execute),
 			id: makeString(options.id, randomId),
 			logs: []
 		};
 	}
+
+	public parseOptionsExecute(execute?: LogTransportAction): LogTransportAction {
+		if (!execute) {
+			return this.defaultAction;
+		}
+
+		if (typeof execute !== 'function') {
+			throw new Error('LogTransport init failed - execute should be a function');
+		}
+
+		return execute;
+	}
+
+	public defaultAction: LogTransportAction = (msg) => {
+		return new Promise((resolve) => {
+			console.log(`[${msg.date}] ${msg.level.toUpperCase()}: ${msg.message}`);
+			resolve();
+		});
+	};
 }

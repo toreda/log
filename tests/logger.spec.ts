@@ -61,9 +61,9 @@ describe('Logger', () => {
 				});
 			};
 
-			reuseTransport = new LogTransport(action, {id: 'reusable'});
+			reuseTransport = new LogTransport({execute: action, id: 'reusable'});
 
-			spy = jest.spyOn(reuseTransport, 'execute');
+			spy = jest.spyOn(reuseTransport.state, 'execute');
 
 			groupsForEach = (func: Function) => {
 				Object.keys(instance.state.transportGroups).forEach((key, index) => {
@@ -139,7 +139,9 @@ describe('Logger', () => {
 			it('should succeed when multiple LogTransports exist', () => {
 				let limit = 5;
 				for (let i = 0; i < limit; i++) {
-					expect(instance.attachTransport(new LogTransport(action)).code).toBe(ArmorActionResultCode.SUCCESS);
+					expect(instance.attachTransport(new LogTransport({execute: action})).code).toBe(
+						ArmorActionResultCode.SUCCESS
+					);
 				}
 
 				expect(instance.attachTransport(reuseTransport).code).toBe(ArmorActionResultCode.SUCCESS);
@@ -164,7 +166,9 @@ describe('Logger', () => {
 			});
 
 			it('should succeed but not remove anything if transport was not attached', () => {
-				expect(instance.attachTransport(new LogTransport(action)).code).toBe(ArmorActionResultCode.SUCCESS);
+				expect(instance.attachTransport(new LogTransport({execute: action})).code).toBe(
+					ArmorActionResultCode.SUCCESS
+				);
 
 				expect(Object.keys(instance.state.transportNames).length).toBe(1);
 				groupsForEach((group) => expect(group.length).toBe(1));
@@ -178,13 +182,17 @@ describe('Logger', () => {
 			});
 
 			it('should succeed only call splice on groups transport is in', () => {
+				expect(instance.attachTransport(new LogTransport({execute: action})).code).toBe(
+					ArmorActionResultCode.SUCCESS
+				);
 				expect(instance.attachTransport(reuseTransport, LogLevels.ERROR).code).toBe(
 					ArmorActionResultCode.SUCCESS
 				);
-				let expectedGroupSize = [1, 0, 0, 0, 0];
+				let expectedGroupSizeInitial = [2, 1, 1, 1, 1];
+				let expectedSizeFinal = 1;
 
-				expect(Object.keys(instance.state.transportNames).length).toBe(1);
-				groupsForEach((group, index) => expect(group.length).toBe(expectedGroupSize[index]));
+				expect(Object.keys(instance.state.transportNames).length).toBe(2);
+				groupsForEach((group, index) => expect(group.length).toBe(expectedGroupSizeInitial[index]));
 
 				let spies: jest.SpyInstance[] = [];
 				groupsForEach((group) => {
@@ -195,10 +203,10 @@ describe('Logger', () => {
 				expect(result.code).toBe(ArmorActionResultCode.SUCCESS);
 				expect(result.payload).toBe(reuseTransport);
 
-				expect(Object.keys(instance.state.transportNames).length).toBe(0);
-				groupsForEach((group) => expect(group.length).toBe(0));
+				expect(Object.keys(instance.state.transportNames).length).toBe(expectedSizeFinal);
+				groupsForEach((group) => expect(group.length).toBe(expectedSizeFinal));
 				spies.forEach((spliceSpy, index) => {
-					expect(spliceSpy).toBeCalledTimes(expectedGroupSize[index]);
+					expect(spliceSpy).toBeCalledTimes(expectedGroupSizeInitial[index] - expectedSizeFinal);
 				});
 			});
 		});
@@ -290,14 +298,13 @@ describe('Logger', () => {
 			const action: LogTransportAction = (logMessage) => {
 				return new Promise((resolve, reject) => {
 					const message = JSON.stringify(logMessage);
-					// console.log(message);
 					appendFileSync(path, message + ',\n');
 					return resolve();
 				});
 			};
 
 			expect(typeof action).toBe('function');
-			const transport = new LogTransport(action);
+			const transport = new LogTransport({execute: action});
 
 			let result = instance.attachTransport(transport, LogLevels.INFO);
 

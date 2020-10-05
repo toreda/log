@@ -114,7 +114,7 @@ export class Logger {
 			}
 
 			for (const transportId of this.state.transportGroups[currentLevel]) {
-				this.state.transportNames[transportId].execute(logMessage);
+				this.state.transportNames[transportId].state.execute(logMessage);
 			}
 		}
 

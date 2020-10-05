@@ -19,11 +19,11 @@ describe('Logger', () => {
 		message: 'threw'
 	};
 
-	let execute: LogTransportAction;
+	let action: LogTransportAction;
 	let instance: LogTransport;
 
 	beforeAll(() => {
-		execute = (logMessage) => {
+		action = (logMessage) => {
 			return new Promise((resolve, reject) => {
 				if (logMessage.message == 'resolved') {
 					resolve(logMessage.message);
@@ -35,50 +35,78 @@ describe('Logger', () => {
 			});
 		};
 
-		instance = new LogTransport(execute);
+		instance = new LogTransport({execute: action});
 	});
 
 	describe('Constructor', () => {
 		describe('constructor', () => {
-			it('should throw if execute is not a funciton', () => {
-				expect(() => {
-					new LogTransport(undefined!);
-				}).toThrow('LogTransport init failed - execute should be a function');
-			});
-
 			it('should call parseOptions', () => {
 				let spy = jest.spyOn(LogTransport.prototype, 'parseOptions').mockReturnValueOnce(null!);
-				new LogTransport(execute);
+				new LogTransport();
 				expect(spy).toBeCalledTimes(1);
 			});
 		});
 
 		describe('parseOptions', () => {
 			it('should always return a LoggerState', () => {
-				let result = instance.parseOptions(undefined);
-				let expectedV = ['id', 'logs'];
+				let expectedV = ['execute', 'id', 'logs'];
 				expectedV.sort((a, b) => (a < b ? -1 : +1));
+
+				let result = instance.parseOptions(undefined);
 				let resultKeys = Object.keys(result).sort((a, b) => (a < b ? -1 : +1));
+
 				expect(resultKeys).toStrictEqual(expectedV);
 				expect(result.logs).toStrictEqual([]);
+				expect(typeof result.execute).toBe('function');
+			});
+		});
+
+		describe('parseOptionsExecute', () => {
+			it('should return a promise function if execute was undefined', () => {
+				expect(instance.parseOptionsExecute()).toBe(instance.defaultAction);
+			});
+
+			it('should throw if execute is not a funciton', () => {
+				expect(() => {
+					instance.parseOptionsExecute({} as any);
+				}).toThrow('LogTransport init failed - execute should be a function');
+			});
+
+			it('should return execute if it was a function', () => {
+				expect(instance.parseOptionsExecute(action)).toBe(action);
 			});
 		});
 	});
 
 	describe('Helpers', () => {
+		describe('defaultAction', () => {
+			it('should call console log with logMessage data', () => {
+				let spy = jest.spyOn(console, 'log').mockImplementation();
+				let expectedV = '';
+				expectedV += `[${LOG_MESSAGE_RESOLVE.date}]`;
+				expectedV += ` ${LOG_MESSAGE_RESOLVE.level.toUpperCase()}:`;
+				expectedV += ` ${LOG_MESSAGE_RESOLVE.message}`;
+
+				instance.defaultAction(LOG_MESSAGE_RESOLVE);
+
+				expect(spy).toBeCalledWith(expectedV);
+				spy.mockRestore();
+			});
+		});
+
 		describe('execute', () => {
 			it('should return resolved message', async () => {
-				await expect(instance.execute(LOG_MESSAGE_RESOLVE)).resolves.toBe(LOG_MESSAGE_RESOLVE.message);
-				await expect(instance.execute(LOG_MESSAGE_RESOLVE)).resolves.not.toThrow();
+				await expect(instance.state.execute(LOG_MESSAGE_RESOLVE)).resolves.toBe(LOG_MESSAGE_RESOLVE.message);
+				await expect(instance.state.execute(LOG_MESSAGE_RESOLVE)).resolves.not.toThrow();
 			}, 100);
 
 			it('should return rejected message', async () => {
-				await expect(instance.execute(LOG_MESSAGE_REJECT)).rejects.toBe(LOG_MESSAGE_REJECT.message);
-				await expect(instance.execute(LOG_MESSAGE_REJECT)).rejects.not.toThrow();
+				await expect(instance.state.execute(LOG_MESSAGE_REJECT)).rejects.toBe(LOG_MESSAGE_REJECT.message);
+				await expect(instance.state.execute(LOG_MESSAGE_REJECT)).rejects.not.toThrow();
 			}, 100);
 
 			it('should throw message', async () => {
-				await expect(instance.execute(LOG_MESSAGE_THROW)).rejects.toThrow(LOG_MESSAGE_THROW.message);
+				await expect(instance.state.execute(LOG_MESSAGE_THROW)).rejects.toThrow(LOG_MESSAGE_THROW.message);
 			}, 100);
 		});
 	});
