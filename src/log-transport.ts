@@ -34,7 +34,7 @@ export class LogTransport {
 		return execute;
 	}
 
-	public defaultAction: LogTransportAction = (logMessage) => {
+	public defaultAction: LogTransportAction = function (logMessage) {
 		return new Promise((resolve) => {
 			let logString = '';
 			logString += `[${logMessage.date}]`;

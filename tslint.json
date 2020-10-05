@@ -59,12 +59,12 @@
 		},
 		"radix": false,
 		"semicolon": {
-			"severity": "error",
+			"severity": "warning",
 			"options": ["always"]
 		},
 		"trailing-comma": false,
 		"triple-equals": {
-			"severity": "error",
+			"severity": "warning",
 			"options": [true]
 		},
 		"typedef": {
