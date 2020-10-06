@@ -1,5 +1,3 @@
-import {makeBool, makeString} from '@toreda/type-box';
-
 import {ArmorActionResult} from '@armorjs/action-result';
 import {LogLevels} from './log-levels';
 import {LogMessage} from './log-message';
@@ -8,23 +6,10 @@ import {LoggerOptions} from './logger-options';
 import {LoggerState} from './logger-state';
 
 export class Logger {
-	public state: LoggerState;
+	public readonly state: LoggerState;
 
 	public constructor(options?: LoggerOptions) {
-		this.state = this.parseOptions(options);
-	}
-
-	public parseOptions(options: LoggerOptions = {}): LoggerState {
-		const size = 5;
-		const randomInt = Math.floor(Math.random() * Math.pow(10, size));
-		const randomId = ('0'.repeat(size) + randomInt.toString()).slice(-1 * size);
-
-		return {
-			consoleEnabled: makeBool(options.consoleEnabled, false),
-			id: makeString(options.id, randomId),
-			transportNames: {},
-			transportGroups: {}
-		};
+		this.state = new LoggerState(options);
 	}
 
 	public attachTransport(transport: LogTransport, levels?: LogLevels | LogLevels[]): ArmorActionResult {
@@ -58,7 +43,21 @@ export class Logger {
 			this.state.transportGroups[lvl].push(transport.state.id());
 		});
 
+		result.payload = transport.state.id();
 		return result.complete();
+	}
+
+	public getTransportFromId(id: string): LogTransport | null {
+		if (typeof id !== 'string') {
+			return null;
+		}
+
+		const transport = this.state.transportNames[id];
+		if (!transport) {
+			return null;
+		}
+
+		return transport;
 	}
 
 	public removeTransport(transport: LogTransport): ArmorActionResult {
@@ -114,7 +113,7 @@ export class Logger {
 			}
 
 			for (const transportId of this.state.transportGroups[currentLevel]) {
-				this.state.transportNames[transportId].state.execute(logMessage);
+				this.state.transportNames[transportId].execute(logMessage);
 			}
 		}
 

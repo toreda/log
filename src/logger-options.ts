@@ -1,4 +1,4 @@
 export interface LoggerOptions {
 	id?: string;
-	consoleEnabled?: boolean;
+	serializedState?: string;
 }
