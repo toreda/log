@@ -22,6 +22,7 @@
 		"web",
 		"stable",
 		"standards driven",
+		"toreda",
 		"lightweight"
 	],
 	"author": "Michael Brich",
@@ -44,6 +45,8 @@
 	},
 	"dependencies": {
 		"@armorjs/action-result": "^0.0.1",
+		"@toreda/map": "^0.1.3",
+		"@toreda/type-box": "^0.6.0",
 		"event-emitter": "^0.3.5"
 	}
 }

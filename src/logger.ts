@@ -1,178 +1,151 @@
 import {ArmorActionResult} from '@armorjs/action-result';
-import {EventEmitter} from 'events';
-import {LogListener} from './log-listener';
+import {LogLevels} from './log-levels';
 import {LogMessage} from './log-message';
-import {LogOptions} from './log-options';
-import {LogState} from './log-state';
+import {LogTransport} from './log-transport';
+import {LoggerOptions} from './logger-options';
+import {LoggerState} from './logger-state';
 
 export class Logger {
-	public events: EventEmitter;
-	public levels: string[];
-	public listeners: {[name: string]: LogListener};
-	public listenerNames: string[];
+	public readonly state: LoggerState;
 
-	public constructor(events?: EventEmitter, options?: LogOptions) {
-		this.listeners = {};
-		this.listenerNames = [];
+	public constructor(options?: LoggerOptions) {
+		this.state = new LoggerState(options);
+	}
 
-		this.events = this.parseEvents(events);
+	public attachTransport(transport: LogTransport, levels?: LogLevels | LogLevels[]): ArmorActionResult {
+		const result = new ArmorActionResult();
+		result.state.failOnError.enabled = true;
+		result.payload = transport;
 
-		const state = this.parseOptions(options);
+		if (!transport || !(transport instanceof LogTransport)) {
+			result.error(new Error('transport is not a LogTransport'));
+			return result.complete();
+		}
 
-		this.levels = state.levels;
+		let logLevels: LogLevels[];
 
-		this.levels.forEach((level) => {
-			this[level] = function (...args: any): Logger {
-				return this.log.apply(this, [level].concat(args));
-			};
+		if (levels == null) {
+			logLevels = [LogLevels.ERROR, LogLevels.WARN, LogLevels.INFO, LogLevels.DEBUG, LogLevels.TRACE];
+		} else if (Array.isArray(levels)) {
+			logLevels = levels;
+		} else {
+			logLevels = [];
+			for (let lvl = 1; lvl <= levels; lvl *= 2) {
+				logLevels.push(lvl);
+			}
+		}
+
+		this.state.transportNames[transport.state.id()] = transport;
+		logLevels.forEach((lvl) => {
+			if (!this.state.transportGroups[lvl]) {
+				this.state.transportGroups[lvl] = [];
+			}
+			this.state.transportGroups[lvl].push(transport.state.id());
 		});
+
+		result.payload = transport.state.id();
+		return result.complete();
 	}
 
-	public parseEvents(events?: EventEmitter): EventEmitter {
-		if (!events) {
-			return new EventEmitter();
+	public getTransportFromId(id: string): LogTransport | null {
+		if (typeof id !== 'string') {
+			return null;
 		}
 
-		if (!(events instanceof EventEmitter)) {
-			return new EventEmitter();
+		const transport = this.state.transportNames[id];
+		if (!transport) {
+			return null;
 		}
 
-		return events;
+		return transport;
 	}
 
-	public parseOptions(options?: LogOptions): LogState {
-		const state: LogState = {
-			levels: ['error', 'warn', 'info', 'debug', 'trace']
-		};
-
-		if (options?.levels && Array.isArray(options.levels)) {
-			state.levels = options.levels;
-		}
-
-		return state;
-	}
-
-	public parseLevel(level?: number | string): {levelNum: number; levelStr: string} {
-		if (level == null) {
-			return {
-				levelNum: this.levels.length - 1,
-				levelStr: this.levels[this.levels.length - 1]
-			};
-		}
-
-		let levelNum: number;
-		let levelStr: string;
-
-		if (typeof level === 'string') {
-			levelStr = level;
-			levelNum = this.levels.findIndex((value) => {
-				return value === levelStr;
-			});
-		} else {
-			levelNum = level;
-		}
-
-		levelNum = Math.round(levelNum);
-		levelNum = Math.max(levelNum, 0);
-		levelNum = Math.min(levelNum, this.levels.length - 1);
-		levelStr = this.levels[levelNum];
-
-		return {
-			levelNum: levelNum,
-			levelStr: levelStr
-		};
-	}
-
-	public attachListener(target?: number | string | LogListener, name?: string): ArmorActionResult {
+	public removeTransport(transport: LogTransport): ArmorActionResult {
 		const result = new ArmorActionResult();
+		result.state.failOnError.enabled = true;
+		result.payload = transport;
 
-		let listener: LogListener;
+		if (!transport || !(transport instanceof LogTransport)) {
+			result.error(new Error('transport is not a LogTransport'));
+			return result.complete();
+		}
 
-		if (target instanceof LogListener) {
-			listener = target;
-		} else {
-			let n = name;
-			if (name == null) {
-				n = this.listenerNames.length.toString();
+		const target = this.state.transportNames[transport.state.id()];
+		if (target === transport) {
+			for (const level in this.state.transportGroups) {
+				const index = this.state.transportGroups[level].indexOf(transport.state.id());
+				if (index >= 0) {
+					this.state.transportGroups[level].splice(index, 1);
+				}
 			}
 
-			listener = new LogListener(this.events, this, target, n);
+			delete this.state.transportNames[transport.state.id()];
 		}
 
-		if (this.listeners[listener.name]) {
-			result.fail();
-			listener.disable();
-			return result;
-		}
-
-		this.listeners[listener.name] = listener;
-		this.listenerNames.push(listener.name);
-		result.payload = listener;
-		result.succeed();
-		return result;
+		return result.complete();
 	}
 
-	public chooseListener(target: number | string): LogListener {
-		let result: LogListener;
-		let name: string;
+	public log(level: LogLevels, ...args: any[]): Logger {
+		let message: any;
 
-		if (typeof target === 'number') {
-			let num = Math.round(target);
-			let max = this.listenerNames.length;
-			if (Math.abs(num) < max) {
-				num = (num + max) % max;
-			} else {
-				num = num >= 0 ? max - 1 : 0;
-			}
-			name = this.listenerNames[num];
+		if (args.length === 0) {
+			message = '';
+		} else if (args.length === 1) {
+			message = args[0];
 		} else {
-			name = target;
+			message = args;
 		}
-
-		result = this.listeners[name];
-
-		return result;
-	}
-
-	public removeListener(target: number | string | LogListener): ArmorActionResult {
-		const result = new ArmorActionResult();
-
-		if (target == null) {
-			result.fail();
-			return result;
-		}
-
-		let listener: LogListener;
-
-		if (target instanceof LogListener) {
-			listener = target;
-		} else {
-			listener = this.chooseListener(target);
-		}
-
-		if (!listener) {
-			result.fail();
-			return result;
-		}
-
-		listener.disable();
-		this.listenerNames = this.listenerNames.filter((name) => name !== listener.name);
-		delete this.listeners[listener.name];
-		result.payload = listener;
-		result.succeed();
-		return result;
-	}
-
-	public log(level: number | string, ...args: any[]): Logger {
-		const {levelNum, levelStr} = this.parseLevel(level);
 
 		const logMessage: LogMessage = {
-			levelNum: levelNum,
-			levelStr: levelStr,
-			message: args
+			date: new Date().toISOString(),
+			level: LogLevels[level],
+			message: message
 		};
 
-		this.events.emit('LogEvent', logMessage);
+		for (let bitMask = 1; bitMask <= 16; bitMask *= 2) {
+			const currentLevel = level & bitMask;
+			if (currentLevel === 0) {
+				continue;
+			}
+
+			if (!this.state.transportGroups[currentLevel]) {
+				continue;
+			}
+
+			for (const transportId of this.state.transportGroups[currentLevel]) {
+				this.state.transportNames[transportId].execute(logMessage);
+			}
+		}
+
+		return this;
+	}
+
+	public error(...args: any[]): Logger {
+		this.log.apply(this, [LogLevels.ERROR as any].concat(args));
+
+		return this;
+	}
+
+	public warn(...args: any[]): Logger {
+		this.log.apply(this, [LogLevels.WARN as any].concat(args));
+
+		return this;
+	}
+
+	public info(...args: any[]): Logger {
+		this.log.apply(this, [LogLevels.INFO as any].concat(args));
+
+		return this;
+	}
+
+	public debug(...args: any[]): Logger {
+		this.log.apply(this, [LogLevels.DEBUG as any].concat(args));
+
+		return this;
+	}
+
+	public trace(...args: any[]): Logger {
+		this.log.apply(this, [LogLevels.TRACE as any].concat(args));
 
 		return this;
 	}

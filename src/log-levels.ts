@@ -1,4 +1,4 @@
-export enum ArmorLogLevel {
+export enum LogLevels {
 	ERROR = 1,
 	WARN = 2,
 	INFO = 4,
