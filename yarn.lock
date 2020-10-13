@@ -479,6 +479,16 @@
   dependencies:
     "@sinonjs/commons" "^1.7.0"
 
+"@toreda/prettier-config@^1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@toreda/prettier-config/-/prettier-config-1.0.1.tgz#bd6c47352aa99560617f0f4a29f16ab7c3070b86"
+  integrity sha512-YE13umi84GlKSOVPAEN1WRsoAGPjT3C3VmOGORtQAeZm5bqayL7XRHQM/ifXaF1ZWSkzeEAXYEnFflmIen/4kw==
+
+"@toreda/strong-types@^0.9.0":
+  version "0.9.0"
+  resolved "https://registry.yarnpkg.com/@toreda/strong-types/-/strong-types-0.9.0.tgz#19074d76569f7fa0da02d3fff56945172e575776"
+  integrity sha512-kq239FFEFF5M64VI7nhDI3YXWYU/JsosDqTRJIdF5nG4rztAdX9R1Vw28bRfHbpw4rhVYiBTB459JG9oGbpEGQ==
+
 "@types/babel__core@^7.0.0", "@types/babel__core@^7.1.7":
   version "7.1.10"
   resolved "https://registry.yarnpkg.com/@types/babel__core/-/babel__core-7.1.10.tgz#ca58fc195dd9734e77e57c6f2df565623636ab40"
