@@ -8,18 +8,17 @@ export class LogTransportState extends Map {
 	public readonly id: TBString;
 	public readonly logs: TBArray<LogMessage>;
 
-	constructor(options?: LogTransportOptions) {
+	constructor(options: LogTransportOptions = {}) {
 		super();
+		this.logs = makeArray([], []);
+		this.id = this.parseOptionsId(options);
+	}
 
+	public parseOptionsId(options: LogTransportOptions = {}): TBString {
 		const size = 9;
 		const randomInt = Math.floor(Math.random() * Math.pow(10, size));
 		const randomId = ('0'.repeat(size) + randomInt.toString()).slice(-1 * size);
 
-		this.id = makeString(randomId, '');
-		this.logs = makeArray([], []);
-
-		if (options) {
-			this.parse(options);
-		}
+		return makeString(options.id, randomId);
 	}
 }

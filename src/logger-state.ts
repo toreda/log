@@ -9,19 +9,18 @@ export class LoggerState extends Map {
 	public transportNames: {[id: string]: LogTransport};
 	public transportGroups: {[name: number]: string[]};
 
-	constructor(options?: LoggerOptions) {
+	constructor(options: LoggerOptions = {}) {
 		super();
+		this.transportGroups = {};
+		this.transportNames = {};
+		this.id = this.parseOptionsId(options);
+	}
 
+	public parseOptionsId(options: LoggerOptions = {}): TBString {
 		const size = 5;
 		const randomInt = Math.floor(Math.random() * Math.pow(10, size));
 		const randomId = ('0'.repeat(size) + randomInt.toString()).slice(-1 * size);
 
-		this.id = makeString(randomId, '');
-		this.transportGroups = {};
-		this.transportNames = {};
-
-		if (options) {
-			this.parse(options);
-		}
+		return makeString(options.id, randomId);
 	}
 }

@@ -51,8 +51,8 @@ describe('Logger', () => {
 				expect(spy).toBeCalledTimes(1);
 			});
 
-			it('should call LogTransportState.parse', () => {
-				const spy = jest.spyOn(LogTransportState.prototype, 'parse').mockReturnValueOnce(null!);
+			it('should call LogTransportState.parseOptionsId', () => {
+				const spy = jest.spyOn(LogTransportState.prototype, 'parseOptionsId').mockReturnValueOnce(null!);
 
 				const expectedV = {
 					id: 'TestingId8624'

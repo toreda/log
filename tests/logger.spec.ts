@@ -18,8 +18,8 @@ describe('Logger', () => {
 
 	describe('Constructor', () => {
 		describe('contructor', () => {
-			it('should call LoggerState.parse', () => {
-				const spy = jest.spyOn(LoggerState.prototype, 'parse').mockReturnValueOnce(null!);
+			it('should call LoggerState.parseOptionsId', () => {
+				const spy = jest.spyOn(LoggerState.prototype, 'parseOptionsId').mockReturnValueOnce(null!);
 
 				const expectedV = {
 					id: 'TestingId9389'
