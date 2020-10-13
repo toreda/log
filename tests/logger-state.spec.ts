@@ -8,8 +8,8 @@ describe('LoggerState', () => {
 	});
 
 	describe('constructor', () => {
-		it('should call parseOptionsId with options', () => {
-			let spy = jest.spyOn(LoggerState.prototype, 'parseOptionsId');
+		it('should call parse with options', () => {
+			let spy = jest.spyOn(LoggerState.prototype, 'parse');
 			const expectedV = {
 				id: 'TestId124'
 			};
@@ -18,9 +18,11 @@ describe('LoggerState', () => {
 		});
 	});
 
-	describe('parseOptionsId', () => {
-		it.each([undefined, 9023, '', 'random string 8'])('should return a TBString: %p', (input) => {
-			expect(instance.parseOptionsId(input as any).typeId).toBe('TypeBox');
+	describe('randomId', () => {
+		it('should return a string of length 5', () => {
+			let result = instance.randomId();
+			expect(typeof result).toBe('string');
+			expect(result.length).toBe(5);
 		});
 	});
 });

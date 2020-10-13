@@ -361,6 +361,11 @@
   dependencies:
     "@toreda/type-box" "^0.5.7"
 
+"@toreda/strong-types@^0.9.0":
+  version "0.9.0"
+  resolved "https://registry.yarnpkg.com/@toreda/strong-types/-/strong-types-0.9.0.tgz#19074d76569f7fa0da02d3fff56945172e575776"
+  integrity sha512-kq239FFEFF5M64VI7nhDI3YXWYU/JsosDqTRJIdF5nG4rztAdX9R1Vw28bRfHbpw4rhVYiBTB459JG9oGbpEGQ==
+
 "@toreda/type-box@^0.5.7":
   version "0.5.7"
   resolved "https://registry.yarnpkg.com/@toreda/type-box/-/type-box-0.5.7.tgz#4ce5ca5c2b795818ff5f9e8c07cf9b44eeb18dc5"
