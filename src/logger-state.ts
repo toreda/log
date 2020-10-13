@@ -1,27 +1,27 @@
-import {TBBool, TBString, makeBool, makeString} from '@toreda/type-box';
+import {StrongMap, StrongString, makeString} from '@toreda/strong-types';
 
 import {LogTransport} from './log-transport';
 import {LoggerOptions} from './logger-options';
-import {Map} from '@toreda/map';
 
-export class LoggerState extends Map {
-	public readonly id: TBString;
+export class LoggerState extends StrongMap {
+	public readonly id: StrongString;
 	public transportNames: {[id: string]: LogTransport};
 	public transportGroups: {[name: number]: string[]};
 
-	constructor(options?: LoggerOptions) {
+	constructor(options: LoggerOptions = {}) {
 		super();
+		this.transportGroups = {};
+		this.transportNames = {};
+		this.id = makeString(this.randomId(), '');
 
+		this.parse(options);
+	}
+
+	public randomId(): string {
 		const size = 5;
 		const randomInt = Math.floor(Math.random() * Math.pow(10, size));
 		const randomId = ('0'.repeat(size) + randomInt.toString()).slice(-1 * size);
 
-		this.id = makeString(randomId, '');
-		this.transportGroups = {};
-		this.transportNames = {};
-
-		if (options) {
-			this.parse(options);
-		}
+		return randomId;
 	}
 }
