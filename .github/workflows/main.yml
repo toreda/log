@@ -4,10 +4,11 @@ name: CI
 
 on:
   # Trigger analysis when pushing in master or pull requests, and when creating
-  # a pull request. 
+  # a pull request.
   push:
     branches:
       - master
+      - develop
   pull_request:
       types: [opened, synchronize, reopened]
 jobs:
