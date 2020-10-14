@@ -1,19 +1,19 @@
-import {LoggerState} from '../src/logger-state';
+import {LogState} from '../../src/log/state';
 
-describe('LoggerState', () => {
-	let instance: LoggerState;
+describe('LogState', () => {
+	let instance: LogState;
 
 	beforeAll(() => {
-		instance = new LoggerState();
+		instance = new LogState();
 	});
 
 	describe('constructor', () => {
 		it('should call parse with options', () => {
-			let spy = jest.spyOn(LoggerState.prototype, 'parse');
+			let spy = jest.spyOn(LogState.prototype, 'parse');
 			const expectedV = {
 				id: 'TestId124'
 			};
-			new LoggerState(expectedV);
+			new LogState(expectedV);
 			expect(spy).toBeCalledWith(expectedV);
 		});
 	});

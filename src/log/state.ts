@@ -1,14 +1,14 @@
 import {StrongMap, StrongString, makeString} from '@toreda/strong-types';
 
-import {LogTransport} from './log-transport';
-import {LoggerOptions} from './logger-options';
+import {LogOptions} from './options';
+import {LogTransport} from './transport';
 
-export class LoggerState extends StrongMap {
+export class LogState extends StrongMap {
 	public readonly id: StrongString;
 	public transportNames: {[id: string]: LogTransport};
 	public transportGroups: {[name: number]: string[]};
 
-	constructor(options: LoggerOptions = {}) {
+	constructor(options: LogOptions = {}) {
 		super();
 		this.transportGroups = {};
 		this.transportNames = {};

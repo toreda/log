@@ -5,7 +5,7 @@
 	"main": "./dist/index.js",
 	"scripts": {
 		"build": "yarn lint && yarn tsc",
-		"lint": "yarn tslint --project .",
+		"lint": "yarn eslint src/**",
 		"test": "yarn jest --coverage"
 	},
 	"repository": {
@@ -30,8 +30,15 @@
 	},
 	"homepage": "https://github.com/toreda/log#readme",
 	"devDependencies": {
+		"@toreda/eslint-config": "^1.0.1",
+		"@toreda/prettier-config": "^1.0.1",
 		"@types/jest": "^26.0.14",
 		"@types/node": "^14.11.8",
+		"@typescript-eslint/eslint-plugin": "^4.4.1",
+		"@typescript-eslint/parser": "^4.4.1",
+		"eslint": "^7.11.0",
+		"eslint-config-prettier": "^6.12.0",
+		"eslint-plugin-prettier": "^3.1.4",
 		"jest": "^26.5.3",
 		"jest-sonar-reporter": "^2.0.0",
 		"ts-jest": "^26.4.1",
@@ -42,8 +49,8 @@
 	},
 	"dependencies": {
 		"@armorjs/action-result": "^0.0.1",
-		"@toreda/prettier-config": "^1.0.1",
-		"@toreda/strong-types": "^0.9.0"
+		"@toreda/strong-types": "^0.9.0",
+		"prettier": "^2.1.2"
 	},
 	"prettier": "@toreda/prettier-config"
 }

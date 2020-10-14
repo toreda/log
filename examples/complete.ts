@@ -1,8 +1,8 @@
 import {Logger, LogTransport, LogLevels} from '@toreda/log';
 
 // Create a new Logger
-const myLogger = new Logger();
-const myLoggerWithOptions = new Logger({
+const myLogger = new Log();
+const myLoggerWithOptions = new Log({
 	id: 'myLoggerId'
 })
 
@@ -28,7 +28,7 @@ const myTransportToFile = new LogTransport((logMessage)=>{
 
 // Attach a LogTransport to a logger
 myLogger.attachTransport(myTransportToFile); // catches every log, returns {payload: id}
-myLogger.attachTransport(myTransport, LogLevel.WARN); // only catches WARN & ERROR logs
+myLogger.attachTransport(myTransport, LogLevels.WARN); // only catches WARN & ERROR logs
 
 const result = myLogger.attachTransport(new LogTransport((msg) => {
 	// do something

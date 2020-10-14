@@ -1,4 +1,4 @@
-export interface LoggerOptions {
+export interface LogOptions {
 	id?: string;
 	serializedState?: string;
 }

@@ -1,9 +1,9 @@
-import {LogMessage} from '../src/log-message';
-import {LogTransport} from '../src/log-transport';
-import {LogTransportAction} from '../src/log-transport-action';
-import {LogTransportState} from '../src/log-transport-state';
+import {LogMessage} from '../../src/log/message';
+import {LogTransport} from '../../src/log/transport';
+import {LogTransportAction} from '../../src/log/transport/action';
+import {LogTransportState} from '../../src/log/transport/state';
 
-describe('Logger', () => {
+describe('LogTransport', () => {
 	const LOG_MESSAGE_RESOLVE: LogMessage = {
 		date: new Date().toISOString(),
 		level: 'ERROR',

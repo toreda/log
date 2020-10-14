@@ -1,15 +1,15 @@
 import {ArmorActionResult} from '@armorjs/action-result';
-import {LogLevels} from './log-levels';
-import {LogMessage} from './log-message';
-import {LogTransport} from './log-transport';
-import {LoggerOptions} from './logger-options';
-import {LoggerState} from './logger-state';
+import {LogLevels} from './log/levels';
+import {LogMessage} from './log/message';
+import {LogOptions} from './log/options';
+import {LogState} from './log/state';
+import {LogTransport} from './log/transport';
 
-export class Logger {
-	public readonly state: LoggerState;
+export class Log {
+	public readonly state: LogState;
 
-	public constructor(options?: LoggerOptions) {
-		this.state = new LoggerState(options);
+	public constructor(options?: LogOptions) {
+		this.state = new LogState(options);
 	}
 
 	public attachTransport(transport: LogTransport, levels?: LogLevels | LogLevels[]): ArmorActionResult {
@@ -85,7 +85,7 @@ export class Logger {
 		return result.complete();
 	}
 
-	public log(level: LogLevels, ...args: any[]): Logger {
+	public log(level: LogLevels, ...args: any[]): Log {
 		let message: any;
 
 		if (args.length === 0) {
@@ -120,31 +120,31 @@ export class Logger {
 		return this;
 	}
 
-	public error(...args: any[]): Logger {
+	public error(...args: any[]): Log {
 		this.log.apply(this, [LogLevels.ERROR as any].concat(args));
 
 		return this;
 	}
 
-	public warn(...args: any[]): Logger {
+	public warn(...args: any[]): Log {
 		this.log.apply(this, [LogLevels.WARN as any].concat(args));
 
 		return this;
 	}
 
-	public info(...args: any[]): Logger {
+	public info(...args: any[]): Log {
 		this.log.apply(this, [LogLevels.INFO as any].concat(args));
 
 		return this;
 	}
 
-	public debug(...args: any[]): Logger {
+	public debug(...args: any[]): Log {
 		this.log.apply(this, [LogLevels.DEBUG as any].concat(args));
 
 		return this;
 	}
 
-	public trace(...args: any[]): Logger {
+	public trace(...args: any[]): Log {
 		this.log.apply(this, [LogLevels.TRACE as any].concat(args));
 
 		return this;

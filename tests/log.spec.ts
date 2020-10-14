@@ -1,17 +1,17 @@
 import {appendFileSync, unlinkSync} from 'fs';
 
 import {ArmorActionResultCode} from '@armorjs/action-result';
-import {LogLevels} from '../src/log-levels';
-import {LogTransport} from '../src/log-transport';
-import {LogTransportAction} from '../src/log-transport-action';
-import {Logger} from '../src/logger';
-import {LoggerState} from '../src/logger-state';
+import {Log} from '../src/log';
+import {LogLevels} from '../src/log/levels';
+import {LogState} from '../src/log/state';
+import {LogTransport} from '../src/log/transport';
+import {LogTransportAction} from '../src/log/transport/action';
 
-describe('Logger', () => {
-	let instance: Logger;
+describe('Log', () => {
+	let instance: Log;
 
 	beforeAll(() => {
-		instance = new Logger();
+		instance = new Log();
 	});
 
 	beforeEach(() => {});
@@ -19,18 +19,18 @@ describe('Logger', () => {
 	describe('Constructor', () => {
 		describe('contructor', () => {
 			it('should call LoggerState.parse', () => {
-				const spy = jest.spyOn(LoggerState.prototype, 'parse').mockReturnValueOnce(null!);
+				const spy = jest.spyOn(LogState.prototype, 'parse').mockReturnValueOnce(null!);
 
 				const expectedV = {
 					id: 'TestingId9389'
 				};
 
-				new Logger(expectedV);
+				new Log(expectedV);
 				expect(spy).toBeCalledWith(expectedV);
 			});
 
 			it('should instantiate when no args are given', () => {
-				expect(new Logger()).toBeInstanceOf(Logger);
+				expect(new Log()).toBeInstanceOf(Log);
 			});
 		});
 	});
@@ -92,7 +92,9 @@ describe('Logger', () => {
 				let result = instance.attachTransport(undefined!);
 
 				expect(result.code).toBe(ArmorActionResultCode.FAILURE);
-				expect(result.state.errors.map((err) => err.message)).toContain('transport is not a LogTransport');
+				expect(result.state.errors.map((err) => err.message)).toContain(
+					'transport is not a LogTransport'
+				);
 			});
 		});
 
@@ -141,7 +143,9 @@ describe('Logger', () => {
 			it('should succeed when multiple LogTransports exist', () => {
 				let limit = 5;
 				for (let i = 0; i < limit; i++) {
-					expect(instance.attachTransport(new LogTransport(action)).code).toBe(ArmorActionResultCode.SUCCESS);
+					expect(instance.attachTransport(new LogTransport(action)).code).toBe(
+						ArmorActionResultCode.SUCCESS
+					);
 				}
 
 				expect(instance.attachTransport(reuseTransport).code).toBe(ArmorActionResultCode.SUCCESS);
@@ -162,11 +166,15 @@ describe('Logger', () => {
 
 				let result = instance.removeTransport(undefined!);
 				expect(result.code).toBe(ArmorActionResultCode.FAILURE);
-				expect(result.state.errors.map((err) => err.message)).toContain('transport is not a LogTransport');
+				expect(result.state.errors.map((err) => err.message)).toContain(
+					'transport is not a LogTransport'
+				);
 			});
 
 			it('should succeed but not remove anything if transport was not attached', () => {
-				expect(instance.attachTransport(new LogTransport(action)).code).toBe(ArmorActionResultCode.SUCCESS);
+				expect(instance.attachTransport(new LogTransport(action)).code).toBe(
+					ArmorActionResultCode.SUCCESS
+				);
 
 				expect(Object.keys(instance.state.transportNames).length).toBe(1);
 				groupsForEach((group) => expect(group.length).toBe(1));
@@ -180,7 +188,9 @@ describe('Logger', () => {
 			});
 
 			it('should succeed only call splice on groups transport is in', () => {
-				expect(instance.attachTransport(new LogTransport(action)).code).toBe(ArmorActionResultCode.SUCCESS);
+				expect(instance.attachTransport(new LogTransport(action)).code).toBe(
+					ArmorActionResultCode.SUCCESS
+				);
 				expect(instance.attachTransport(reuseTransport, LogLevels.ERROR).code).toBe(
 					ArmorActionResultCode.SUCCESS
 				);

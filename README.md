@@ -28,8 +28,8 @@ import {Logger, LogTransport, LogLevels} from '@toreda/log';
 **Create Logger Instance**
 
 ```typescript
-const myLogger = new Logger();
-const myLoggerWithOptions = new Logger({
+const myLogger = new Log();
+const myLoggerWithOptions = new Log({
 	id: 'myLoggerId'
 })
 ```

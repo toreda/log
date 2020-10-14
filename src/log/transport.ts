@@ -1,7 +1,7 @@
-import {LogMessage} from './log-message';
-import {LogTransportAction} from './log-transport-action';
-import {LogTransportOptions} from './log-transport-options';
-import {LogTransportState} from './log-transport-state';
+import {LogMessage} from './message';
+import {LogTransportAction} from './transport/action';
+import {LogTransportOptions} from './transport/options';
+import {LogTransportState} from './transport/state';
 
 export class LogTransport {
 	public readonly execute: LogTransportAction;
@@ -21,7 +21,7 @@ export class LogTransport {
 			throw new Error('LogTransport init failed - execute should be a function');
 		}
 
-		return (logMessage) => {
+		return (logMessage): any => {
 			this.storeLog(logMessage);
 			return action(logMessage);
 		};

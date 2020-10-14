@@ -3,5 +3,6 @@ export enum LogLevels {
 	WARN = 2,
 	INFO = 4,
 	DEBUG = 8,
-	TRACE = 16
+	TRACE = 16,
+	ALL = 31
 }

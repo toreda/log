@@ -1,3 +1,3 @@
-import {LogMessage} from './log-message';
+import {LogMessage} from '../message';
 
 export type LogTransportAction = (logMessage: LogMessage) => Promise<any>;

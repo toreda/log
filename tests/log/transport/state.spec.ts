@@ -1,4 +1,4 @@
-import {LogTransportState} from '../src/log-transport-state';
+import {LogTransportState} from '../../../src/log/transport/state';
 
 describe('LogTransportState', () => {
 	let instance: LogTransportState;

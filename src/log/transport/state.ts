@@ -1,7 +1,7 @@
 import {StrongArray, StrongMap, StrongString, makeArray, makeString} from '@toreda/strong-types';
 
-import {LogMessage} from './log-message';
-import {LogTransportOptions} from './log-transport-options';
+import {LogMessage} from '../message';
+import {LogTransportOptions} from './options';
 
 export class LogTransportState extends StrongMap {
 	public readonly id: StrongString;
