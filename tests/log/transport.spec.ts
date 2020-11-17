@@ -24,14 +24,14 @@ describe('LogTransport', () => {
 	let instance: LogTransport;
 
 	beforeAll(() => {
-		action = (logMessage) => {
+		action = (logMessage): Promise<unknown> => {
 			return new Promise((resolve, reject) => {
 				if (logMessage.message == 'resolved') {
 					resolve(logMessage.message);
 				} else if (logMessage.message == 'rejected') {
 					reject(logMessage.message);
 				} else {
-					throw new Error(logMessage.message);
+					throw new Error(logMessage.message as string);
 				}
 			});
 		};
@@ -46,7 +46,7 @@ describe('LogTransport', () => {
 	describe('Constructor', () => {
 		describe('constructor', () => {
 			it('should call parseExecute', () => {
-				let spy = jest.spyOn(LogTransport.prototype, 'parseExecute').mockReturnValueOnce(null!);
+				const spy = jest.spyOn(LogTransport.prototype, 'parseExecute').mockReturnValueOnce(null!);
 				new LogTransport();
 				expect(spy).toBeCalledTimes(1);
 			});
@@ -78,11 +78,11 @@ describe('LogTransport', () => {
 			});
 
 			it('should return action if it was a function', () => {
-				let customAction: LogTransportAction = (msg): any => {
+				const customAction: LogTransportAction = (msg): any => {
 					return msg;
 				};
 
-				let resultAction = instance.parseExecute(customAction);
+				const resultAction = instance.parseExecute(customAction);
 
 				expect(resultAction(LOG_MESSAGE_RESOLVE)).toBe(customAction(LOG_MESSAGE_RESOLVE));
 			});
@@ -107,7 +107,7 @@ describe('LogTransport', () => {
 
 		describe('logToConsole', () => {
 			it('should call console log with logMessage data', () => {
-				let spy = jest.spyOn(console, 'log').mockImplementation();
+				const spy = jest.spyOn(console, 'log').mockImplementation();
 				let expectedV = '';
 				expectedV += `[${LOG_MESSAGE_RESOLVE.date}]`;
 				expectedV += ` ${LOG_MESSAGE_RESOLVE.level.toUpperCase()}:`;
@@ -122,7 +122,9 @@ describe('LogTransport', () => {
 
 		describe('execute', () => {
 			it('should return resolved message', async () => {
-				await expect(instance.execute(LOG_MESSAGE_RESOLVE)).resolves.toBe(LOG_MESSAGE_RESOLVE.message);
+				await expect(instance.execute(LOG_MESSAGE_RESOLVE)).resolves.toBe(
+					LOG_MESSAGE_RESOLVE.message
+				);
 				await expect(instance.execute(LOG_MESSAGE_RESOLVE)).resolves.not.toThrow();
 			}, 100);
 
@@ -132,7 +134,9 @@ describe('LogTransport', () => {
 			}, 100);
 
 			it('should throw message', async () => {
-				await expect(instance.execute(LOG_MESSAGE_THROW)).rejects.toThrow(LOG_MESSAGE_THROW.message);
+				await expect(instance.execute(LOG_MESSAGE_THROW)).rejects.toThrow(
+					LOG_MESSAGE_THROW.message as string
+				);
 			}, 100);
 		});
 	});

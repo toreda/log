@@ -1,9 +1,11 @@
-import {ArmorActionResult} from '@armorjs/action-result';
+import {ActionResult} from '@toreda/action-result';
 import {LogLevels} from './log/levels';
 import {LogMessage} from './log/message';
 import {LogOptions} from './log/options';
 import {LogState} from './log/state';
 import {LogTransport} from './log/transport';
+
+type ActResLogTrnPrt = ActionResult<LogTransport>;
 
 export class Log {
 	public readonly state: LogState;
@@ -12,14 +14,12 @@ export class Log {
 		this.state = new LogState(options);
 	}
 
-	public attachTransport(transport: LogTransport, levels?: LogLevels | LogLevels[]): ArmorActionResult {
-		const result = new ArmorActionResult();
-		result.state.failOnError.enabled = true;
-		result.payload = transport;
+	public attachTransport(transport: LogTransport, levels?: LogLevels | LogLevels[]): ActResLogTrnPrt {
+		const result = new ActionResult<LogTransport>({payload: transport});
 
 		if (!transport || !(transport instanceof LogTransport)) {
 			result.error(new Error('transport is not a LogTransport'));
-			return result.complete();
+			return result;
 		}
 
 		let logLevels: LogLevels[];
@@ -43,8 +43,7 @@ export class Log {
 			this.state.transportGroups[lvl].push(transport.state.id());
 		});
 
-		result.payload = transport.state.id();
-		return result.complete();
+		return result;
 	}
 
 	public getTransportFromId(id: string): LogTransport | null {
@@ -60,14 +59,12 @@ export class Log {
 		return transport;
 	}
 
-	public removeTransport(transport: LogTransport): ArmorActionResult {
-		const result = new ArmorActionResult();
-		result.state.failOnError.enabled = true;
-		result.payload = transport;
+	public removeTransport(transport: LogTransport): ActionResult<LogTransport> {
+		const result = new ActionResult<LogTransport>({payload: transport});
 
 		if (!transport || !(transport instanceof LogTransport)) {
 			result.error(new Error('transport is not a LogTransport'));
-			return result.complete();
+			return result;
 		}
 
 		const target = this.state.transportNames[transport.state.id()];
@@ -82,11 +79,11 @@ export class Log {
 			delete this.state.transportNames[transport.state.id()];
 		}
 
-		return result.complete();
+		return result;
 	}
 
-	public log(level: LogLevels, ...args: any[]): Log {
-		let message: any;
+	public log(level: LogLevels, ...args: unknown[]): Log {
+		let message: unknown;
 
 		if (args.length === 0) {
 			message = '';
@@ -120,32 +117,32 @@ export class Log {
 		return this;
 	}
 
-	public error(...args: any[]): Log {
-		this.log.apply(this, [LogLevels.ERROR as any].concat(args));
+	public error(...args: unknown[]): Log {
+		this.log(LogLevels.ERROR, ...args);
 
 		return this;
 	}
 
-	public warn(...args: any[]): Log {
-		this.log.apply(this, [LogLevels.WARN as any].concat(args));
+	public warn(...args: unknown[]): Log {
+		this.log(LogLevels.WARN, ...args);
 
 		return this;
 	}
 
-	public info(...args: any[]): Log {
-		this.log.apply(this, [LogLevels.INFO as any].concat(args));
+	public info(...args: unknown[]): Log {
+		this.log(LogLevels.INFO, ...args);
 
 		return this;
 	}
 
-	public debug(...args: any[]): Log {
-		this.log.apply(this, [LogLevels.DEBUG as any].concat(args));
+	public debug(...args: unknown[]): Log {
+		this.log(LogLevels.DEBUG, ...args);
 
 		return this;
 	}
 
-	public trace(...args: any[]): Log {
-		this.log.apply(this, [LogLevels.TRACE as any].concat(args));
+	public trace(...args: unknown[]): Log {
+		this.log(LogLevels.TRACE, ...args);
 
 		return this;
 	}

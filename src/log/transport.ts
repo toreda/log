@@ -21,14 +21,15 @@ export class LogTransport {
 			throw new Error('LogTransport init failed - execute should be a function');
 		}
 
-		return (logMessage): any => {
+		return (logMessage): Promise<unknown> => {
 			this.storeLog(logMessage);
 			return action(logMessage);
 		};
 	}
 
-	public storeLog(logMessage: LogMessage): any {
+	public async storeLog(logMessage: LogMessage): Promise<void> {
 		this.state.logs().push(logMessage);
+		return;
 	}
 
 	public static logToConsole: LogTransportAction = (logMessage) => {

@@ -1,6 +1,6 @@
 import {appendFileSync, unlinkSync} from 'fs';
 
-import {ArmorActionResultCode} from '@armorjs/action-result';
+import {ActionResultCode} from '@toreda/action-result';
 import {Log} from '../src/log';
 import {LogLevels} from '../src/log/levels';
 import {LogState} from '../src/log/state';
@@ -13,8 +13,6 @@ describe('Log', () => {
 	beforeAll(() => {
 		instance = new Log();
 	});
-
-	beforeEach(() => {});
 
 	describe('Constructor', () => {
 		describe('contructor', () => {
@@ -37,12 +35,12 @@ describe('Log', () => {
 
 	describe('Implementation', () => {
 		let reuseTransport: LogTransport;
-		let groupsForEach: Function;
+		let groupsForEach: (arg1: unknown) => unknown;
 		let spy: jest.SpyInstance;
 		let action: LogTransportAction;
 
 		beforeAll(() => {
-			action = () => {
+			action = (): Promise<unknown> => {
 				return new Promise((resolve, reject) => {
 					return resolve();
 				});
@@ -52,7 +50,7 @@ describe('Log', () => {
 
 			spy = jest.spyOn(reuseTransport, 'execute');
 
-			groupsForEach = (func: Function) => {
+			groupsForEach = (func: (arg1: unknown, arg2: unknown) => unknown): void => {
 				Object.keys(instance.state.transportGroups).forEach((key, index) => {
 					func(instance.state.transportGroups[key], index);
 				});
@@ -71,28 +69,27 @@ describe('Log', () => {
 
 		describe('attachTransport', () => {
 			it('should succeed and increase transportNames.length if transport was a LogTransport', () => {
-				let result = instance.attachTransport(reuseTransport);
-				expect(result.code).toBe(ArmorActionResultCode.SUCCESS);
+				const result = instance.attachTransport(reuseTransport);
+				expect(result.isSuccess()).toBe(true);
 				expect(Object.keys(instance.state.transportNames).length).toBe(1);
 			});
 
 			it('should succeed and increase transportGroups[level].length if transport was a LogTransport', () => {
-				let result = instance.attachTransport(reuseTransport);
-				expect(result.code).toBe(ArmorActionResultCode.SUCCESS);
+				const result = instance.attachTransport(reuseTransport);
+				expect(result.isSuccess()).toBe(true);
 				groupsForEach((group) => expect(group.length).toBe(1));
 			});
 
 			it('should succeed and return LogTransport if transport was a LogTransport', () => {
-				let result = instance.attachTransport(reuseTransport);
-				expect(result.code).toBe(ArmorActionResultCode.SUCCESS);
-				expect(result.payload).toBe(reuseTransport.state.id());
+				const result = instance.attachTransport(reuseTransport);
+				expect(result.isSuccess()).toBe(true);
+				expect(result.payload).toBe(reuseTransport);
 			});
 
 			it('should fail if transport was not a LogTransport', () => {
-				let result = instance.attachTransport(undefined!);
-
-				expect(result.code).toBe(ArmorActionResultCode.FAILURE);
-				expect(result.state.errors.map((err) => err.message)).toContain(
+				const result = instance.attachTransport(undefined!);
+				expect(result.isFailure()).toBe(true);
+				expect(result.state.errorLog.map((err) => err.message)).toContain(
 					'transport is not a LogTransport'
 				);
 			});
@@ -115,46 +112,44 @@ describe('Log', () => {
 
 		describe('removeTransport', () => {
 			it('should succeed and decrease transportNames.length if transport was removed', () => {
-				expect(instance.attachTransport(reuseTransport).code).toBe(ArmorActionResultCode.SUCCESS);
+				instance.attachTransport(reuseTransport);
 				expect(Object.keys(instance.state.transportNames).length).toBe(1);
 
-				let result = instance.removeTransport(reuseTransport);
-				expect(result.code).toBe(ArmorActionResultCode.SUCCESS);
+				const result = instance.removeTransport(reuseTransport);
+				expect(result.isSuccess()).toBe(true);
 				expect(Object.keys(instance.state.transportNames).length).toBe(0);
 			});
 
 			it('should succeed and decrease transportGroups[level].length if transport was removed', () => {
-				expect(instance.attachTransport(reuseTransport).code).toBe(ArmorActionResultCode.SUCCESS);
+				instance.attachTransport(reuseTransport);
 				groupsForEach((group) => expect(group.length).toBe(1));
 
-				let result = instance.removeTransport(reuseTransport);
-				expect(result.code).toBe(ArmorActionResultCode.SUCCESS);
+				const result = instance.removeTransport(reuseTransport);
+				expect(result.isSuccess()).toBe(true);
 				groupsForEach((group) => expect(group.length).toBe(0));
 			});
 
 			it('should succeed and return LogTransport if transport was removed', () => {
-				expect(instance.attachTransport(reuseTransport).code).toBe(ArmorActionResultCode.SUCCESS);
+				instance.attachTransport(reuseTransport);
 
-				let result = instance.removeTransport(reuseTransport);
-				expect(result.code).toBe(ArmorActionResultCode.SUCCESS);
+				const result = instance.removeTransport(reuseTransport);
+				expect(result.isSuccess()).toBe(true);
 				expect(result.payload).toBe(reuseTransport);
 			});
 
 			it('should succeed when multiple LogTransports exist', () => {
-				let limit = 5;
+				const limit = 5;
 				for (let i = 0; i < limit; i++) {
-					expect(instance.attachTransport(new LogTransport(action)).code).toBe(
-						ArmorActionResultCode.SUCCESS
-					);
+					instance.attachTransport(new LogTransport(action));
 				}
 
-				expect(instance.attachTransport(reuseTransport).code).toBe(ArmorActionResultCode.SUCCESS);
+				instance.attachTransport(reuseTransport);
 
 				expect(Object.keys(instance.state.transportNames).length).toBe(limit + 1);
 				groupsForEach((group) => expect(group.length).toBe(limit + 1));
 
-				let result = instance.removeTransport(reuseTransport);
-				expect(result.code).toBe(ArmorActionResultCode.SUCCESS);
+				const result = instance.removeTransport(reuseTransport);
+				expect(result.isSuccess()).toBe(true);
 				expect(result.payload).toBe(reuseTransport);
 
 				expect(Object.keys(instance.state.transportNames).length).toBe(limit);
@@ -162,25 +157,23 @@ describe('Log', () => {
 			});
 
 			it('should fail if transport was not a LogTransport', () => {
-				expect(instance.attachTransport(reuseTransport).code).toBe(ArmorActionResultCode.SUCCESS);
+				instance.attachTransport(reuseTransport);
 
-				let result = instance.removeTransport(undefined!);
-				expect(result.code).toBe(ArmorActionResultCode.FAILURE);
-				expect(result.state.errors.map((err) => err.message)).toContain(
+				const result = instance.removeTransport(undefined!);
+				expect(result.isFailure()).toBe(true);
+				expect(result.state.errorLog.map((err) => err.message)).toContain(
 					'transport is not a LogTransport'
 				);
 			});
 
 			it('should succeed but not remove anything if transport was not attached', () => {
-				expect(instance.attachTransport(new LogTransport(action)).code).toBe(
-					ArmorActionResultCode.SUCCESS
-				);
+				instance.attachTransport(new LogTransport(action));
 
 				expect(Object.keys(instance.state.transportNames).length).toBe(1);
 				groupsForEach((group) => expect(group.length).toBe(1));
 
-				let result = instance.removeTransport(reuseTransport);
-				expect(result.code).toBe(ArmorActionResultCode.SUCCESS);
+				const result = instance.removeTransport(reuseTransport);
+				expect(result.isSuccess()).toBe(true);
 				expect(result.payload).toBe(reuseTransport);
 
 				expect(Object.keys(instance.state.transportNames).length).toBe(1);
@@ -188,25 +181,22 @@ describe('Log', () => {
 			});
 
 			it('should succeed only call splice on groups transport is in', () => {
-				expect(instance.attachTransport(new LogTransport(action)).code).toBe(
-					ArmorActionResultCode.SUCCESS
-				);
-				expect(instance.attachTransport(reuseTransport, LogLevels.ERROR).code).toBe(
-					ArmorActionResultCode.SUCCESS
-				);
-				let expectedGroupSizeInitial = [2, 1, 1, 1, 1];
-				let expectedSizeFinal = 1;
+				instance.attachTransport(new LogTransport(action));
+				instance.attachTransport(reuseTransport, LogLevels.ERROR);
+
+				const expectedGroupSizeInitial = [2, 1, 1, 1, 1];
+				const expectedSizeFinal = 1;
 
 				expect(Object.keys(instance.state.transportNames).length).toBe(2);
 				groupsForEach((group, index) => expect(group.length).toBe(expectedGroupSizeInitial[index]));
 
-				let spies: jest.SpyInstance[] = [];
+				const spies: jest.SpyInstance[] = [];
 				groupsForEach((group) => {
 					spies.push(jest.spyOn(group, 'splice'));
 				});
 
-				let result = instance.removeTransport(reuseTransport);
-				expect(result.code).toBe(ArmorActionResultCode.SUCCESS);
+				const result = instance.removeTransport(reuseTransport);
+				expect(result.isSuccess()).toBe(true);
 				expect(result.payload).toBe(reuseTransport);
 
 				expect(Object.keys(instance.state.transportNames).length).toBe(expectedSizeFinal);
@@ -254,7 +244,7 @@ describe('Log', () => {
 				instance.attachTransport(reuseTransport);
 				let funcCalls = 0;
 				let result: any;
-				let expectedV = {
+				const expectedV = {
 					level: LogLevels[1],
 					message: '' as any
 				};
@@ -272,7 +262,7 @@ describe('Log', () => {
 				expect(result).toStrictEqual(expectedV);
 				funcCalls++;
 
-				let secondParam = 'second test string';
+				const secondParam = 'second test string';
 				expectedV.message = [expectedV.message].concat(secondParam);
 				instance.log(LogLevels[expectedV.level], toLog, secondParam);
 				result = spy.mock.calls[funcCalls][0];
@@ -312,10 +302,10 @@ describe('Log', () => {
 			expect(typeof action).toBe('function');
 			const transport = new LogTransport(action);
 
-			let result = instance.attachTransport(transport, LogLevels.INFO);
+			const result = instance.attachTransport(transport, LogLevels.INFO);
 
-			expect(result.code).toBe(ArmorActionResultCode.SUCCESS);
-			expect(result.payload).toBe(transport.state.id());
+			expect(result.isSuccess()).toBe(true);
+			expect(result.payload).toBe(transport);
 
 			instance.error('message 0');
 			instance.warn('message 1');

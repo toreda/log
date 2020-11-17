@@ -2,10 +2,6 @@
 # yarn lockfile v1
 
 
-"@armorjs/action-result@^0.0.1":
-  version "0.0.1"
-  resolved "https://registry.yarnpkg.com/@armorjs/action-result/-/action-result-0.0.1.tgz#e1f5094bb160db5e7a8bc8d4781483ae2212d5e3"
-
 "@babel/code-frame@^7.0.0", "@babel/code-frame@^7.8.3":
   version "7.8.3"
   resolved "https://registry.yarnpkg.com/@babel/code-frame/-/code-frame-7.8.3.tgz#33e25903d7481181534e12ec0a25f16b6fcf419e"
@@ -511,6 +507,11 @@
   resolved "https://registry.yarnpkg.com/@sinonjs/fake-timers/-/fake-timers-6.0.1.tgz#293674fccb3262ac782c7aadfdeca86b10c75c40"
   dependencies:
     "@sinonjs/commons" "^1.7.0"
+
+"@toreda/action-result@^0.1.0":
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/@toreda/action-result/-/action-result-0.1.0.tgz#ce5ecf875c7f1106c1dd9220992d09e72724d9e3"
+  integrity sha512-C8ybJuKdqBfWKqa1Tpn5+wwJ9KSZoac6KCyF5BUc3HGmzxrEu3brb1wQS8NsqYGyTncjaYvjRyK+0oRqSDKnAg==
 
 "@toreda/eslint-config@^1.0.1":
   version "1.0.1"
