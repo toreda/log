@@ -1,149 +1,213 @@
-import {ActionResult} from '@toreda/action-result';
 import {LogLevels} from './log/levels';
-import {LogMessage} from './log/message';
 import {LogOptions} from './log/options';
-import {LogState} from './log/state';
 import {LogTransport} from './log/transport';
+import {LogGroup} from './log/group';
+import {isType} from '@toreda/strong-types';
+import {LogState} from './log/state';
 
-type ActResLogTrnPrt = ActionResult<LogTransport>;
-
+/**
+ * Main log class holding attached transports and internal state
+ * data, and logging configuration.
+ */
 export class Log {
+	/** Serializable internal state data */
 	public readonly state: LogState;
 
 	public constructor(options?: LogOptions) {
 		this.state = new LogState(options);
 	}
 
-	public attachTransport(transport: LogTransport, levels?: LogLevels | LogLevels[]): ActResLogTrnPrt {
-		const result = new ActionResult<LogTransport>({payload: transport});
-
+	public addGroupTransport(groupId: string | null, transport: LogTransport): boolean {
 		if (!transport || !(transport instanceof LogTransport)) {
-			result.error(new Error('transport is not a LogTransport'));
-			return result;
+			console.error(new Error('transport is not a LogTransport'));
+			return false;
 		}
 
-		let logLevels: LogLevels[];
-
-		if (levels == null) {
-			logLevels = [LogLevels.ERROR, LogLevels.WARN, LogLevels.INFO, LogLevels.DEBUG, LogLevels.TRACE];
-		} else if (Array.isArray(levels)) {
-			logLevels = levels;
-		} else {
-			logLevels = [];
-			for (let lvl = 1; lvl <= levels; lvl *= 2) {
-				logLevels.push(lvl);
-			}
+		if (groupId === null) {
+			return this.state.groups.all.addTransport(transport);
 		}
 
-		this.state.transportNames[transport.state.id()] = transport;
-		logLevels.forEach((lvl) => {
-			if (!this.state.transportGroups[lvl]) {
-				this.state.transportGroups[lvl] = [];
-			}
-			this.state.transportGroups[lvl].push(transport.state.id());
-		});
+		const group = this.getGroup(groupId);
+		if (!group) {
+			console.error(`addTransport failure - unable to find or create group with id '${groupId}.`);
+			return false;
+		}
 
-		return result;
+		group.addTransport(transport);
+
+		return true;
 	}
 
-	public getTransportFromId(id: string): LogTransport | null {
-		if (typeof id !== 'string') {
+	public addTransport(transport: LogTransport): boolean {
+		return this.addGroupTransport(null, transport);
+	}
+
+	public removeTransport(transport: LogTransport): boolean {
+		return this.removeGroupTransport(null, transport);
+	}
+
+	public removeGroupTransport(groupId: string | null, transport: LogTransport): boolean {
+		const idStr = typeof groupId === 'string' ? groupId : 'all';
+		const group: LogGroup | null = this.getGroup(idStr);
+		if (!group) {
+			console.error(`remove transport failure - bad group with id '${groupId}'.`);
+			return false;
+		}
+
+		return group.removeTransport(transport);
+	}
+
+	/**
+	 * Change global log level. Individual group levels
+	 * are used instead of global level when they are set.
+	 * @param logLevel
+	 */
+	public setGlobalLevel(logLevel: LogLevels): void {
+		if (typeof logLevel !== 'number') {
+			return;
+		}
+	}
+
+	/**
+	 * Set log level for target group.
+	 * @param logLevel
+	 * @param groupId
+	 */
+	public setGroupLevel(logLevel: LogLevels, groupId: string): void {
+		if (typeof logLevel !== 'number') {
+			return;
+		}
+
+		const group = this.getGroup(groupId);
+		if (!group) {
+			return;
+		}
+
+		group.logLevel = logLevel;
+	}
+
+	/**
+	 * Make a group logger instance where all log levels automatically
+	 * log to the target group ID.
+	 * @param groupId
+	 */
+	public getGroup(groupId: string): LogGroup | null {
+		if (typeof groupId !== 'string') {
 			return null;
 		}
 
-		const transport = this.state.transportNames[id];
-		if (!transport) {
-			return null;
+		const group = this.state.groups[groupId];
+		if (!isType(group, LogGroup)) {
+			this.state.groups[groupId] = new LogGroup(groupId, LogLevels.NONE | LogLevels.ERROR);
+			return this.state.groups[groupId];
 		}
 
-		return transport;
+		return group;
 	}
 
-	public removeTransport(transport: LogTransport): ActionResult<LogTransport> {
-		const result = new ActionResult<LogTransport>({payload: transport});
-
-		if (!transport || !(transport instanceof LogTransport)) {
-			result.error(new Error('transport is not a LogTransport'));
-			return result;
+	/**
+	 * Log message to target group. If groupId is null,
+	 * @param groupId 		Target group to send log message to.
+	 * @param level
+	 * @param msg
+	 */
+	public log(groupId: string | null, level: LogLevels, ...msg: unknown[]): Log {
+		if (!groupId) {
+			return this;
 		}
 
-		const target = this.state.transportNames[transport.state.id()];
-		if (target === transport) {
-			for (const level in this.state.transportGroups) {
-				const index = this.state.transportGroups[level].indexOf(transport.state.id());
-				if (index >= 0) {
-					this.state.transportGroups[level].splice(index, 1);
-				}
-			}
-
-			delete this.state.transportNames[transport.state.id()];
-		}
-
-		return result;
-	}
-
-	public log(level: LogLevels, ...args: unknown[]): Log {
-		let message: unknown;
-
-		if (args.length === 0) {
-			message = '';
-		} else if (args.length === 1) {
-			message = args[0];
+		if (this.state.groups[groupId]) {
+			this.state.groups[groupId].log(level, ...msg);
 		} else {
-			message = args;
+			this.state.groups['all'].log(level, ...msg);
 		}
 
-		const logMessage: LogMessage = {
-			date: new Date().toISOString(),
-			level: LogLevels[level],
-			message: message
-		};
-
-		for (let bitMask = 1; bitMask <= 16; bitMask *= 2) {
-			const currentLevel = level & bitMask;
-			if (currentLevel === 0) {
-				continue;
-			}
-
-			if (!this.state.transportGroups[currentLevel]) {
-				continue;
-			}
-
-			for (const transportId of this.state.transportGroups[currentLevel]) {
-				this.state.transportNames[transportId].execute(logMessage);
-			}
-		}
+		this.state.groups.global.log(level, ...msg);
 
 		return this;
 	}
 
-	public error(...args: unknown[]): Log {
-		this.log(LogLevels.ERROR, ...args);
-
-		return this;
+	/**
+	 * Trigger an error-level log message for no specific group (global).
+	 * @param msg
+	 */
+	public error(...msg: unknown[]): Log {
+		return this.log(null, LogLevels.ERROR, ...msg);
 	}
 
-	public warn(...args: unknown[]): Log {
-		this.log(LogLevels.WARN, ...args);
-
-		return this;
+	/**
+	 * Trigger an error-level log message for target group.
+	 * @param groupId
+	 * @param msg
+	 */
+	public errorGroup(groupId: string | null, ...msg: unknown[]): Log {
+		return this.log(groupId, LogLevels.ERROR, ...msg);
 	}
 
-	public info(...args: unknown[]): Log {
-		this.log(LogLevels.INFO, ...args);
-
-		return this;
+	/**
+	 * Trigger a warn-level log message for no specific group (global).
+	 * @param msg
+	 */
+	public warn(...msg: unknown[]): Log {
+		return this.warnGroup(null, ...msg);
 	}
 
-	public debug(...args: unknown[]): Log {
-		this.log(LogLevels.DEBUG, ...args);
-
-		return this;
+	/**
+	 * Trigger a warn-level log message for target group.
+	 * @param groupId
+	 * @param msg
+	 */
+	public warnGroup(groupId: string | null, ...msg: unknown[]): Log {
+		return this.log(groupId, LogLevels.WARN, ...msg);
+	}
+	/**
+	 * Trigger an info-level log message for no specific group (global).
+	 * @param args
+	 */
+	public info(...msg: unknown[]): Log {
+		return this.infoGroup(null, LogLevels.INFO, ...msg);
 	}
 
-	public trace(...args: unknown[]): Log {
-		this.log(LogLevels.TRACE, ...args);
+	/**
+	 * Triggers an info-level log message for target group.
+	 * @param groupId
+	 * @param msg
+	 */
+	public infoGroup(groupId: string | null, ...msg: unknown[]): Log {
+		return this.log(groupId, LogLevels.INFO, ...msg);
+	}
 
-		return this;
+	/**
+	 * Trigger a debug-level log message for no specific group (global).
+	 * @param msg
+	 */
+	public debug(...msg: unknown[]): Log {
+		return this.debugGroup(null, LogLevels.DEBUG, ...msg);
+	}
+
+	/**
+	 * Trigger a debug-level log message for target group.
+	 * @param groupId
+	 * @param msg
+	 */
+	public debugGroup(groupId: string | null, ...msg: unknown[]): Log {
+		return this.log(groupId, LogLevels.DEBUG, ...msg);
+	}
+
+	/**
+	 * Trigger a trace-level log message for no specific group (global).
+	 * @param args
+	 */
+	public trace(...msg: unknown[]): Log {
+		return this.traceGroup(null, ...msg);
+	}
+
+	/**
+	 * Trigger a trace-level log message for target group.
+	 * @param groupId
+	 * @param msg
+	 */
+	public traceGroup(groupId: string | null, ...msg: unknown[]): Log {
+		return this.log(groupId, LogLevels.TRACE, ...msg);
 	}
 }

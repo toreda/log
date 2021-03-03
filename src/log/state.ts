@@ -1,27 +1,27 @@
-import {StrongMap, StrongString, makeString} from '@toreda/strong-types';
+import {LogLevels} from './levels';
+import {LogGroup} from './group';
+import {LogOptions} from '../log/options';
 
-import {LogOptions} from './options';
-import {LogTransport} from './transport';
+export class LogState {
+	public globalLogLevel: number;
+	public readonly groups: Record<'all' | 'global' | string, LogGroup>;
 
-export class LogState extends StrongMap {
-	public readonly id: StrongString;
-	public transportNames: {[id: string]: LogTransport};
-	public transportGroups: {[name: number]: string[]};
+	constructor(options?: LogOptions) {
+		this.globalLogLevel = LogLevels.ALL & ~LogLevels.DEBUG & LogLevels.TRACE;
+		this.groups = this.makeDefaultGroups();
 
-	constructor(options: LogOptions = {}) {
-		super();
-		this.transportGroups = {};
-		this.transportNames = {};
-		this.id = makeString(this.randomId(), '');
-
-		this.parse(options);
+		if (options && typeof options.globalLogLevel === 'number') {
+			this.globalLogLevel = options.globalLogLevel;
+		}
 	}
 
-	public randomId(): string {
-		const size = 5;
-		const randomInt = Math.floor(Math.random() * Math.pow(10, size));
-		const randomId = ('0'.repeat(size) + randomInt.toString()).slice(-1 * size);
-
-		return randomId;
+	/**
+	 * Create default log groups for instance
+	 */
+	private makeDefaultGroups(): Record<'all' | 'global' | string, LogGroup> {
+		return {
+			all: new LogGroup('all', LogLevels.ALL),
+			global: new LogGroup('global', LogLevels.ALL)
+		};
 	}
 }

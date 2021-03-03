@@ -3,5 +3,21 @@
 		{
 			"path": "."
 		}
-	]
+	],
+	"settings": {
+		"files.exclude": {
+			"**/.git": true,
+			"**/.svn": true,
+			"**/.hg": true,
+			"**/CVS": true,
+			"**/.DS_Store": true,
+			"**/node_modules": true,
+			"test-report.xml": true,
+			"**/.gitignore": true,
+			".gitattributes": true,
+			"coverage": true,
+			"**/dist": true
+
+		}
+	}
 }

@@ -1,14 +1,16 @@
 // Logger
-export * from './log';
-export * from './log/options';
-export * from './log/state';
+export {Log} from './log';
+export {LogOptions} from './log/options';
+export {LogState} from './log/state';
+
+export {LogGroup} from './log/group';
 
 // Log Transport
-export * from './log/transport';
-export * from './log/transport/action';
-export * from './log/transport/options';
-export * from './log/transport/state';
+export {LogTransport} from './log/transport';
+export {LogTransportAction} from './log/transport/action';
+export {LogTransportOptions} from './log/transport/options';
+export {LogTransportState} from './log/transport/state';
 
 // Interfaces
-export * from './log/levels';
-export * from './log/message';
+export {LogLevels} from './log/levels';
+export {LogMessage} from './log/message';

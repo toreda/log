@@ -1,4 +1,6 @@
+/** Supported log levels and associated ID (and bitmask). */
 export enum LogLevels {
+	NONE = 0,
 	ERROR = 1,
 	WARN = 2,
 	INFO = 4,

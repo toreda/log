@@ -1,4 +1,5 @@
+import {LogLevels} from './levels';
+
 export interface LogOptions {
-	id?: string;
-	serializedState?: string;
+	globalLogLevel: LogLevels;
 }

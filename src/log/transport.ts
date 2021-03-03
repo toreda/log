@@ -2,14 +2,17 @@ import {LogMessage} from './message';
 import {LogTransportAction} from './transport/action';
 import {LogTransportOptions} from './transport/options';
 import {LogTransportState} from './transport/state';
+import {LogLevels} from './levels';
 
 export class LogTransport {
 	public readonly execute: LogTransportAction;
 	public readonly state: LogTransportState;
+	public levels: number;
 
-	constructor(action?: LogTransportAction, options?: LogTransportOptions) {
+	constructor(levels: LogLevels, action?: LogTransportAction, options?: LogTransportOptions) {
 		this.execute = this.parseExecute(action);
 		this.state = new LogTransportState(options);
+		this.levels = levels;
 	}
 
 	public parseExecute(action?: LogTransportAction): LogTransportAction {
