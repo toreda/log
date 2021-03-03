@@ -1,6 +1,5 @@
 import {appendFileSync, unlinkSync} from 'fs';
 
-import {ActionResultCode} from '@toreda/action-result';
 import {Log} from '../src/log';
 import {LogLevels} from '../src/log/levels';
 import {LogState} from '../src/log/state';
@@ -41,8 +40,8 @@ describe('Log', () => {
 
 		beforeAll(() => {
 			action = (): Promise<unknown> => {
-				return new Promise((resolve, reject) => {
-					return resolve();
+				return new Promise((resolve) => {
+					return resolve(true);
 				});
 			};
 
@@ -292,10 +291,10 @@ describe('Log', () => {
 
 		it('should create/find file and post logs there', () => {
 			const action: LogTransportAction = (logMessage) => {
-				return new Promise((resolve, reject) => {
+				return new Promise((resolve) => {
 					const message = JSON.stringify(logMessage);
 					appendFileSync(path, message + ',\n');
-					resolve();
+					resolve(true);
 				});
 			};
 

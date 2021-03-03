@@ -39,7 +39,7 @@ export class LogTransport {
 			logString += ` ${logMessage.level.toUpperCase()}:`;
 			logString += ` ${logMessage.message}`;
 			console.log(logString);
-			resolve();
+			resolve(true);
 		});
 	};
 }
