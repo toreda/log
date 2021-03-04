@@ -1,16 +1,19 @@
 import {LogTransport} from './transport';
 import {LogLevels} from './levels';
 import {LogMessage} from '../log/message';
+import {isType} from '@toreda/strong-types';
 
 export class LogGroup {
 	public readonly id: string;
 	public readonly transports: LogTransport[];
+	public readonly added: Set<LogTransport>;
 	public logLevel: LogLevels;
 
 	constructor(id: string, logLevel: LogLevels) {
 		this.id = id;
 		this.transports = [];
 		this.logLevel = logLevel;
+		this.added = new Set<LogTransport>();
 	}
 
 	public async log(level: LogLevels, ...msg: unknown[]): Promise<void> {
@@ -100,6 +103,10 @@ export class LogGroup {
 	 * @param transport
 	 */
 	public addTransport(transport: LogTransport): boolean {
+		if (!transport || !isType(transport, LogTransport)) {
+			return false;
+		}
+
 		this.transports.push(transport);
 		return true;
 	}
@@ -114,15 +121,24 @@ export class LogGroup {
 			return false;
 		}
 
+		this.added.delete(transport);
 		let deleteCount = 0;
 		for (let i = this.transports.length - 1; i >= 0; i--) {
 			if (transport === this.transports[i]) {
-				delete this.transports[i];
+				this.transports.splice(i, 1);
 				deleteCount++;
 			}
 		}
 
 		/** 1 or more deletions is success. */
 		return deleteCount > 0;
+	}
+
+	/**
+	 * Quickly and efficiently remove all transports in this group
+	 */
+	public clear(): void {
+		this.transports.length = 0;
+		this.added.clear();
 	}
 }

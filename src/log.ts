@@ -17,6 +17,14 @@ export class Log {
 		this.state = new LogState(options);
 	}
 
+	/**
+	 * Add transport to target group.
+	 * @param groupId			Target group to add transport to. When null the default 'all'
+	 * 							group is used. When target is non-null and target group does
+	 * 							not exist, it will be created.
+	 *
+	 * @param transport 		Transport to add to target group.
+	 */
 	public addGroupTransport(groupId: string | null, transport: LogTransport): boolean {
 		if (!transport || !(transport instanceof LogTransport)) {
 			console.error(new Error('transport is not a LogTransport'));
@@ -38,14 +46,32 @@ export class Log {
 		return true;
 	}
 
+	/**
+	 * Add transport to default 'all' group. Transports in 'all'
+	 * are only executed for messages which don't provide
+	 * target groupId.
+	 * @param transport		Transport to add to 'all' group.
+	 */
 	public addTransport(transport: LogTransport): boolean {
 		return this.addGroupTransport(null, transport);
 	}
 
+	/**
+	 * Remove target transport from default 'all' group. Calling
+	 * has no effect when transport does not exist in 'all' group. If
+	 * transport has been added to multiple groups,
+	 * @param transport
+	 */
 	public removeTransport(transport: LogTransport): boolean {
 		return this.removeGroupTransport(null, transport);
 	}
 
+	/**
+	 * Remove transport from target group, or from the 'all' group if
+	 * groupId is null.
+	 * @param groupId
+	 * @param transport
+	 */
 	public removeGroupTransport(groupId: string | null, transport: LogTransport): boolean {
 		const idStr = typeof groupId === 'string' ? groupId : 'all';
 		const group: LogGroup | null = this.getGroup(idStr);
@@ -57,6 +83,29 @@ export class Log {
 		return group.removeTransport(transport);
 	}
 
+	/**
+	 * Remove matching transports from all groups. Expensive call not suitable to
+	 * use generally, but available for specific cases where transports must be removed
+	 * and may exist in multiple unknown groups. Prefer to use use `removeTransport` or
+	 * `removeGroupTransport` when possible.
+	 * @param transport
+	 */
+	public removeTransportEverywhere(transport: LogTransport): boolean {
+		if (!transport) {
+			return false;
+		}
+
+		let removeCount = 0;
+		for (const groupName of this.state.groupList) {
+			const group = this.state.groups[groupName];
+			const result = group.removeTransport(transport);
+			if (result) {
+				removeCount++;
+			}
+		}
+
+		return removeCount > 0;
+	}
 	/**
 	 * Change global log level. Individual group levels
 	 * are used instead of global level when they are set.
@@ -209,5 +258,14 @@ export class Log {
 	 */
 	public traceGroup(groupId: string | null, ...msg: unknown[]): Log {
 		return this.log(groupId, LogLevels.TRACE, ...msg);
+	}
+
+	/**
+	 * Clear all transports from all groups.
+	 */
+	public clearAll(): void {
+		for (const groupId of this.state.groupList) {
+			this.state.groups[groupId].clear();
+		}
 	}
 }
