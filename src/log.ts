@@ -226,7 +226,7 @@ export class Log {
 		return this.log(groupId, LogLevels.INFO, ...msg);
 	}
 
-	/**
+	/*
 	 * Trigger a debug-level log message for no specific group (global).
 	 * @param msg
 	 */

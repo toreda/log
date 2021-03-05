@@ -16,7 +16,7 @@ export class LogState {
 		const defaultGroups = this.createDefaultGroups();
 
 		this.groups = defaultGroups.map;
-		this.groupList = defaultGroups.list;
+		this.groupList = defaultGroups.keys;
 
 		if (options && typeof options.globalLogLevel === 'number') {
 			this.globalLogLevel = options.globalLogLevel;
@@ -26,9 +26,9 @@ export class LogState {
 	/**
 	 * Create default groups object with built-in 'all' and 'global' groups.
 	 */
-	private createDefaultGroups(): {list: string[]; map: Record<'all' | 'global' | string, LogGroup>} {
+	public createDefaultGroups(): {keys: string[]; map: Record<'all' | 'global' | string, LogGroup>} {
 		return {
-			list: ['all', 'global'],
+			keys: ['all', 'global'],
 			map: {
 				all: new LogGroup('all', LogLevels.ALL),
 				global: new LogGroup('global', LogLevels.ALL)

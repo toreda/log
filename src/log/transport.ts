@@ -1,48 +1,35 @@
 import {LogMessage} from './message';
 import {LogTransportAction} from './transport/action';
 import {LogTransportOptions} from './transport/options';
-import {LogTransportState} from './transport/state';
 import {LogLevels} from './levels';
 
 export class LogTransport {
-	public readonly execute: LogTransportAction;
-	public readonly state: LogTransportState;
-	public levels: number;
+	public readonly id: string;
+	public readonly action: LogTransportAction;
+	public readonly level: number;
 
-	constructor(levels: LogLevels, action?: LogTransportAction, options?: LogTransportOptions) {
-		this.execute = this.parseExecute(action);
-		this.state = new LogTransportState(options);
-		this.levels = levels;
-	}
+	constructor(id: string, level: LogLevels, action: LogTransportAction, options?: LogTransportOptions) {
+		if (!id && typeof id !== 'string') {
+			throw new Error('Log Transport init failure - id arg must be a non-empty string.');
+		}
 
-	public parseExecute(action?: LogTransportAction): LogTransportAction {
+		if (typeof id !== 'string') {
+			throw new Error(`Log Transport init failure - id arg is missing.`);
+		}
+
 		if (!action) {
-			return this.storeLog;
+			throw new Error(`[logtr:${id}] Init failure - action arg is missing.`);
 		}
-
-		if (typeof action !== 'function') {
-			throw new Error('LogTransport init failed - execute should be a function');
-		}
-
-		return (logMessage): Promise<unknown> => {
-			this.storeLog(logMessage);
-			return action(logMessage);
-		};
+		this.id = id;
+		this.action = action;
+		this.level = level;
 	}
 
-	public async storeLog(logMessage: LogMessage): Promise<void> {
-		this.state.logs().push(logMessage);
-		return;
-	}
+	public async execute(msg: LogMessage): Promise<boolean> {
+		if (typeof this.action !== 'function') {
+			return false;
+		}
 
-	public static logToConsole: LogTransportAction = (logMessage) => {
-		return new Promise((resolve) => {
-			let logString = '';
-			logString += `[${logMessage.date}]`;
-			logString += ` ${logMessage.level.toUpperCase()}:`;
-			logString += ` ${logMessage.message}`;
-			console.log(logString);
-			resolve(true);
-		});
-	};
+		return await this.action(msg);
+	}
 }

@@ -1,5 +1,5 @@
 export interface LogMessage {
 	date: string;
-	level: string;
-	message: unknown;
+	level: number;
+	message: string;
 }

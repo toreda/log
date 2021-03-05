@@ -121,17 +121,18 @@ export class LogGroup {
 			return false;
 		}
 
-		this.added.delete(transport);
-		let deleteCount = 0;
+		let deleted = false;
 		for (let i = this.transports.length - 1; i >= 0; i--) {
 			if (transport === this.transports[i]) {
 				this.transports.splice(i, 1);
-				deleteCount++;
+				deleted = true;
+				this.added.delete(transport);
+				break;
 			}
 		}
 
 		/** 1 or more deletions is success. */
-		return deleteCount > 0;
+		return deleted;
 	}
 
 	/**
