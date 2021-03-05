@@ -16,19 +16,36 @@ export class LogGroup {
 		this.added = new Set<LogTransport>();
 	}
 
+	/**
+	 * Convert message to structured data and call all
+	 * group transports which listen for message log level.
+	 * @param level		Bitmask level msg was logged with.
+	 * @param msg		Message to be logged.
+	 */
 	public async log(level: LogLevels, ...msg: unknown[]): Promise<void> {
-		const content: string = msg.join(' ');
-
-		const logMessage: LogMessage = {
-			date: new Date().toISOString(),
-			level: LogLevels[level],
-			message: content
-		};
+		const logMsg = this.createMessage('', level, ...msg);
 
 		for (let bitMask = 1; bitMask <= 16; bitMask *= 2) {
 			const currentLevel = level & bitMask;
-			await this.executeLevel(currentLevel, logMessage);
+			await this.executeLevel(currentLevel, logMsg);
 		}
+	}
+
+	/**
+	 * Create structured log message. Provided as a call argument
+	 * during transport execution.
+	 * @param ts			UTC timestamp when msg was created.
+	 * @param level			Level bitmask msg was logged with.
+	 * @param msg			Msg that was logged.
+	 */
+	public createMessage(ts: string, level: LogLevels, ...msg: unknown[]): LogMessage {
+		const content = Array.isArray(msg) ? msg.join(' ') : msg;
+
+		return {
+			date: ts,
+			level: level,
+			message: content
+		};
 	}
 
 	/**
@@ -92,7 +109,7 @@ export class LogGroup {
 	}
 
 	public canExecute(logLevel: LogLevels, transport: LogTransport): boolean {
-		return (logLevel & transport.levels) > 0x0;
+		return (logLevel & transport.level) > 0x0;
 	}
 
 	/**

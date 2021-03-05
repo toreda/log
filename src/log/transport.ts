@@ -10,11 +10,11 @@ export class LogTransport {
 
 	constructor(id: string, level: LogLevels, action: LogTransportAction, options?: LogTransportOptions) {
 		if (!id && typeof id !== 'string') {
-			throw new Error('Log Transport init failure - id arg must be a non-empty string.');
+			throw new Error('Log Transport init failure - id arg is missing.');
 		}
 
 		if (typeof id !== 'string') {
-			throw new Error(`Log Transport init failure - id arg is missing.`);
+			throw new Error(`Log Transport init failure - id arg must be a non-empty string.`);
 		}
 
 		if (!action) {

@@ -13,13 +13,14 @@ describe('Log', () => {
 
 	beforeAll(() => {
 		instance = new Log();
-		action = async (msg: LogMessage): Promise<boolean> => {
-			return true;
-		};
-		transport = new LogTransport('test', LogLevels.ALL, action);
 	});
 
 	beforeEach(() => {
+		action = async (msg: LogMessage): Promise<boolean> => {
+			return true;
+		};
+
+		transport = new LogTransport('test', LogLevels.ALL, action);
 		instance.clearAll();
 	});
 
@@ -33,15 +34,11 @@ describe('Log', () => {
 		let spy: jest.SpyInstance;
 		let action: LogTransportAction;
 
-		beforeAll(() => {
-			action = (): Promise<unknown> => {
-				return new Promise((resolve) => {
-					return resolve(true);
-				});
+		beforeEach(() => {
+			action = async (msg: LogMessage): Promise<boolean> => {
+				return true;
 			};
 		});
-
-		beforeEach(() => {});
 
 		describe('addTransport', () => {
 			it('should return false when transport arg is undefined', () => {

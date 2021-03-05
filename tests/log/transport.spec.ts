@@ -3,6 +3,9 @@ import {LogTransport} from '../../src/log/transport';
 import {LogTransportAction} from '../../src/log/transport/action';
 import {LogLevels} from '../../src/log/levels';
 
+const MOCK_ID = 'log_transport_id';
+const MOCK_LEVEL: LogLevels = LogLevels.NONE | LogLevels.ERROR;
+
 describe('LogTransport', () => {
 	let action: LogTransportAction;
 	let level: LogLevels;
@@ -36,7 +39,9 @@ describe('LogTransport', () => {
 		});
 
 		it('should throw when action arg is undefined', () => {
-			expect(() => {}).toThrow('');
+			expect(() => {
+				const custom = new LogTransport(MOCK_ID, MOCK_LEVEL, undefined as any);
+			}).toThrow(`[logtr:${MOCK_ID}] Init failure - action arg is missing.`);
 		});
 	});
 });

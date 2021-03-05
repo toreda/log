@@ -9,7 +9,6 @@ export {LogGroup} from './log/group';
 export {LogTransport} from './log/transport';
 export {LogTransportAction} from './log/transport/action';
 export {LogTransportOptions} from './log/transport/options';
-export {LogTransportState} from './log/transport/state';
 
 // Interfaces
 export {LogLevels} from './log/levels';
