@@ -10,7 +10,7 @@ import {StrongMap} from '@toreda/strong-types';
 export class LogState extends StrongMap {
 	public globalLogLevel: number;
 	public readonly groups: Record<'all' | 'global' | string, LogGroup>;
-	public readonly groupList: string[];
+	public readonly groupKeys: string[];
 
 	constructor(options?: LogOptions) {
 		super();
@@ -18,7 +18,7 @@ export class LogState extends StrongMap {
 		const defaultGroups = this.createDefaultGroups();
 
 		this.groups = defaultGroups.map;
-		this.groupList = defaultGroups.keys;
+		this.groupKeys = defaultGroups.keys;
 
 		if (options && typeof options.globalLogLevel === 'number') {
 			this.globalLogLevel = options.globalLogLevel;

@@ -20,16 +20,17 @@ export class LogTransport {
 		if (!action) {
 			throw new Error(`[logtr:${id}] Init failure - action arg is missing.`);
 		}
+
+		if (typeof action !== 'function') {
+			throw new Error(`[logtr:${id}] Init failure - action arg must be a function.`);
+		}
+
 		this.id = id;
 		this.action = action;
 		this.level = level;
 	}
 
 	public async execute(msg: LogMessage): Promise<boolean> {
-		if (typeof this.action !== 'function') {
-			return false;
-		}
-
 		return await this.action(msg);
 	}
 }

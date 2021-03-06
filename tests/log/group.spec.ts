@@ -46,7 +46,41 @@ describe('LogGroup', () => {
 	});
 
 	describe('Implementation', () => {
-		describe('log', () => {});
+		let sampleLogMsg: LogMessage;
+		beforeEach(() => {
+			sampleLogMsg = {
+				date: Date.now().toLocaleString(),
+				level: LogLevels.DEBUG,
+				message: 'badger-badger-badger-badger-44141'
+			};
+		});
+
+		describe('log', () => {
+			let executeSpy: jest.SpyInstance;
+			let logAction: LogAction;
+			let testTransport: LogTransport;
+
+			beforeAll(() => {
+				executeSpy = jest.spyOn(instance, 'execute');
+				logAction = jest.fn();
+				testTransport = new LogTransport(MOCK_ID, MOCK_LEVEL, logAction);
+			});
+
+			beforeEach(() => {
+				executeSpy.mockClear();
+			});
+
+			afterAll(() => {
+				executeSpy.mockRestore();
+			});
+
+			it('should should not attempt to execute any transports when msg level is 0', async () => {
+				sampleLogMsg.level = 0x0;
+				expect(executeSpy).not.toHaveBeenCalled();
+				await instance.log(sampleLogMsg);
+				expect(executeSpy).not.toHaveBeenCalled();
+			});
+		});
 
 		describe('canExecute', () => {
 			it('should return false when msg log level is 0', () => {

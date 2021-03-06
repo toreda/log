@@ -66,6 +66,11 @@ export class LogGroup {
 			return false;
 		}
 
+		if (this.added.has(transport)) {
+			return false;
+		}
+
+		this.added.add(transport);
 		this.transports.push(transport);
 		return true;
 	}

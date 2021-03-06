@@ -3,8 +3,20 @@ import {LogLevels} from '../src/log/levels';
 import {LogTransport} from '../src/log/transport';
 import {LogAction} from '../src/log/action';
 import {LogMessage} from '../src/log/message';
+import {LogGroup} from '../src/log/group';
 
+const MOCK_ID = '149714971_92872981';
 const MOCK_MSG = 'msg here';
+const EMPTY_STRING = '';
+
+const LOG_LEVELS: number[] = [
+	LogLevels.ERROR,
+	LogLevels.WARN,
+	LogLevels.TRACE,
+	LogLevels.INFO,
+	LogLevels.DEBUG,
+	LogLevels.TRACE
+];
 
 const LOG_METHODS = [
 	{
@@ -73,6 +85,7 @@ describe('Log', () => {
 			return true;
 		};
 
+		instance.setGlobalLevel(LogLevels.DEBUG);
 		transport = new LogTransport('test', LogLevels.ALL, action);
 		instance.clearAll();
 	});
@@ -93,6 +106,65 @@ describe('Log', () => {
 			};
 		});
 
+		describe('setGroupLevel', () => {
+			let group: LogGroup;
+			const groupId = '19814_77eF971_VAZ714971';
+
+			beforeAll(() => {
+				group = instance.getGroup(groupId);
+			});
+
+			beforeEach(() => {
+				instance.setGroupLevel(groupId, LogLevels.ERROR);
+			});
+
+			it('should not change group log level when logLevel arg is undefined', () => {
+				const groupId = '97149_974646_MVVCJ196714';
+				const group = instance.getGroup(groupId);
+				group!.logLevel = LogLevels.TRACE;
+				instance.setGroupLevel(groupId, undefined as any);
+				expect(group!.logLevel).toBe(LogLevels.TRACE);
+			});
+
+			for (const level of LOG_LEVELS) {
+				it(`should set group level to ${level} set to ${level}`, () => {
+					expect(instance.state.groups[groupId].logLevel).toBe(LogLevels.ERROR);
+					instance.setGroupLevel(groupId, level);
+					expect(instance.state.groups[groupId].logLevel).toBe(level);
+				});
+			}
+		});
+
+		describe('setGlobalLevel', () => {
+			it('should not change log level when logLevel arg is undefined', () => {
+				expect(instance.state.globalLogLevel).toBe(LogLevels.DEBUG);
+				instance.setGlobalLevel('adfjakha' as any);
+				expect(instance.state.globalLogLevel).toBe(LogLevels.DEBUG);
+			});
+
+			it('should set global log level to 0 when logLevel arg is NONE', () => {
+				expect(instance.state.globalLogLevel).toBe(LogLevels.DEBUG);
+				instance.setGlobalLevel(LogLevels.NONE);
+				expect(instance.state.globalLogLevel).toBe(0);
+			});
+
+			it('should not change global level when logLevel arg is a negative number', () => {
+				expect(instance.state.globalLogLevel).toBe(LogLevels.DEBUG);
+				instance.setGlobalLevel(-1);
+				instance.setGlobalLevel(-41);
+				instance.setGlobalLevel(-3);
+				expect(instance.state.globalLogLevel).toBe(LogLevels.DEBUG);
+			});
+
+			for (const logLevel of LOG_LEVELS) {
+				it(`should set log level to ${logLevel}`, () => {
+					expect(instance.state.globalLogLevel).toBe(LogLevels.DEBUG);
+					instance.setGlobalLevel(logLevel);
+					expect(instance.state.globalLogLevel).toBe(logLevel);
+				});
+			}
+		});
+
 		describe('addTransport', () => {
 			it('should return false when transport arg is undefined', () => {
 				expect(instance.addTransport(undefined as any)).toBe(false);
@@ -108,19 +180,12 @@ describe('Log', () => {
 				expect(instance.addTransport(transport)).toBe(true);
 			});
 
-			it('should return true each time the same transport is added', () => {
-				const transport = new LogTransport('test', LogLevels.ALL, action);
-				const log = new Log();
-				for (let i = 0; i < 5; i++) {
-					expect(log.addTransport(transport)).toBe(true);
-				}
-			});
-
 			it('should not add the same transport more than once', () => {
 				const transport = new LogTransport('test', LogLevels.ALL, action);
 				const log = new Log();
+				log.addTransport(transport);
 				for (let i = 0; i < 5; i++) {
-					expect(log.addTransport(transport)).toBe(true);
+					expect(log.addTransport(transport)).toBe(false);
 				}
 			});
 		});
@@ -156,6 +221,42 @@ describe('Log', () => {
 				expect(group!.transports).toHaveLength(0);
 				expect(instance.addGroupTransport(groupId, null as any)).toBe(false);
 				expect(group!.transports).toHaveLength(0);
+			});
+
+			it(`should add transport to 'all' when groupId is null`, () => {
+				const transport = new LogTransport('11097141', LogLevels.ALL, action);
+				expect(instance.state.groups.all.transports).toHaveLength(0);
+				instance.addGroupTransport(null, transport);
+				expect(instance.state.groups.all.transports).toHaveLength(1);
+			});
+
+			it('should return false when groupId arg is undefined', () => {
+				const transport = new LogTransport(MOCK_ID, LogLevels.ALL, action);
+				expect(instance.addGroupTransport(undefined as any, transport)).toBe(false);
+			});
+
+			it('should return false when groupId arg is not a string and is not null', () => {
+				const transport = new LogTransport(MOCK_ID, LogLevels.ALL, action);
+				expect(instance.addGroupTransport(8767187182 as any, transport)).toBe(false);
+			});
+		});
+
+		describe('makeGroup', () => {
+			it('should return false when groupId arg is an empty string', () => {
+				expect(instance.makeGroup(EMPTY_STRING, LogLevels.DEBUG)).toBe(false);
+			});
+
+			it('should return false when groupId already exists', () => {
+				const groupId = '194714_8841978AF';
+				instance.makeGroup(groupId, LogLevels.DEBUG);
+				expect(instance.makeGroup(groupId, LogLevels.DEBUG)).toBe(false);
+			});
+
+			it('should return true when groupId is created', () => {
+				const groupId = '491719714';
+				expect(instance.state.groups[groupId]).toBeUndefined();
+				expect(instance.makeGroup(groupId, LogLevels.DEBUG)).toBe(true);
+				expect(instance.state.groups[groupId]).toHaveProperty('transports');
 			});
 		});
 
@@ -193,13 +294,47 @@ describe('Log', () => {
 			});
 		});
 
-		describe('getGroup', () => {
-			it('should return null when groupId arg is undefined', () => {
-				expect(instance.getGroup(undefined as any)).toBeNull();
+		describe('removeTransportEverywhere', () => {
+			it('should return false when transport is undefined', () => {
+				expect(instance.removeTransportEverywhere(undefined as any)).toBe(false);
 			});
 
-			it('should return null when groupId arg is null', () => {
-				expect(instance.getGroup(null as any)).toBeNull();
+			it('should return false when transport is null', () => {
+				expect(instance.removeTransportEverywhere(null as any)).toBe(false);
+			});
+
+			it('should return false when transport arg is provided but is not a LogTransport', () => {
+				expect(instance.removeTransportEverywhere(141971 as any)).toBe(false);
+			});
+
+			it('should remove target transport from all groups', () => {
+				const transport = new LogTransport(MOCK_ID, LogLevels.ALL, action);
+				const groupId1 = '14971497_7d7AKHF';
+				const groupId2 = '149719971_f7f7AA';
+				const groupId3 = '778910891_KHF8M4';
+
+				instance.addGroupTransport(groupId1, transport);
+				instance.addGroupTransport(groupId2, transport);
+				instance.addGroupTransport(groupId3, transport);
+
+				expect(instance.state.groups[groupId1].transports).toHaveLength(1);
+				expect(instance.state.groups[groupId2].transports).toHaveLength(1);
+				expect(instance.state.groups[groupId3].transports).toHaveLength(1);
+
+				instance.removeTransportEverywhere(transport);
+
+				expect(instance.state.groups[groupId1].transports).toHaveLength(0);
+				expect(instance.state.groups[groupId2].transports).toHaveLength(0);
+				expect(instance.state.groups[groupId3].transports).toHaveLength(0);
+			});
+		});
+
+		describe('getGroup', () => {
+			it('should return existing group', () => {
+				const groupId = '149714917_9174179';
+				const log = new Log();
+				const group = log.getGroup(groupId);
+				expect(log.getGroup(groupId)).toEqual(group);
 			});
 
 			it('should create and return group when groupId does not exist', () => {

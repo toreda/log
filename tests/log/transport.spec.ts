@@ -1,13 +1,13 @@
 import {LogMessage} from '../../src/log/message';
 import {LogTransport} from '../../src/log/transport';
-import {LogTransportAction} from '../../src/log/transport/action';
+import {LogAction} from '../../src/log/action';
 import {LogLevels} from '../../src/log/levels';
 
 const MOCK_ID = 'log_transport_id';
 const MOCK_LEVEL: LogLevels = LogLevels.NONE | LogLevels.ERROR;
 
 describe('LogTransport', () => {
-	let action: LogTransportAction;
+	let action: LogAction;
 	let level: LogLevels;
 	beforeAll(() => {
 		action = async (msg: LogMessage): Promise<boolean> => {
@@ -42,6 +42,31 @@ describe('LogTransport', () => {
 			expect(() => {
 				const custom = new LogTransport(MOCK_ID, MOCK_LEVEL, undefined as any);
 			}).toThrow(`[logtr:${MOCK_ID}] Init failure - action arg is missing.`);
+		});
+
+		it('should throw when id action arg is not a function', () => {
+			expect(() => {
+				const custom = new LogTransport(MOCK_ID, level, 1408141 as any);
+			}).toThrow(`[logtr:${MOCK_ID}] Init failure - action arg must be a function.`);
+		});
+	});
+
+	describe('Implementation', () => {
+		describe('execute', () => {
+			it('should pass msg to action call', async () => {
+				const sampleAction = jest.fn();
+				const custom = new LogTransport(MOCK_ID, LogLevels.ALL, sampleAction);
+				expect(sampleAction).not.toHaveBeenCalled();
+				const sampleMsg: LogMessage = {
+					level: LogLevels.ERROR | LogLevels.TRACE,
+					message: 'aaaa 01841 10481048 1444671',
+					date: Date.now().toLocaleString()
+				};
+
+				await custom.execute(sampleMsg);
+				expect(sampleAction).toHaveBeenCalledTimes(1);
+				expect(sampleAction).toHaveBeenLastCalledWith(sampleMsg);
+			});
 		});
 	});
 });

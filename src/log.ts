@@ -4,6 +4,7 @@ import {LogTransport} from './log/transport';
 import {LogGroup} from './log/group';
 import {LogState} from './log/state';
 import {LogMessage} from './log/message';
+import {isType} from '@toreda/strong-types';
 
 /**
  * Main log class holding attached transports and internal state
@@ -26,6 +27,10 @@ export class Log {
 	 * @param transport 		Transport to add to target group.
 	 */
 	public addGroupTransport(groupId: string | null, transport: LogTransport): boolean {
+		if (typeof groupId !== 'string' && groupId !== null) {
+			return false;
+		}
+
 		if (!transport || !(transport instanceof LogTransport)) {
 			console.error(new Error('transport is not a LogTransport'));
 			return false;
@@ -41,9 +46,7 @@ export class Log {
 			return false;
 		}
 
-		group.addTransport(transport);
-
-		return true;
+		return group.addTransport(transport);
 	}
 
 	/**
@@ -114,12 +117,12 @@ export class Log {
 	 * @param transport
 	 */
 	public removeTransportEverywhere(transport: LogTransport): boolean {
-		if (!transport) {
+		if (!transport || !isType(transport, LogTransport)) {
 			return false;
 		}
 
 		let removeCount = 0;
-		for (const groupName of this.state.groupList) {
+		for (const groupName of this.state.groupKeys) {
 			const group = this.state.groups[groupName];
 			const result = group.removeTransport(transport);
 			if (result) {
@@ -139,6 +142,12 @@ export class Log {
 		if (typeof logLevel !== 'number') {
 			return;
 		}
+
+		if (logLevel < 0 || logLevel > LogLevels.ALL) {
+			return;
+		}
+
+		this.state.globalLogLevel = logLevel;
 	}
 
 	/**
@@ -146,7 +155,7 @@ export class Log {
 	 * @param logLevel
 	 * @param groupId
 	 */
-	public setGroupLevel(logLevel: LogLevels, groupId: string): void {
+	public setGroupLevel(groupId: string, logLevel: LogLevels): void {
 		if (typeof logLevel !== 'number') {
 			return;
 		}
@@ -176,6 +185,7 @@ export class Log {
 			return false;
 		}
 
+		this.state.groupKeys.push(groupId);
 		this.state.groups[groupId] = new LogGroup(groupId, logLevel);
 		return true;
 	}
@@ -202,21 +212,12 @@ export class Log {
 	 * log to the target group ID.
 	 * @param groupId
 	 */
-	public getGroup(groupId: string): LogGroup | null {
-		if (typeof groupId !== 'string') {
-			return null;
-		}
-
+	public getGroup(groupId: string): LogGroup {
 		if (this.state.groups[groupId]) {
 			return this.state.groups[groupId];
 		}
 
-		const success = this.makeGroup(groupId, LogLevels.NONE | LogLevels.ERROR);
-
-		if (!success) {
-			return null;
-		}
-
+		this.makeGroup(groupId, LogLevels.NONE | LogLevels.ERROR);
 		return this.state.groups[groupId];
 	}
 
@@ -329,8 +330,12 @@ export class Log {
 	 * Clear all transports from all groups.
 	 */
 	public clearAll(): void {
-		for (const groupId of this.state.groupList) {
+		for (const groupId of this.state.groupKeys) {
 			this.state.groups[groupId].clear();
 		}
+
+		this.state.groupKeys.length = 0;
+		this.state.groupKeys.push('all');
+		this.state.groupKeys.push('global');
 	}
 }

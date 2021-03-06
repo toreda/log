@@ -30,16 +30,16 @@ describe('LogState', () => {
 			expect(custom.groups.global).toBeTruthy();
 		});
 
-		it(`should initialize groupList member and include 'all' key`, () => {
+		it(`should initialize groupKeys member and include 'all' key`, () => {
 			const custom = new LogState(options);
-			expect(Array.isArray(custom.groupList)).toBeTruthy();
-			expect(custom.groupList.includes('all')).toBe(true);
+			expect(Array.isArray(custom.groupKeys)).toBeTruthy();
+			expect(custom.groupKeys.includes('all')).toBe(true);
 		});
 
-		it(`should initialize groupList member and include 'global' key`, () => {
+		it(`should initialize groupKeys member and include 'global' key`, () => {
 			const custom = new LogState(options);
-			expect(Array.isArray(custom.groupList)).toBe(true);
-			expect(custom.groupList.includes('global')).toBe(true);
+			expect(Array.isArray(custom.groupKeys)).toBe(true);
+			expect(custom.groupKeys.includes('global')).toBe(true);
 		});
 	});
 
