@@ -77,7 +77,7 @@ describe('LogGroup', () => {
 			it('should should not attempt to execute any transports when msg level is 0', async () => {
 				sampleLogMsg.level = 0x0;
 				expect(executeSpy).not.toHaveBeenCalled();
-				await instance.log(sampleLogMsg);
+				await instance.log(LogLevels.ALL, sampleLogMsg);
 				expect(executeSpy).not.toHaveBeenCalled();
 			});
 		});
@@ -85,42 +85,58 @@ describe('LogGroup', () => {
 		describe('canExecute', () => {
 			it('should return false when msg log level is 0', () => {
 				const transport = new LogTransport(MOCK_ID, LogLevels.ALL, action);
-				expect(instance.canExecute(transport, LogLevels.NONE)).toBe(false);
+				expect(instance.canExecute(transport, LogLevels.ALL, LogLevels.ALL, LogLevels.NONE)).toBe(
+					false
+				);
 			});
 
 			it('should return false when transport arg is undefined', () => {
-				expect(instance.canExecute(undefined as any, LogLevels.ALL)).toBe(false);
+				expect(
+					instance.canExecute(undefined as any, LogLevels.ALL, LogLevels.ALL, LogLevels.ALL)
+				).toBe(false);
 			});
 
 			it('should return false when transport arg is null', () => {
-				expect(instance.canExecute(null as any, LogLevels.ALL)).toBe(false);
+				expect(instance.canExecute(null as any, LogLevels.ALL, LogLevels.ALL, LogLevels.ALL)).toBe(
+					false
+				);
 			});
 
 			it('should return false when transport arg is not a LogTransport', () => {
-				expect(instance.canExecute(instance as any, LogLevels.ALL)).toBe(false);
+				expect(
+					instance.canExecute(instance as any, LogLevels.ALL, LogLevels.ALL, LogLevels.ALL)
+				).toBe(false);
 			});
 
 			it('should return true when transport matches all active log levels', () => {
 				const transport = new LogTransport(MOCK_ID, LogLevels.ALL, action);
-				expect(instance.canExecute(transport, LogLevels.ALL)).toBe(true);
+				expect(instance.canExecute(transport, LogLevels.ALL, LogLevels.NONE, LogLevels.ALL)).toBe(
+					true
+				);
 			});
 
 			it('should return true when transport one active log levels', () => {
 				const transport = new LogTransport(MOCK_ID, LogLevels.ERROR, action);
-				expect(instance.canExecute(transport, LogLevels.ALL)).toBe(true);
+				expect(instance.canExecute(transport, LogLevels.NONE, LogLevels.INFO, LogLevels.INFO)).toBe(
+					true
+				);
 			});
 
-			it('should return true when transport multiple active log levels', () => {
+			it('should return true when msg mask matches multiple log levels', () => {
 				const levels = LogLevels.ERROR | LogLevels.DEBUG | LogLevels.INFO;
 				const transport = new LogTransport(MOCK_ID, levels, action);
-				expect(instance.canExecute(transport, LogLevels.ALL)).toBe(true);
+				expect(instance.canExecute(transport, LogLevels.ALL, LogLevels.ALL, LogLevels.ALL)).toBe(
+					true
+				);
 			});
 
 			it(`should return false when transport's log levels don't match message levels`, () => {
 				const transportLevels = LogLevels.DEBUG | LogLevels.ERROR;
 				const messageLevels = LogLevels.TRACE | LogLevels.WARN;
 				const transport = new LogTransport(MOCK_ID, transportLevels, action);
-				expect(instance.canExecute(transport, messageLevels)).toBe(false);
+				expect(instance.canExecute(transport, LogLevels.NONE, LogLevels.NONE, messageLevels)).toBe(
+					false
+				);
 			});
 		});
 	});

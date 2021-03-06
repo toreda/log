@@ -17,7 +17,6 @@ export {LogAction} from './log/action';
  * LOG TRANSPORT
  */
 export {LogTransport} from './log/transport';
-export {LogTransportOptions} from './log/transport/options';
 
 /**
  * INTERFACES

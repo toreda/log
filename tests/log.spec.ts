@@ -196,6 +196,7 @@ describe('Log', () => {
 				const transport = new LogTransport('test', LogLevels.ALL, action);
 				instance.addGroupTransport(groupId, transport);
 				const group = instance.state.groups[groupId];
+
 				expect(group).not.toBeUndefined();
 				expect(Array.isArray(group.transports)).toBe(true);
 				expect(group.transports[0]).toBe(transport);
@@ -346,6 +347,52 @@ describe('Log', () => {
 			});
 		});
 
+		describe('initGroups', () => {
+			let setGroupLevelMock: jest.SpyInstance;
+
+			beforeAll(() => {
+				setGroupLevelMock = jest.spyOn(instance, 'setGroupLevel');
+			});
+
+			beforeEach(() => {
+				setGroupLevelMock.mockClear();
+			});
+
+			it('should not call setGroupLevel when groups arg is undefined or null', () => {
+				instance.initGroups(undefined);
+				instance.initGroups(null as any);
+				expect(setGroupLevelMock).not.toHaveBeenCalled();
+			});
+
+			it('should not call setGroupLevel when groups arg is not an array', () => {
+				instance.initGroups(1971497 as any);
+				expect(setGroupLevelMock).not.toHaveBeenCalled();
+			});
+
+			it('should not call setGroupLevel when groups is an empty array', () => {
+				instance.initGroups([]);
+				expect(setGroupLevelMock).not.toHaveBeenCalled();
+			});
+
+			it('should not call setGroupLevel for elements missing a groupId string', () => {
+				const item1 = {id: 149197 as any, level: LogLevels.ALL};
+				const item2 = {id: '499181', level: LogLevels.DEBUG};
+				const item3 = {id: 'i6568712867', level: LogLevels.INFO};
+				const item4 = {id: 'i6568712867', level: LogLevels.INFO};
+				instance.initGroups([item1, item2, item3, item4]);
+				expect(setGroupLevelMock).toHaveBeenCalledTimes(3);
+			});
+
+			it('should not call setGroupLevel for elements missing a level', () => {
+				const item1 = {id: '1490714971', level: 'stringhere' as any};
+				const item2 = {id: '499181', level: LogLevels.DEBUG};
+				const item3 = {id: 'i6568712867', level: LogLevels.INFO};
+				instance.initGroups([item1, item2, item3]);
+				expect(setGroupLevelMock).toHaveBeenCalledTimes(2);
+			});
+
+		});
+
 		describe('log', () => {
 			it('should send log to target group when groupId is non-null', () => {
 				const groupId = '149719714';
@@ -356,7 +403,7 @@ describe('Log', () => {
 
 				custom.log(groupId, LogLevels.ALL, sampleMsg);
 				expect(spy).toHaveBeenCalledTimes(1);
-				const lastMsg = spy.mock.calls[0][0];
+				const lastMsg = spy.mock.calls[0][1];
 				expect(lastMsg.level).toBe(LogLevels.ALL);
 				expect(lastMsg.message).toBe(sampleMsg);
 
@@ -369,11 +416,28 @@ describe('Log', () => {
 				const spy = jest.spyOn(log.state.groups.all, 'log');
 				log.log(null, LogLevels.ALL, sampleMsg);
 				expect(spy).toHaveBeenCalledTimes(1);
-				const lastMsg = spy.mock.calls[0][0];
+				const lastMsg = spy.mock.calls[0][1];
 				expect(lastMsg.level).toBe(LogLevels.ALL);
 				expect(lastMsg.message).toBe(sampleMsg);
 
 				spy.mockRestore();
+			});
+		});
+
+		describe('Log Level', () => {
+			it('should execute transports when group and transport log level are active but global level is 0', () => {
+				const activeInactive = jest.fn();
+				const transportInactive = new LogTransport('inactive', LogLevels.NONE, activeInactive);
+				const actionActive = jest.fn();
+				const transportActive = new LogTransport('active', LogLevels.DEBUG, actionActive);
+				instance.setGlobalLevel(LogLevels.NONE);
+				instance.addGroupTransport('149719_7419', transportInactive);
+				instance.addGroupTransport('4741798_8811', transportInactive);
+
+				const gid = '19GHVC_7149714_917477a6333AVH';
+				instance.addGroupTransport(gid, transportActive);
+				const group = instance.getGroup(gid);
+				group.setLogLevel(LogLevels.DEBUG);
 			});
 		});
 

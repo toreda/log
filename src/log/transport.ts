@@ -1,6 +1,5 @@
 import {LogMessage} from './message';
 import {LogAction} from './action';
-import {LogTransportOptions} from './transport/options';
 import {LogLevels} from './levels';
 
 export class LogTransport {
@@ -8,7 +7,7 @@ export class LogTransport {
 	public readonly action: LogAction;
 	public readonly level: number;
 
-	constructor(id: string, level: LogLevels, action: LogAction, options?: LogTransportOptions) {
+	constructor(id: string, level: LogLevels, action: LogAction) {
 		if (!id && typeof id !== 'string') {
 			throw new Error('Log Transport init failure - id arg is missing.');
 		}

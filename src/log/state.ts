@@ -14,7 +14,10 @@ export class LogState extends StrongMap {
 
 	constructor(options?: LogOptions) {
 		super();
-		this.globalLogLevel = LogLevels.ALL & ~LogLevels.DEBUG & LogLevels.TRACE;
+		this.globalLogLevel =
+			options && typeof options.globalLogLevel === 'number'
+				? options.globalLogLevel
+				: LogLevels.ALL & ~LogLevels.DEBUG & LogLevels.TRACE;
 		const defaultGroups = this.createDefaultGroups();
 
 		this.groups = defaultGroups.map;

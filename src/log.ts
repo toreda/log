@@ -18,6 +18,21 @@ export class Log {
 		this.state = new LogState(options);
 	}
 
+	public initGroups(groups?: {id: string; level: LogLevels}[]): void {
+		if (!groups) {
+			return;
+		}
+
+		if (!Array.isArray(groups)) {
+			return;
+		}
+
+		for (const group of groups) {
+			if (typeof group.id === 'string' && typeof group.level === 'number') {
+				this.setGroupLevel(group.id, group.level);
+			}
+		}
+	}
 	/**
 	 * Add transport to target group.
 	 * @param groupId			Target group to add transport to. When null the default 'all'
@@ -156,16 +171,12 @@ export class Log {
 	 * @param groupId
 	 */
 	public setGroupLevel(groupId: string, logLevel: LogLevels): void {
-		if (typeof logLevel !== 'number') {
-			return;
-		}
-
 		const group = this.getGroup(groupId);
 		if (!group) {
 			return;
 		}
 
-		group.logLevel = logLevel;
+		group.setLogLevel(logLevel);
 	}
 
 	/**
@@ -231,12 +242,12 @@ export class Log {
 		const logMsg: LogMessage = this.createMessage('', level, ...msg);
 
 		if (typeof groupId === 'string' && this.state.groups[groupId]) {
-			this.state.groups[groupId].log(logMsg);
+			this.state.groups[groupId].log(this.state.globalLogLevel, logMsg);
 		} else {
-			this.state.groups['all'].log(logMsg);
+			this.state.groups['all'].log(this.state.globalLogLevel, logMsg);
 		}
 
-		this.state.groups.global.log(logMsg);
+		this.state.groups.global.log(this.state.globalLogLevel, logMsg);
 
 		return this;
 	}

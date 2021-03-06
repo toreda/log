@@ -22,18 +22,29 @@ export class LogGroup {
 	 * @param level		Bitmask level msg was logged with.
 	 * @param msg		Message to be logged.
 	 */
-	public async log(msg: LogMessage): Promise<void> {
+	public async log(globalLevel: LogLevels, msg: LogMessage): Promise<void> {
 		if (typeof msg.level !== 'number' || msg.level === 0) {
 			return;
 		}
 
 		for (const transport of this.transports) {
-			await this.execute(transport, msg);
+			await this.execute(transport, globalLevel, this.logLevel, msg);
 		}
 	}
 
-	public async execute(transport: LogTransport, msg: LogMessage): Promise<boolean> {
-		if (!this.canExecute(transport, msg.level)) {
+	/**
+	 * Attempt to execute every action with transports matching the
+	 * current log level.
+	 * @param transport
+	 * @param msg
+	 */
+	public async execute(
+		transport: LogTransport,
+		globalLevel: LogLevels,
+		groupLevel: LogLevels,
+		msg: LogMessage
+	): Promise<boolean> {
+		if (!this.canExecute(transport, globalLevel, groupLevel, msg.level)) {
 			return false;
 		}
 
@@ -46,12 +57,23 @@ export class LogGroup {
 		return true;
 	}
 
-	public canExecute(transport: LogTransport, logLevel: LogLevels): boolean {
+	public canExecute(
+		transport: LogTransport,
+		globalLevel: LogLevels,
+		groupLevel: LogLevels,
+		msgLevel: LogLevels
+	): boolean {
 		if (!isType(transport, LogTransport)) {
 			return false;
 		}
 
-		return (logLevel & transport.level) > 0x0;
+		// Combine all active bits from the global, group, and transport
+		// masks into a single active bitmask.
+		const activeMask = globalLevel | groupLevel | transport.level;
+
+		// Message level mask contains >= 1 active bits.
+		// Matching 1+ bits allows message to be logged.
+		return (activeMask & msgLevel) != 0;
 	}
 
 	/**
@@ -73,6 +95,18 @@ export class LogGroup {
 		this.added.add(transport);
 		this.transports.push(transport);
 		return true;
+	}
+
+	/**
+	 * Set active log level for this group.
+	 * @param logLevel
+	 */
+	public setLogLevel(logLevel: LogLevels): void {
+		if (typeof logLevel !== 'number') {
+			return;
+		}
+
+		this.logLevel = logLevel;
 	}
 
 	/**
