@@ -1,15 +1,27 @@
-// Logger
+/**
+ * MAIN LOG CLASS
+ */
 export {Log} from './log';
+/** Options provided to logger on creation. */
 export {LogOptions} from './log/options';
+/** Internal log state data. */
 export {LogState} from './log/state';
-
+/** Groups to partition active logging across specific classes
+ * and systems. */
 export {LogGroup} from './log/group';
 
-// Log Transport
+/** Action used in transport execution */
+export {LogAction} from './log/action';
+
+/**
+ * LOG TRANSPORT
+ */
 export {LogTransport} from './log/transport';
-export {LogTransportAction} from './log/transport/action';
 export {LogTransportOptions} from './log/transport/options';
 
-// Interfaces
+/**
+ * INTERFACES
+ */
 export {LogLevels} from './log/levels';
+/** Structured log data format with basic call meta data. */
 export {LogMessage} from './log/message';

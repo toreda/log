@@ -1,14 +1,67 @@
-import {appendFileSync, unlinkSync} from 'fs';
-
 import {Log} from '../src/log';
 import {LogLevels} from '../src/log/levels';
 import {LogTransport} from '../src/log/transport';
-import {LogTransportAction} from '../src/log/transport/action';
+import {LogAction} from '../src/log/action';
 import {LogMessage} from '../src/log/message';
+
+const MOCK_MSG = 'msg here';
+
+const LOG_METHODS = [
+	{
+		name: 'error',
+		level: LogLevels.ERROR,
+		groupId: null
+	},
+	{
+		name: 'warn',
+		level: LogLevels.WARN,
+		groupId: null
+	},
+	{
+		name: 'info',
+		level: LogLevels.INFO,
+		groupId: null
+	},
+	{
+		name: 'debug',
+		level: LogLevels.DEBUG,
+		groupId: null
+	},
+	{
+		name: 'trace',
+		level: LogLevels.TRACE,
+		groupId: null
+	},
+	{
+		name: 'errorGroup',
+		level: LogLevels.ERROR,
+		groupId: '104814081'
+	},
+	{
+		name: 'warnGroup',
+		level: LogLevels.WARN,
+		groupId: '4662191908'
+	},
+	{
+		name: 'infoGroup',
+		level: LogLevels.INFO,
+		groupId: '48719190'
+	},
+	{
+		name: 'debugGroup',
+		level: LogLevels.DEBUG,
+		groupId: '98198198'
+	},
+	{
+		name: 'traceGroup',
+		level: LogLevels.TRACE,
+		groupId: '98149814'
+	}
+];
 
 describe('Log', () => {
 	let instance: Log;
-	let action: LogTransportAction;
+	let action: LogAction;
 	let transport: LogTransport;
 
 	beforeAll(() => {
@@ -32,7 +85,7 @@ describe('Log', () => {
 
 	describe('Implementation', () => {
 		let spy: jest.SpyInstance;
-		let action: LogTransportAction;
+		let action: LogAction;
 
 		beforeEach(() => {
 			action = async (msg: LogMessage): Promise<boolean> => {
@@ -156,6 +209,111 @@ describe('Log', () => {
 				const group = log.getGroup(groupId);
 				expect(group).toBeDefined();
 			});
+		});
+
+		describe('log', () => {
+			it('should send log to target group when groupId is non-null', () => {
+				const groupId = '149719714';
+				const sampleMsg = 'badger-badger-badger-badger';
+				const custom = new Log();
+				custom.getGroup(groupId);
+				const spy = jest.spyOn(custom.state.groups[groupId], 'log');
+
+				custom.log(groupId, LogLevels.ALL, sampleMsg);
+				expect(spy).toHaveBeenCalledTimes(1);
+				const lastMsg = spy.mock.calls[0][0];
+				expect(lastMsg.level).toBe(LogLevels.ALL);
+				expect(lastMsg.message).toBe(sampleMsg);
+
+				spy.mockRestore();
+			});
+
+			it(`should send log to 'all' group when groupId arg is null`, () => {
+				const log = new Log();
+				const sampleMsg = 'aaaaaa14145';
+				const spy = jest.spyOn(log.state.groups.all, 'log');
+				log.log(null, LogLevels.ALL, sampleMsg);
+				expect(spy).toHaveBeenCalledTimes(1);
+				const lastMsg = spy.mock.calls[0][0];
+				expect(lastMsg.level).toBe(LogLevels.ALL);
+				expect(lastMsg.message).toBe(sampleMsg);
+
+				spy.mockRestore();
+			});
+		});
+
+		describe('Log Methods', () => {
+			let logSpy: jest.SpyInstance;
+
+			beforeAll(() => {
+				logSpy = jest.spyOn(instance, 'log');
+			});
+
+			beforeEach(() => {
+				logSpy.mockClear();
+				expect(logSpy).not.toHaveBeenCalled();
+			});
+
+			afterAll(() => {
+				logSpy.mockRestore();
+			});
+
+			for (const method of LOG_METHODS) {
+				describe(`${method.name} method`, () => {
+					it('should call log method exactly once', () => {
+						if (method.groupId === null) {
+							instance[method.name](MOCK_MSG);
+						} else {
+							instance[method.name](method.groupId, MOCK_MSG);
+						}
+
+						expect(logSpy).toHaveBeenCalledTimes(1);
+					});
+
+					it(`should pass '${method.groupId}' groupId to log method`, () => {
+						if (method.groupId === null) {
+							instance[method.name](MOCK_MSG);
+						} else {
+							instance[method.name](method.groupId, MOCK_MSG);
+						}
+
+						expect(logSpy).toHaveBeenLastCalledWith(
+							method.groupId,
+							expect.anything(),
+							expect.anything()
+						);
+						expect(logSpy).toHaveBeenCalledTimes(1);
+					});
+
+					it(`should pass log level '${method.level}' to log method`, () => {
+						if (method.groupId === null) {
+							instance[method.name](MOCK_MSG);
+						} else {
+							instance[method.name](method.groupId, MOCK_MSG);
+						}
+
+						expect(logSpy).toHaveBeenLastCalledWith(
+							method.groupId,
+							method.level,
+							expect.anything()
+						);
+						expect(logSpy).toHaveBeenCalledTimes(1);
+					});
+
+					it('should pass msg to log method', () => {
+						const sampleMsg = 'AAA0814108';
+
+						if (method.groupId === null) {
+							instance[method.name](sampleMsg);
+						} else {
+							instance[method.name](method.groupId, sampleMsg);
+						}
+
+						expect(logSpy).toHaveBeenLastCalledWith(method.groupId, expect.anything(), sampleMsg);
+						expect(logSpy).toHaveBeenCalledTimes(1);
+					});
+				});
+			}
 		});
 	});
 });

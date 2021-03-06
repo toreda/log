@@ -2,8 +2,8 @@ import {LogLevels} from './log/levels';
 import {LogOptions} from './log/options';
 import {LogTransport} from './log/transport';
 import {LogGroup} from './log/group';
-import {isType} from '@toreda/strong-types';
 import {LogState} from './log/state';
+import {LogMessage} from './log/message';
 
 /**
  * Main log class holding attached transports and internal state
@@ -57,6 +57,29 @@ export class Log {
 	}
 
 	/**
+	 * Add global transport. Executed once per log message matching
+	 * transport's log level across all groups.
+	 * @param transport		Target transport to become a global listener.
+	 */
+	public addGlobalTransport(transport: LogTransport): boolean {
+		return this.addGroupTransport('global', transport);
+	}
+
+	/**
+	 * Remove existing global transsport, if it exists. No changes made
+	 * to global transports when target does not exist. Call only as needed
+	 * for optimal performance. Method must perform an `O(n)` iteration where
+	 * `n` is the current global transport count.
+	 * @param transport		target transport to remove from global list.
+	 *
+	 * @returns 			`true` when transport match was found and removed
+	 * 						from target group. `false` if no match was found.
+	 */
+	public removeGlobalTransport(transport: LogTransport): boolean {
+		return this.removeGroupTransport('global', transport);
+	}
+
+	/**
 	 * Remove target transport from default 'all' group. Calling
 	 * has no effect when transport does not exist in 'all' group. If
 	 * transport has been added to multiple groups,
@@ -106,6 +129,7 @@ export class Log {
 
 		return removeCount > 0;
 	}
+
 	/**
 	 * Change global log level. Individual group levels
 	 * are used instead of global level when they are set.
@@ -136,6 +160,44 @@ export class Log {
 	}
 
 	/**
+	 * Attempt to make new log group with target groupId. Does not
+	 * overwrite existing groups.
+	 * @param groupId 		target log group to create.
+	 * @returns 			Whether make group operation was successful. `false` when
+	 * 						group already exists or failed. `true` when group with target
+	 * 						id is created successfully.
+	 */
+	public makeGroup(groupId: string, logLevel: LogLevels): boolean {
+		if (typeof groupId !== 'string' || !groupId) {
+			return false;
+		}
+
+		if (this.state.groups[groupId]) {
+			return false;
+		}
+
+		this.state.groups[groupId] = new LogGroup(groupId, logLevel);
+		return true;
+	}
+
+	/**
+	 * Create structured log message. Provided as a call argument
+	 * during transport execution.
+	 * @param ts			UTC timestamp when msg was created.
+	 * @param level			Level bitmask msg was logged with.
+	 * @param msg			Msg that was logged.
+	 */
+	public createMessage(ts: string, level: LogLevels, ...msg: unknown[]): LogMessage {
+		const content = Array.isArray(msg) ? msg.join(' ') : msg;
+
+		return {
+			date: ts,
+			level: level,
+			message: content
+		};
+	}
+
+	/**
 	 * Make a group logger instance where all log levels automatically
 	 * log to the target group ID.
 	 * @param groupId
@@ -145,13 +207,17 @@ export class Log {
 			return null;
 		}
 
-		const group = this.state.groups[groupId];
-		if (!isType(group, LogGroup)) {
-			this.state.groups[groupId] = new LogGroup(groupId, LogLevels.NONE | LogLevels.ERROR);
+		if (this.state.groups[groupId]) {
 			return this.state.groups[groupId];
 		}
 
-		return group;
+		const success = this.makeGroup(groupId, LogLevels.NONE | LogLevels.ERROR);
+
+		if (!success) {
+			return null;
+		}
+
+		return this.state.groups[groupId];
 	}
 
 	/**
@@ -161,17 +227,15 @@ export class Log {
 	 * @param msg
 	 */
 	public log(groupId: string | null, level: LogLevels, ...msg: unknown[]): Log {
-		if (!groupId) {
-			return this;
-		}
+		const logMsg: LogMessage = this.createMessage('', level, ...msg);
 
-		if (this.state.groups[groupId]) {
-			this.state.groups[groupId].log(level, ...msg);
+		if (typeof groupId === 'string' && this.state.groups[groupId]) {
+			this.state.groups[groupId].log(logMsg);
 		} else {
-			this.state.groups['all'].log(level, ...msg);
+			this.state.groups['all'].log(logMsg);
 		}
 
-		this.state.groups.global.log(level, ...msg);
+		this.state.groups.global.log(logMsg);
 
 		return this;
 	}
@@ -209,12 +273,13 @@ export class Log {
 	public warnGroup(groupId: string | null, ...msg: unknown[]): Log {
 		return this.log(groupId, LogLevels.WARN, ...msg);
 	}
+
 	/**
 	 * Trigger an info-level log message for no specific group (global).
 	 * @param args
 	 */
 	public info(...msg: unknown[]): Log {
-		return this.infoGroup(null, LogLevels.INFO, ...msg);
+		return this.infoGroup(null, ...msg);
 	}
 
 	/**
@@ -231,7 +296,7 @@ export class Log {
 	 * @param msg
 	 */
 	public debug(...msg: unknown[]): Log {
-		return this.debugGroup(null, LogLevels.DEBUG, ...msg);
+		return this.debugGroup(null, ...msg);
 	}
 
 	/**

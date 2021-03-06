@@ -22,93 +22,35 @@ export class LogGroup {
 	 * @param level		Bitmask level msg was logged with.
 	 * @param msg		Message to be logged.
 	 */
-	public async log(level: LogLevels, ...msg: unknown[]): Promise<void> {
-		const logMsg = this.createMessage('', level, ...msg);
-
-		for (let bitMask = 1; bitMask <= 16; bitMask *= 2) {
-			const currentLevel = level & bitMask;
-			await this.executeLevel(currentLevel, logMsg);
-		}
-	}
-
-	/**
-	 * Create structured log message. Provided as a call argument
-	 * during transport execution.
-	 * @param ts			UTC timestamp when msg was created.
-	 * @param level			Level bitmask msg was logged with.
-	 * @param msg			Msg that was logged.
-	 */
-	public createMessage(ts: string, level: LogLevels, ...msg: unknown[]): LogMessage {
-		const content = Array.isArray(msg) ? msg.join(' ') : msg;
-
-		return {
-			date: ts,
-			level: level,
-			message: content
-		};
-	}
-
-	/**
-	 * Log error message to this group.
-	 * @param msg
-	 */
-	public error(...msg: unknown[]): void {
-		this.log(LogLevels.ERROR, msg);
-	}
-
-	/**
-	 * Log warning message to this group.
-	 * @param msg
-	 */
-	public warn(...msg: unknown[]): void {
-		this.log(LogLevels.WARN, msg);
-	}
-
-	/**
-	 * Log info message to this group.
-	 * @param msg
-	 */
-	public info(...msg: unknown[]): void {
-		this.log(LogLevels.INFO, msg);
-	}
-
-	/**
-	 * Log debug message to this group.
-	 * @param msg
-	 */
-	public debug(...msg: unknown[]): void {
-		this.log(LogLevels.DEBUG, msg);
-	}
-
-	/**
-	 * Log trace message to this group.
-	 * @param msg
-	 */
-	public trace(...msg: unknown[]): void {
-		this.log(LogLevels.TRACE, msg);
-	}
-
-	public async executeLevel(logLevel: number, msg: LogMessage): Promise<boolean> {
-		if (typeof logLevel !== 'number' || logLevel === 0) {
-			return false;
+	public async log(msg: LogMessage): Promise<void> {
+		if (typeof msg.level !== 'number' || msg.level === 0) {
+			return;
 		}
 
 		for (const transport of this.transports) {
-			if (!this.canExecute(logLevel, transport)) {
-				continue;
-			}
+			await this.execute(transport, msg);
+		}
+	}
 
-			try {
-				transport.execute(msg);
-			} catch (e) {
-				console.error(`transport execution failure: ${e.message}.`);
-			}
+	public async execute(transport: LogTransport, msg: LogMessage): Promise<boolean> {
+		if (!this.canExecute(transport, msg.level)) {
+			return false;
+		}
+
+		try {
+			transport.execute(msg);
+		} catch (e) {
+			console.error(`transport execution failure: ${e.message}.`);
 		}
 
 		return true;
 	}
 
-	public canExecute(logLevel: LogLevels, transport: LogTransport): boolean {
+	public canExecute(transport: LogTransport, logLevel: LogLevels): boolean {
+		if (!isType(transport, LogTransport)) {
+			return false;
+		}
+
 		return (logLevel & transport.level) > 0x0;
 	}
 
