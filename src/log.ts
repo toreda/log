@@ -98,6 +98,47 @@ export class Log {
 	}
 
 	/**
+	 * Remove global transport using its unique ID when you
+	 * no longer have access to the transport object itself.
+	 * @param id		Transport's unique ID.
+	 */
+	public removeGlobalTransportById(id: string): boolean {
+		return this.removeGroupTransportById('global', id);
+	}
+
+	/**
+	 * Remove transport matching transportId from the default
+	 * 'all' log group.
+	 * @param transportId
+	 */
+	public removeTransportById(transportId: string): boolean {
+		return this.removeGroupTransportById('all', transportId);
+	}
+
+	/**
+	 * Remove transport matching target id from target group if
+	 * both the group exists and the transport is in the group.
+	 * @param groupId
+	 * @param transportId
+	 */
+	public removeGroupTransportById(groupId: string, transportId: string): boolean {
+		const group = this.getGroup(groupId);
+
+		for (let i = group.transports.length - 1; i >= 0; i--) {
+			const transport = group.transports[i];
+
+			// Remove matching transport and exit. Only one
+			// of each transport can be added to a group.
+			if (transport.id === transportId) {
+				group.transports.splice(i, 1);
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
 	 * Remove target transport from default 'all' group. Calling
 	 * has no effect when transport does not exist in 'all' group. If
 	 * transport has been added to multiple groups,

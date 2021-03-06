@@ -4,7 +4,14 @@
 
 ![CI](https://github.com/toreda/log/workflows/CI/badge.svg?branch=master) [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=toreda_log&metric=coverage)](https://sonarcloud.io/dashboard?id=toreda_log) [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=toreda_log&metric=alert_status)](https://sonarcloud.io/dashboard?id=toreda_log)
 
-Lightweight and flexible TypeScript logger for node, web, and serverless environments. Write custom transports to filter and processes log output. The extremely small package footprint is ideal for webacking or bundling `@toreda/log` for live deployment.
+Light TypeScript logger for node, web, and serverless environments. 
+
+Features:
+* Custom Transports
+* Small footprint
+* Browser Compatible
+* Serverless Compatible
+* TypeScript first
 
 # Contents
 * [**Usage**](#usage)
