@@ -543,13 +543,6 @@
   dependencies:
     "@sinonjs/commons" "^1.7.0"
 
-"@toreda/action-result@^0.3.0":
-  version "0.3.0"
-  resolved "https://registry.yarnpkg.com/@toreda/action-result/-/action-result-0.3.0.tgz#c1fa2e7c167e03ea51e6cf4999219593502f63b5"
-  integrity sha512-rItfFcIHwRpgqtmv442ys5GRKT6wsiFxyo4WmI2G8mqjYJzdHJHwGaCfLThYV+fffNg9UmkaE+PcdjqyskX6vQ==
-  dependencies:
-    "@toreda/strong-types" "^0.9.0"
-
 "@toreda/eslint-config@^2.0.0":
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/@toreda/eslint-config/-/eslint-config-2.0.0.tgz#0417b6ce737462eb99fefb1410a44e2ea62748d3"
