@@ -1,16 +1,19 @@
 import {LogTransport} from './transport';
 import {LogLevels} from './levels';
 import {LogMessage} from '../log/message';
-import {isType} from '@toreda/strong-types';
+import {isType, makeBoolean, StrongBoolean} from '@toreda/strong-types';
 
 export class LogGroup {
 	public readonly id: string;
+	public readonly enabled: StrongBoolean;
 	public readonly transports: LogTransport[];
 	public readonly added: Set<LogTransport>;
 	public logLevel: LogLevels;
 
-	constructor(id: string, logLevel: LogLevels) {
+	constructor(id: string, logLevel: LogLevels, enable: boolean) {
 		this.id = id;
+
+		this.enabled = makeBoolean(enable, true);
 		this.transports = [];
 		this.logLevel = logLevel;
 		this.added = new Set<LogTransport>();
@@ -24,6 +27,11 @@ export class LogGroup {
 	 */
 	public async log(globalLevel: LogLevels, msg: LogMessage): Promise<void> {
 		if (typeof msg.level !== 'number' || msg.level === 0) {
+			return;
+		}
+
+		// No logs processed when entire group is disabled.
+		if (!this.enabled()) {
 			return;
 		}
 
@@ -73,6 +81,11 @@ export class LogGroup {
 		msgLevel: LogLevels
 	): boolean {
 		if (!isType(transport, LogTransport)) {
+			return false;
+		}
+
+		// No logs or transports processed when group is disabled.
+		if (!this.enabled()) {
 			return false;
 		}
 

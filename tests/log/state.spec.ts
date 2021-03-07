@@ -41,6 +41,37 @@ describe('LogState', () => {
 			expect(Array.isArray(custom.groupKeys)).toBe(true);
 			expect(custom.groupKeys.includes('global')).toBe(true);
 		});
+
+		it(`should default consoleEnabled to false when option.consoleLogEnabled is not provided`, () => {
+			const custom = new LogState({
+				globalLogLevel: LogLevels.ERROR
+			});
+			expect(custom.consoleEnabled()).toBe(false);
+		});
+
+		it(`should set consoleEnabled to false when option.consoleLogEnabled is false`, () => {
+			const custom = new LogState({
+				globalLogLevel: LogLevels.ERROR,
+				consoleLogEnabled: false
+			});
+			expect(custom.consoleEnabled()).toBe(false);
+		});
+
+		it(`should set consoleEnabled to true when option.consoleLogEnabled is true`, () => {
+			const custom = new LogState({
+				globalLogLevel: LogLevels.ERROR,
+				consoleLogEnabled: true
+			});
+			expect(custom.consoleEnabled()).toBe(true);
+		});
+
+		it(`should set consoleEnabled to false when option.consoleLogEnabled is non-boolean truthy `, () => {
+			const custom = new LogState({
+				globalLogLevel: LogLevels.ERROR,
+				consoleLogEnabled: 14971 as any
+			});
+			expect(custom.consoleEnabled()).toBe(false);
+		});
 	});
 
 	describe('Implementation', () => {

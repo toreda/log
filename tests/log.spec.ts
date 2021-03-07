@@ -182,6 +182,35 @@ describe('Log', () => {
 			});
 		});
 
+		describe('enableGlobalLevel', () => {
+			it('should not change global level when level input arg is not a number', () => {
+				const input = '1497197' as any;
+				instance.state.globalLogLevel = LogLevels.ERROR;
+				instance.enableGlobalLevel(input as any);
+				expect(instance.state.globalLogLevel).toBe(LogLevels.ERROR);
+
+				instance.state.globalLogLevel = LogLevels.TRACE;
+				instance.enableGlobalLevel(input as any);
+				expect(instance.state.globalLogLevel).toBe(LogLevels.TRACE);
+			});
+
+			it('should add target level flag to global log level', () => {
+				const targetLevel = LogLevels.DEBUG;
+				instance.state.globalLogLevel = LogLevels.ERROR;
+
+				instance.enableGlobalLevel(targetLevel);
+				const mask = LogLevels.DEBUG | LogLevels.ERROR;
+				expect(instance.state.globalLogLevel & mask).toBe(mask);
+			});
+
+			it('should not change global log level when target level is none', () => {
+				instance.state.globalLogLevel = LogLevels.ERROR;
+
+				instance.enableGlobalLevel(LogLevels.NONE);
+				expect(instance.state.globalLogLevel).toBe(LogLevels.ERROR);
+			});
+		});
+
 		describe('addGroupTransport', () => {
 			it('should create group and add transport when group does not exist', () => {
 				const groupId = '@97141876';
@@ -382,7 +411,6 @@ describe('Log', () => {
 				instance.initGroups([item1, item2, item3]);
 				expect(setGroupLevelMock).toHaveBeenCalledTimes(2);
 			});
-
 		});
 
 		describe('log', () => {

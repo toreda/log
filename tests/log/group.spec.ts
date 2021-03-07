@@ -13,7 +13,7 @@ describe('LogGroup', () => {
 	let action: LogAction;
 
 	beforeAll(() => {
-		instance = new LogGroup(MOCK_ID, MOCK_LEVEL);
+		instance = new LogGroup(MOCK_ID, MOCK_LEVEL, true);
 		action = async (msg: LogMessage): Promise<boolean> => {
 			return true;
 		};
@@ -22,26 +22,31 @@ describe('LogGroup', () => {
 	describe('Constructor', () => {
 		it('should set group id to provided id arg', () => {
 			const id = '1947194714@@@@1';
-			const custom = new LogGroup(id, MOCK_LEVEL);
+			const custom = new LogGroup(id, MOCK_LEVEL, true);
 			expect(custom.id).toBe(id);
 		});
 
 		it('should set logLevel to provided logLevel arg', () => {
 			const sampleLevel = LogLevels.INFO & ~LogLevels.WARN;
-			const custom = new LogGroup(MOCK_ID, sampleLevel);
+			const custom = new LogGroup(MOCK_ID, sampleLevel, true);
 			expect(custom.logLevel).toBe(sampleLevel);
 		});
 
 		it('should initialize added to an empty set', () => {
-			const custom = new LogGroup(MOCK_ID, MOCK_LEVEL);
+			const custom = new LogGroup(MOCK_ID, MOCK_LEVEL, true);
 			expect(isType(custom.added, Set)).toBe(true);
 			expect(custom.added.size).toBe(0);
 		});
 
 		it('should initialize transports to an empty array', () => {
-			const custom = new LogGroup(MOCK_ID, MOCK_LEVEL);
+			const custom = new LogGroup(MOCK_ID, MOCK_LEVEL, true);
 			expect(Array.isArray(custom.transports)).toBe(true);
 			expect(custom.transports).toHaveLength(0);
+		});
+
+		it('should initialize enabled to true', () => {
+			const custom = new LogGroup(MOCK_ID, MOCK_LEVEL, true);
+			expect(custom.enabled()).toBe(true);
 		});
 	});
 

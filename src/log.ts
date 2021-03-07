@@ -5,7 +5,7 @@ import {LogGroup} from './log/group';
 import {LogState} from './log/state';
 import {LogMessage} from './log/message';
 import {isType} from '@toreda/strong-types';
-
+import {LogActionConsole} from './log/action/console';
 /**
  * Main log class holding attached transports and internal state
  * data, and logging configuration.
@@ -16,6 +16,11 @@ export class Log {
 
 	public constructor(options?: LogOptions) {
 		this.state = new LogState(options);
+
+		// Activate console logging if allowed by start options.
+		if (this.state.consoleEnabled()) {
+			this.activateGlobalConsole();
+		}
 	}
 
 	public initGroups(groups?: {id: string; level: LogLevels}[]): void {
@@ -208,7 +213,7 @@ export class Log {
 	 * invalid values.
 	 * @param levels
 	 */
-	public addGlobalLevels(levels: number[]): void {
+	public enablelobalLevels(levels: number[]): void {
 		if (!Array.isArray(levels)) {
 			return;
 		}
@@ -222,10 +227,16 @@ export class Log {
 			mask |= level;
 		}
 
-		this.addGlobalLevel(mask);
+		this.enableGlobalLevel(mask);
 	}
 
-	public addGlobalLevel(level: number): void {
+	/**
+	 * Add a level flag to the global log level without
+	 * affecting other global level flags. Has no effect
+	 * if target level flag is already enabled.
+	 * @param level
+	 */
+	public enableGlobalLevel(level: number): void {
 		if (typeof level !== 'number') {
 			return;
 		}
@@ -267,7 +278,7 @@ export class Log {
 		}
 
 		this.state.groupKeys.push(groupId);
-		this.state.groups[groupId] = new LogGroup(groupId, logLevel);
+		this.state.groups[groupId] = new LogGroup(groupId, logLevel, this.state.groupsDefaultEnabled());
 		return true;
 	}
 
@@ -286,6 +297,16 @@ export class Log {
 			level: level,
 			message: content
 		};
+	}
+
+	/**
+	 * Enable global console logging for development and debugging.
+	 */
+	public activateGlobalConsole(): void {
+		// Initial log level is NONE, which will rely on the global
+		// log levl.
+		const transport = new LogTransport('console', LogLevels.NONE, LogActionConsole);
+		this.addGlobalTransport(transport);
 	}
 
 	/**
