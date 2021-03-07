@@ -100,8 +100,7 @@
 						<section class="tsd-index-section ">
 							<h3>Methods</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-method tsd-parent-kind-class"><a href="log.html#addgloballevel" class="tsd-kind-icon">add<wbr>Global<wbr>Level</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class"><a href="log.html#addgloballevels" class="tsd-kind-icon">add<wbr>Global<wbr>Levels</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="log.html#activateglobalconsole" class="tsd-kind-icon">activate<wbr>Global<wbr>Console</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="log.html#addglobaltransport" class="tsd-kind-icon">add<wbr>Global<wbr>Transport</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="log.html#addgrouptransport" class="tsd-kind-icon">add<wbr>Group<wbr>Transport</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="log.html#addtransport" class="tsd-kind-icon">add<wbr>Transport</a></li>
@@ -109,6 +108,8 @@
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="log.html#createmessage" class="tsd-kind-icon">create<wbr>Message</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="log.html#debug" class="tsd-kind-icon">debug</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="log.html#debuggroup" class="tsd-kind-icon">debug<wbr>Group</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="log.html#enablegloballevel" class="tsd-kind-icon">enable<wbr>Global<wbr>Level</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="log.html#enableloballevels" class="tsd-kind-icon">enablelobal<wbr>Levels</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="log.html#error" class="tsd-kind-icon">error</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="log.html#errorgroup" class="tsd-kind-icon">error<wbr>Group</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="log.html#getgroup" class="tsd-kind-icon">get<wbr>Group</a></li>
@@ -147,7 +148,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/toreda/log/blob/f9931e7/src/log.ts#L15">src/log.ts:15</a></li>
+									<li>Defined in <a href="https://github.com/toreda/log/blob/582ae43/src/log.ts#L15">src/log.ts:15</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -169,7 +170,7 @@
 					<div class="tsd-signature tsd-kind-icon">state<span class="tsd-signature-symbol">:</span> <a href="logstate.html" class="tsd-signature-type" data-tsd-kind="Class">LogState</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/toreda/log/blob/f9931e7/src/log.ts#L15">src/log.ts:15</a></li>
+							<li>Defined in <a href="https://github.com/toreda/log/blob/582ae43/src/log.ts#L15">src/log.ts:15</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -182,56 +183,23 @@
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Methods</h2>
 				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
-					<a name="addgloballevel" class="tsd-anchor"></a>
-					<h3>add<wbr>Global<wbr>Level</h3>
+					<a name="activateglobalconsole" class="tsd-anchor"></a>
+					<h3>activate<wbr>Global<wbr>Console</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">add<wbr>Global<wbr>Level<span class="tsd-signature-symbol">(</span>level<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+						<li class="tsd-signature tsd-kind-icon">activate<wbr>Global<wbr>Console<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/toreda/log/blob/f9931e7/src/log.ts#L228">src/log.ts:228</a></li>
-								</ul>
-							</aside>
-							<h4 class="tsd-parameters-title">Parameters</h4>
-							<ul class="tsd-parameters">
-								<li>
-									<h5>level: <span class="tsd-signature-type">number</span></h5>
-								</li>
-							</ul>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
-						</li>
-					</ul>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
-					<a name="addgloballevels" class="tsd-anchor"></a>
-					<h3>add<wbr>Global<wbr>Levels</h3>
-					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">add<wbr>Global<wbr>Levels<span class="tsd-signature-symbol">(</span>levels<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
-					</ul>
-					<ul class="tsd-descriptions">
-						<li class="tsd-description">
-							<aside class="tsd-sources">
-								<ul>
-									<li>Defined in <a href="https://github.com/toreda/log/blob/f9931e7/src/log.ts#L211">src/log.ts:211</a></li>
+									<li>Defined in <a href="https://github.com/toreda/log/blob/582ae43/src/log.ts#L305">src/log.ts:305</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
-									<p>Add multiple flags to global log level. Performs
-										sanity checks on each provided level and discards
-									invalid values.</p>
+									<p>Enable global console logging for development and debugging.</p>
 								</div>
 							</div>
-							<h4 class="tsd-parameters-title">Parameters</h4>
-							<ul class="tsd-parameters">
-								<li>
-									<h5>levels: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span></h5>
-									<div class="tsd-comment tsd-typography">
-									</div>
-								</li>
-							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
 						</li>
 					</ul>
@@ -246,7 +214,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/toreda/log/blob/f9931e7/src/log.ts#L82">src/log.ts:82</a></li>
+									<li>Defined in <a href="https://github.com/toreda/log/blob/582ae43/src/log.ts#L87">src/log.ts:87</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -278,7 +246,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/toreda/log/blob/f9931e7/src/log.ts#L44">src/log.ts:44</a></li>
+									<li>Defined in <a href="https://github.com/toreda/log/blob/582ae43/src/log.ts#L49">src/log.ts:49</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -317,7 +285,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/toreda/log/blob/f9931e7/src/log.ts#L73">src/log.ts:73</a></li>
+									<li>Defined in <a href="https://github.com/toreda/log/blob/582ae43/src/log.ts#L78">src/log.ts:78</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -350,7 +318,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/toreda/log/blob/f9931e7/src/log.ts#L413">src/log.ts:413</a></li>
+									<li>Defined in <a href="https://github.com/toreda/log/blob/582ae43/src/log.ts#L434">src/log.ts:434</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -372,7 +340,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/toreda/log/blob/f9931e7/src/log.ts#L281">src/log.ts:281</a></li>
+									<li>Defined in <a href="https://github.com/toreda/log/blob/582ae43/src/log.ts#L292">src/log.ts:292</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -416,7 +384,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/toreda/log/blob/f9931e7/src/log.ts#L380">src/log.ts:380</a></li>
+									<li>Defined in <a href="https://github.com/toreda/log/blob/582ae43/src/log.ts#L401">src/log.ts:401</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -439,7 +407,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/toreda/log/blob/f9931e7/src/log.ts#L389">src/log.ts:389</a></li>
+									<li>Defined in <a href="https://github.com/toreda/log/blob/582ae43/src/log.ts#L410">src/log.ts:410</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -463,6 +431,70 @@
 					</ul>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="enablegloballevel" class="tsd-anchor"></a>
+					<h3>enable<wbr>Global<wbr>Level</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">enable<wbr>Global<wbr>Level<span class="tsd-signature-symbol">(</span>level<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/toreda/log/blob/582ae43/src/log.ts#L239">src/log.ts:239</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Add a level flag to the global log level without
+										affecting other global level flags. Has no effect
+									if target level flag is already enabled.</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>level: <span class="tsd-signature-type">number</span></h5>
+									<div class="tsd-comment tsd-typography">
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="enableloballevels" class="tsd-anchor"></a>
+					<h3>enablelobal<wbr>Levels</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">enablelobal<wbr>Levels<span class="tsd-signature-symbol">(</span>levels<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/toreda/log/blob/582ae43/src/log.ts#L216">src/log.ts:216</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Add multiple flags to global log level. Performs
+										sanity checks on each provided level and discards
+									invalid values.</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>levels: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span></h5>
+									<div class="tsd-comment tsd-typography">
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
 					<a name="error" class="tsd-anchor"></a>
 					<h3>error</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
@@ -472,7 +504,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/toreda/log/blob/f9931e7/src/log.ts#L329">src/log.ts:329</a></li>
+									<li>Defined in <a href="https://github.com/toreda/log/blob/582ae43/src/log.ts#L350">src/log.ts:350</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -502,7 +534,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/toreda/log/blob/f9931e7/src/log.ts#L338">src/log.ts:338</a></li>
+									<li>Defined in <a href="https://github.com/toreda/log/blob/582ae43/src/log.ts#L359">src/log.ts:359</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -535,7 +567,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/toreda/log/blob/f9931e7/src/log.ts#L296">src/log.ts:296</a></li>
+									<li>Defined in <a href="https://github.com/toreda/log/blob/582ae43/src/log.ts#L317">src/log.ts:317</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -566,7 +598,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/toreda/log/blob/f9931e7/src/log.ts#L363">src/log.ts:363</a></li>
+									<li>Defined in <a href="https://github.com/toreda/log/blob/582ae43/src/log.ts#L384">src/log.ts:384</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -594,7 +626,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/toreda/log/blob/f9931e7/src/log.ts#L372">src/log.ts:372</a></li>
+									<li>Defined in <a href="https://github.com/toreda/log/blob/582ae43/src/log.ts#L393">src/log.ts:393</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -627,7 +659,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/toreda/log/blob/f9931e7/src/log.ts#L21">src/log.ts:21</a></li>
+									<li>Defined in <a href="https://github.com/toreda/log/blob/582ae43/src/log.ts#L26">src/log.ts:26</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -650,7 +682,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/toreda/log/blob/f9931e7/src/log.ts#L311">src/log.ts:311</a></li>
+									<li>Defined in <a href="https://github.com/toreda/log/blob/582ae43/src/log.ts#L332">src/log.ts:332</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -689,7 +721,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/toreda/log/blob/f9931e7/src/log.ts#L260">src/log.ts:260</a></li>
+									<li>Defined in <a href="https://github.com/toreda/log/blob/582ae43/src/log.ts#L271">src/log.ts:271</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -727,7 +759,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/toreda/log/blob/f9931e7/src/log.ts#L96">src/log.ts:96</a></li>
+									<li>Defined in <a href="https://github.com/toreda/log/blob/582ae43/src/log.ts#L101">src/log.ts:101</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -763,7 +795,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/toreda/log/blob/f9931e7/src/log.ts#L105">src/log.ts:105</a></li>
+									<li>Defined in <a href="https://github.com/toreda/log/blob/582ae43/src/log.ts#L110">src/log.ts:110</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -795,7 +827,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/toreda/log/blob/f9931e7/src/log.ts#L157">src/log.ts:157</a></li>
+									<li>Defined in <a href="https://github.com/toreda/log/blob/582ae43/src/log.ts#L162">src/log.ts:162</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -829,7 +861,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/toreda/log/blob/f9931e7/src/log.ts#L124">src/log.ts:124</a></li>
+									<li>Defined in <a href="https://github.com/toreda/log/blob/582ae43/src/log.ts#L129">src/log.ts:129</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -863,7 +895,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/toreda/log/blob/f9931e7/src/log.ts#L147">src/log.ts:147</a></li>
+									<li>Defined in <a href="https://github.com/toreda/log/blob/582ae43/src/log.ts#L152">src/log.ts:152</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -895,7 +927,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/toreda/log/blob/f9931e7/src/log.ts#L114">src/log.ts:114</a></li>
+									<li>Defined in <a href="https://github.com/toreda/log/blob/582ae43/src/log.ts#L119">src/log.ts:119</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -926,7 +958,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/toreda/log/blob/f9931e7/src/log.ts#L175">src/log.ts:175</a></li>
+									<li>Defined in <a href="https://github.com/toreda/log/blob/582ae43/src/log.ts#L180">src/log.ts:180</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -959,7 +991,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/toreda/log/blob/f9931e7/src/log.ts#L197">src/log.ts:197</a></li>
+									<li>Defined in <a href="https://github.com/toreda/log/blob/582ae43/src/log.ts#L202">src/log.ts:202</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -988,7 +1020,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/toreda/log/blob/f9931e7/src/log.ts#L243">src/log.ts:243</a></li>
+									<li>Defined in <a href="https://github.com/toreda/log/blob/582ae43/src/log.ts#L254">src/log.ts:254</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1021,7 +1053,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/toreda/log/blob/f9931e7/src/log.ts#L397">src/log.ts:397</a></li>
+									<li>Defined in <a href="https://github.com/toreda/log/blob/582ae43/src/log.ts#L418">src/log.ts:418</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1049,7 +1081,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/toreda/log/blob/f9931e7/src/log.ts#L406">src/log.ts:406</a></li>
+									<li>Defined in <a href="https://github.com/toreda/log/blob/582ae43/src/log.ts#L427">src/log.ts:427</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1082,7 +1114,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/toreda/log/blob/f9931e7/src/log.ts#L346">src/log.ts:346</a></li>
+									<li>Defined in <a href="https://github.com/toreda/log/blob/582ae43/src/log.ts#L367">src/log.ts:367</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1112,7 +1144,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/toreda/log/blob/f9931e7/src/log.ts#L355">src/log.ts:355</a></li>
+									<li>Defined in <a href="https://github.com/toreda/log/blob/582ae43/src/log.ts#L376">src/log.ts:376</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1162,10 +1194,7 @@
 								<a href="log.html#state" class="tsd-kind-icon">state</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
-								<a href="log.html#addgloballevel" class="tsd-kind-icon">add<wbr>Global<wbr>Level</a>
-							</li>
-							<li class=" tsd-kind-method tsd-parent-kind-class">
-								<a href="log.html#addgloballevels" class="tsd-kind-icon">add<wbr>Global<wbr>Levels</a>
+								<a href="log.html#activateglobalconsole" class="tsd-kind-icon">activate<wbr>Global<wbr>Console</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
 								<a href="log.html#addglobaltransport" class="tsd-kind-icon">add<wbr>Global<wbr>Transport</a>
@@ -1187,6 +1216,12 @@
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
 								<a href="log.html#debuggroup" class="tsd-kind-icon">debug<wbr>Group</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="log.html#enablegloballevel" class="tsd-kind-icon">enable<wbr>Global<wbr>Level</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="log.html#enableloballevels" class="tsd-kind-icon">enablelobal<wbr>Levels</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
 								<a href="log.html#error" class="tsd-kind-icon">error</a>

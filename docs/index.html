@@ -93,66 +93,53 @@
 				<a href="#typescript" id="typescript" style="color: inherit; text-decoration: none;">
 					<h2>Typescript</h2>
 				</a>
-				<p><strong>Import Logger</strong></p>
-				<pre><code class="language-typescript"><span style="color: #AF00DB">import</span><span style="color: #000000"> {</span><span style="color: #001080">Logger</span><span style="color: #000000">, </span><span style="color: #001080">LogTransport</span><span style="color: #000000">, </span><span style="color: #001080">LogLevels</span><span style="color: #000000">} </span><span style="color: #AF00DB">from</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;@toreda/log&#039;</span><span style="color: #000000">;</span>
+				<p><strong>Import and create Logger</strong></p>
+				<pre><code class="language-typescript"><span style="color: #AF00DB">import</span><span style="color: #000000"> {</span><span style="color: #001080">Log</span><span style="color: #000000">, </span><span style="color: #001080">LogLevels</span><span style="color: #000000">} </span><span style="color: #AF00DB">from</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;@toreda/log&#039;</span><span style="color: #000000">;</span>
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">log</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #795E26">Log</span><span style="color: #000000">();</span>
 </code></pre>
-				<p><strong>Create Logger Instance</strong></p>
-				<pre><code class="language-typescript"><span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">myLogger</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #795E26">Log</span><span style="color: #000000">();</span>
-<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">myLoggerWithOptions</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #795E26">Log</span><span style="color: #000000">({</span>
-<span style="color: #000000">    </span><span style="color: #001080">id:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;myLoggerId&#039;</span>
-<span style="color: #000000">})</span>
+				<p><strong>Log Levels</strong></p>
+				<pre><code class="language-typescript"><span style="color: #AF00DB">import</span><span style="color: #000000"> {</span><span style="color: #001080">Log</span><span style="color: #000000">, </span><span style="color: #001080">LogLevels</span><span style="color: #000000">} </span><span style="color: #AF00DB">from</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;@toreda/log&#039;</span><span style="color: #000000">;</span>
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">log</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #795E26">Log</span><span style="color: #000000">();</span>
+<span style="color: #008000">// Change log level:</span>
+<span style="color: #001080">log</span><span style="color: #000000">.</span><span style="color: #795E26">setGlobalLevel</span><span style="color: #000000">(</span><span style="color: #001080">LogLevels</span><span style="color: #000000">.</span><span style="color: #0070C1">ALL</span><span style="color: #000000">);</span>
+<span style="color: #008000">// Trace</span>
+<span style="color: #001080">log</span><span style="color: #000000">.</span><span style="color: #795E26">trace</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;Trace message here&#039;</span><span style="color: #000000">);</span>
+<span style="color: #008000">// Debug</span>
+<span style="color: #001080">log</span><span style="color: #000000">.</span><span style="color: #795E26">debug</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;Debug message here&#039;</span><span style="color: #000000">);</span>
+<span style="color: #008000">// Info</span>
+<span style="color: #001080">log</span><span style="color: #000000">.</span><span style="color: #795E26">info</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;Info message here&#039;</span><span style="color: #000000">);</span>
+<span style="color: #008000">// Warn</span>
+<span style="color: #001080">log</span><span style="color: #000000">.</span><span style="color: #795E26">warn</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;Warn message here&#039;</span><span style="color: #000000">);</span>
+<span style="color: #008000">// Error</span>
+<span style="color: #001080">log</span><span style="color: #000000">.</span><span style="color: #795E26">error</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;my&#039;</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;message&#039;</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;here&#039;</span><span style="color: #000000">);</span>
 </code></pre>
-				<p><strong>Create new <code>LogTransport</code></strong></p>
-				<pre><code class="language-typescript"><span style="color: #008000">// Create a new LogTransport that outputs to console</span>
-<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">myTransport</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #795E26">LogTransport</span><span style="color: #000000">(</span><span style="color: #001080">LogTransport</span><span style="color: #000000">.</span><span style="color: #001080">logToConsole</span><span style="color: #000000">) </span><span style="color: #008000">// random id</span>
-<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">myTransportWithOptions</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #795E26">LogTransport</span><span style="color: #000000">(</span><span style="color: #001080">LogTransport</span><span style="color: #000000">.</span><span style="color: #001080">logToConsole</span><span style="color: #000000">, {</span>
-<span style="color: #000000">    </span><span style="color: #001080">id:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;myTransportId&#039;</span>
-<span style="color: #000000">})</span>
-</code></pre>
-				<p><strong>Create <code>LogTransport</code> with random id that outputs to file</strong></p>
-				<pre><code class="language-typescript"><span style="color: #AF00DB">import</span><span style="color: #000000"> {</span><span style="color: #001080">appendFileSync</span><span style="color: #000000">} </span><span style="color: #AF00DB">from</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;fs&#039;</span><span style="color: #000000">;</span>
-<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">myTransportToFile</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #795E26">LogTransport</span><span style="color: #000000">((</span><span style="color: #001080">logMessage</span><span style="color: #000000">)</span><span style="color: #0000FF">=&gt;</span><span style="color: #000000">{</span>
-<span style="color: #000000">    </span><span style="color: #AF00DB">return</span><span style="color: #000000"> </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #267F99">Promise</span><span style="color: #000000">((</span><span style="color: #001080">resolve</span><span style="color: #000000">, </span><span style="color: #001080">reject</span><span style="color: #000000">) </span><span style="color: #0000FF">=&gt;</span><span style="color: #000000"> {</span>
-<span style="color: #000000">        </span><span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">message</span><span style="color: #000000"> = </span><span style="color: #267F99">JSON</span><span style="color: #000000">.</span><span style="color: #795E26">stringify</span><span style="color: #000000">(</span><span style="color: #001080">logMessage</span><span style="color: #000000">);</span>
-<span style="color: #000000">        </span><span style="color: #AF00DB">try</span><span style="color: #000000"> {</span>
-<span style="color: #000000">            </span><span style="color: #795E26">appendFileSync</span><span style="color: #000000">(</span><span style="color: #001080">someFilePath</span><span style="color: #000000">, </span><span style="color: #001080">message</span><span style="color: #000000"> + </span><span style="color: #A31515">&#039;,</span><span style="color: #EE0000">\n</span><span style="color: #A31515">&#039;</span><span style="color: #000000">);</span>
-<span style="color: #000000">            </span><span style="color: #795E26">resolve</span><span style="color: #000000">();</span>
-<span style="color: #000000">        } </span><span style="color: #AF00DB">catch</span><span style="color: #000000"> (</span><span style="color: #001080">error</span><span style="color: #000000">) {</span>
-<span style="color: #000000">            </span><span style="color: #795E26">reject</span><span style="color: #000000">(</span><span style="color: #001080">error</span><span style="color: #000000">);</span>
-<span style="color: #000000">        }</span>
-<span style="color: #000000">    }).</span><span style="color: #795E26">catch</span><span style="color: #000000">((</span><span style="color: #001080">result</span><span style="color: #000000">) </span><span style="color: #0000FF">=&gt;</span><span style="color: #000000"> </span><span style="color: #001080">result</span><span style="color: #000000">);</span>
-<span style="color: #000000">})</span>
+				<p><strong>Global Transports</strong>
+				Global Log Transports receive all log messages with matching active log levels, for all log groups. </p>
+				<pre><code class="language-typescript"><span style="color: #AF00DB">import</span><span style="color: #000000"> {</span><span style="color: #001080">Log</span><span style="color: #000000">, </span><span style="color: #001080">LogLevels</span><span style="color: #000000">} </span><span style="color: #AF00DB">from</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;@toreda/log&#039;</span><span style="color: #000000">;</span>
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">log</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #795E26">Log</span><span style="color: #000000">();</span>
 
-<span style="color: #008000">// Attach a LogTransport to a logger</span>
-<span style="color: #001080">myLogger</span><span style="color: #000000">.</span><span style="color: #795E26">attachTransport</span><span style="color: #000000">(</span><span style="color: #001080">myTransportToFile</span><span style="color: #000000">); </span><span style="color: #008000">// catches every log, returns {payload: id}</span>
-<span style="color: #001080">myLogger</span><span style="color: #000000">.</span><span style="color: #795E26">attachTransport</span><span style="color: #000000">(</span><span style="color: #001080">myTransport</span><span style="color: #000000">, </span><span style="color: #001080">LogLevel</span><span style="color: #000000">.</span><span style="color: #0070C1">WARN</span><span style="color: #000000">); </span><span style="color: #008000">// only catches WARN &amp; ERROR logs</span>
-
-<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">result</span><span style="color: #000000"> = </span><span style="color: #001080">myLogger</span><span style="color: #000000">.</span><span style="color: #795E26">attachTransport</span><span style="color: #000000">(</span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #795E26">LogTransport</span><span style="color: #000000">((</span><span style="color: #001080">msg</span><span style="color: #000000">) </span><span style="color: #0000FF">=&gt;</span><span style="color: #000000"> {</span>
-<span style="color: #000000">    </span><span style="color: #008000">// do something</span>
-<span style="color: #000000">}, {</span>
-<span style="color: #000000">    </span><span style="color: #001080">id:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;customTransport&#039;</span>
+<span style="color: #008000">// Example dummy example.</span>
+<span style="color: #008000">// Custom actions can perform any async activity.</span>
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #795E26">action</span><span style="color: #000000"> = </span><span style="color: #0000FF">async</span><span style="color: #000000"> (</span><span style="color: #001080">msg</span><span style="color: #000000">: </span><span style="color: #267F99">LogMessage</span><span style="color: #000000">): </span><span style="color: #267F99">Promise</span><span style="color: #000000">&lt;</span><span style="color: #267F99">void</span><span style="color: #000000">&gt; </span><span style="color: #0000FF">=&gt;</span><span style="color: #000000"> {</span>
+<span style="color: #000000">   </span><span style="color: #AF00DB">return</span><span style="color: #000000"> </span><span style="color: #0000FF">true</span><span style="color: #000000">;</span>
 <span style="color: #000000">}</span>
-<span style="color: #000000">), [</span><span style="color: #001080">LogLevel</span><span style="color: #000000">.</span><span style="color: #0070C1">ERROR</span><span style="color: #000000">, </span><span style="color: #001080">LogLevel</span><span style="color: #000000">.</span><span style="color: #0070C1">DEBUG</span><span style="color: #000000">]); </span><span style="color: #008000">// only catches ERROR &amp; DEBUG logs, returns {payload: id}</span>
-</code></pre>
-				<p><strong>Remove a <code>LogTransport</code></strong></p>
-				<pre><code class="language-typescript"><span style="color: #008000">// Remove a LogTransport</span>
-<span style="color: #008000">// returns {payload: LogTransport}</span>
-<span style="color: #001080">myLogger</span><span style="color: #000000">.</span><span style="color: #795E26">removeTransport</span><span style="color: #000000">(</span><span style="color: #001080">myTransportToFile</span><span style="color: #000000">);</span>
-<span style="color: #000000"> </span><span style="color: #008000">// returns {payload: LogTransport}</span>
-<span style="color: #001080">myLogger</span><span style="color: #000000">.</span><span style="color: #795E26">removeTransport</span><span style="color: #000000">(</span><span style="color: #001080">myLogger</span><span style="color: #000000">.</span><span style="color: #795E26">getTransportFromId</span><span style="color: #000000">(</span><span style="color: #001080">result</span><span style="color: #000000">.</span><span style="color: #001080">payload</span><span style="color: #000000">)));</span>
-</code></pre>
-				<p><strong>Reattach File Logger</strong></p>
-				<pre><code class="language-typescript"><span style="color: #008000">// catches all logs expect TRACE</span>
-<span style="color: #001080">myLogger</span><span style="color: #000000">.</span><span style="color: #795E26">attachTransport</span><span style="color: #000000">(</span><span style="color: #001080">myTransportToFile</span><span style="color: #000000">, </span><span style="color: #001080">LogLevels</span><span style="color: #000000">.</span><span style="color: #0070C1">DEBUG</span><span style="color: #000000">);</span>
-</code></pre>
-				<p><strong>Logging messages</strong></p>
-				<pre><code class="language-typescript"><span style="color: #001080">myLogger</span><span style="color: #000000">.</span><span style="color: #795E26">error</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;Some error has occured&#039;</span><span style="color: #000000">);</span>
-<span style="color: #001080">myLogger</span><span style="color: #000000">.</span><span style="color: #795E26">warn</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;This is a warning&#039;</span><span style="color: #000000">);</span>
-<span style="color: #001080">myLogger</span><span style="color: #000000">.</span><span style="color: #795E26">info</span><span style="color: #000000">(</span><span style="color: #001080">leftHandValue</span><span style="color: #000000"> === </span><span style="color: #001080">rightHandValue</span><span style="color: #000000">);</span>
-<span style="color: #001080">myLogger</span><span style="color: #000000">.</span><span style="color: #795E26">debug</span><span style="color: #000000">(</span><span style="color: #001080">leftHandValue</span><span style="color: #000000">, </span><span style="color: #001080">rightHandValue</span><span style="color: #000000">);</span>
-<span style="color: #001080">myLogger</span><span style="color: #000000">.</span><span style="color: #795E26">trace</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;someFunction called&#039;</span><span style="color: #000000">);</span>
+<span style="color: #008000">// Transports take a string ID, initial log level,</span>
+<span style="color: #008000">// and async action function.</span>
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">transport</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #795E26">LogTransport</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;tid1&#039;</span><span style="color: #000000">, </span><span style="color: #001080">LogLevels</span><span style="color: #000000">.</span><span style="color: #0070C1">ALL</span><span style="color: #000000">, </span><span style="color: #001080">action</span><span style="color: #000000">);</span>
 
-<span style="color: #001080">myLogger</span><span style="color: #000000">.</span><span style="color: #795E26">log</span><span style="color: #000000">(</span><span style="color: #001080">LogLevel</span><span style="color: #000000">.</span><span style="color: #0070C1">ERROR</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;Same thing as calling myLogger.error&#039;</span><span style="color: #000000"> );</span>
+<span style="color: #008000">// Add transport to global listeners.</span>
+<span style="color: #001080">log</span><span style="color: #000000">.</span><span style="color: #795E26">addGlobalTransport</span><span style="color: #000000">(</span><span style="color: #001080">transport</span><span style="color: #000000">);</span>
+</code></pre>
+				<p><strong>Removing Global Transports</strong></p>
+				<pre><code class="language-typescript"><span style="color: #008000">// Remove the same transport</span>
+<span style="color: #008000">// NOTE: Requires access to original transport object</span>
+<span style="color: #008000">// now being removed.</span>
+<span style="color: #001080">log</span><span style="color: #000000">.</span><span style="color: #795E26">removeGlobalTransport</span><span style="color: #000000">(</span><span style="color: #001080">transport</span><span style="color: #000000">);</span>
+
+<span style="color: #008000">// Remove global transport by ID.</span>
+<span style="color: #008000">// Use ID to remove global transports if you no</span>
+<span style="color: #008000">// longer have a reference to target transport.</span>
+<span style="color: #001080">log</span><span style="color: #000000">.</span><span style="color: #795E26">removeGlobalTransportById</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;tid1&#039;</span><span style="color: #000000">);</span>
 </code></pre>
 				<a href="#package" id="package" style="color: inherit; text-decoration: none;">
 					<h1>Package</h1>

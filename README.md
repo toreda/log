@@ -1,3 +1,4 @@
+
 # `@toreda/log` - Dynamic Logger
 
 ![Toreda](https://content.toreda.com/logo/toreda-logo.png)
@@ -27,91 +28,64 @@ Features:
 
 ## Typescript
 
-**Import Logger**
+**Import and create Logger**
 ```typescript
-import {Logger, LogTransport, LogLevels} from '@toreda/log';
+import {Log, LogLevels} from '@toreda/log';
+const log = new Log();
 ```
 
-**Create Logger Instance**
-
+**Log Levels**
 ```typescript
-const myLogger = new Log();
-const myLoggerWithOptions = new Log({
-	id: 'myLoggerId'
-})
+import {Log, LogLevels} from '@toreda/log';
+const log = new Log();
+// Change log level:
+log.setGlobalLevel(LogLevels.ALL);
+// Trace
+log.trace('Trace message here');
+// Debug
+log.debug('Debug message here');
+// Info
+log.info('Info message here');
+// Warn
+log.warn('Warn message here');
+// Error
+log.error('my', 'message', 'here');
 ```
-
-
-
-**Create new `LogTransport`**
-```typescript
-// Create a new LogTransport that outputs to console
-const myTransport = new LogTransport(LogTransport.logToConsole) // random id
-const myTransportWithOptions = new LogTransport(LogTransport.logToConsole, {
-	id: 'myTransportId'
-})
-```
-
-
-
-**Create `LogTransport` with random id that outputs to file**
+**Global Transports**
+Global Log Transports receive all log messages with matching active log levels, for all log groups. 
 
 ```typescript
-import {appendFileSync} from 'fs';
-const myTransportToFile = new LogTransport((logMessage)=>{
-	return new Promise((resolve, reject) => {
-		const message = JSON.stringify(logMessage);
-		try {
-			appendFileSync(someFilePath, message + ',\n');
-			resolve();
-		} catch (error) {
-			reject(error);
-		}
-	}).catch((result) => result);
-})
+import {Log, LogLevels} from '@toreda/log';
+const log = new Log();
 
-// Attach a LogTransport to a logger
-myLogger.attachTransport(myTransportToFile); // catches every log, returns {payload: id}
-myLogger.attachTransport(myTransport, LogLevel.WARN); // only catches WARN & ERROR logs
-
-const result = myLogger.attachTransport(new LogTransport((msg) => {
-	// do something
-}, {
-	id: 'customTransport'
+// Example dummy example.
+// Custom actions can perform any async activity.
+const action = async (msg: LogMessage): Promise<void> => {
+   return true;
 }
-), [LogLevel.ERROR, LogLevel.DEBUG]); // only catches ERROR & DEBUG logs, returns {payload: id}
+// Transports take a string ID, initial log level,
+// and async action function.
+const transport = new LogTransport('tid1', LogLevels.ALL, action);
+
+// Add transport to global listeners.
+log.addGlobalTransport(transport);
 ```
 
 
-
-**Remove a `LogTransport`**
+**Removing Global Transports**
 
 ```typescript
-// Remove a LogTransport
-// returns {payload: LogTransport}
-myLogger.removeTransport(myTransportToFile);
- // returns {payload: LogTransport}
-myLogger.removeTransport(myLogger.getTransportFromId(result.payload)));
+// Remove the same transport
+// NOTE: Requires access to original transport object
+// now being removed.
+log.removeGlobalTransport(transport);
+
+// Remove global transport by ID.
+// Use ID to remove global transports if you no
+// longer have a reference to target transport.
+log.removeGlobalTransportById('tid1');
 ```
 
-**Reattach File Logger**
-```typescript
-// catches all logs expect TRACE
-myLogger.attachTransport(myTransportToFile, LogLevels.DEBUG);
-```
-
-
-**Logging messages**
-
-```typescript
-myLogger.error('Some error has occured');
-myLogger.warn('This is a warning');
-myLogger.info(leftHandValue === rightHandValue);
-myLogger.debug(leftHandValue, rightHandValue);
-myLogger.trace('someFunction called');
-
-myLogger.log(LogLevel.ERROR, 'Same thing as calling myLogger.error' );
-```
 
 # Package
 

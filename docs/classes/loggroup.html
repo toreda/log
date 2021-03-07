@@ -87,6 +87,7 @@
 							<h3>Properties</h3>
 							<ul class="tsd-index-list">
 								<li class="tsd-kind-property tsd-parent-kind-class"><a href="loggroup.html#added" class="tsd-kind-icon">added</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="loggroup.html#enabled" class="tsd-kind-icon">enabled</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class"><a href="loggroup.html#id" class="tsd-kind-icon">id</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class"><a href="loggroup.html#loglevel" class="tsd-kind-icon">log<wbr>Level</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class"><a href="loggroup.html#transports" class="tsd-kind-icon">transports</a></li>
@@ -114,13 +115,13 @@
 					<a name="constructor" class="tsd-anchor"></a>
 					<h3>constructor</h3>
 					<ul class="tsd-signatures tsd-kind-constructor tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">new <wbr>Log<wbr>Group<span class="tsd-signature-symbol">(</span>id<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, logLevel<span class="tsd-signature-symbol">: </span><a href="../enums/loglevels.html" class="tsd-signature-type" data-tsd-kind="Enumeration">LogLevels</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="loggroup.html" class="tsd-signature-type" data-tsd-kind="Class">LogGroup</a></li>
+						<li class="tsd-signature tsd-kind-icon">new <wbr>Log<wbr>Group<span class="tsd-signature-symbol">(</span>id<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, logLevel<span class="tsd-signature-symbol">: </span><a href="../enums/loglevels.html" class="tsd-signature-type" data-tsd-kind="Enumeration">LogLevels</a>, enable<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="loggroup.html" class="tsd-signature-type" data-tsd-kind="Class">LogGroup</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/toreda/log/blob/f9931e7/src/log/group.ts#L10">src/log/group.ts:10</a></li>
+									<li>Defined in <a href="https://github.com/toreda/log/blob/582ae43/src/log/group.ts#L11">src/log/group.ts:11</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -130,6 +131,9 @@
 								</li>
 								<li>
 									<h5>logLevel: <a href="../enums/loglevels.html" class="tsd-signature-type" data-tsd-kind="Enumeration">LogLevels</a></h5>
+								</li>
+								<li>
+									<h5>enable: <span class="tsd-signature-type">boolean</span></h5>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <a href="loggroup.html" class="tsd-signature-type" data-tsd-kind="Class">LogGroup</a></h4>
@@ -145,7 +149,17 @@
 					<div class="tsd-signature tsd-kind-icon">added<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Set</span><span class="tsd-signature-symbol">&lt;</span><a href="logtransport.html" class="tsd-signature-type" data-tsd-kind="Class">LogTransport</a><span class="tsd-signature-symbol">&gt;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/toreda/log/blob/f9931e7/src/log/group.ts#L9">src/log/group.ts:9</a></li>
+							<li>Defined in <a href="https://github.com/toreda/log/blob/582ae43/src/log/group.ts#L10">src/log/group.ts:10</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
+					<a name="enabled" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagReadonly">Readonly</span> enabled</h3>
+					<div class="tsd-signature tsd-kind-icon">enabled<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">StrongBoolean</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/toreda/log/blob/582ae43/src/log/group.ts#L8">src/log/group.ts:8</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -155,7 +169,7 @@
 					<div class="tsd-signature tsd-kind-icon">id<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/toreda/log/blob/f9931e7/src/log/group.ts#L7">src/log/group.ts:7</a></li>
+							<li>Defined in <a href="https://github.com/toreda/log/blob/582ae43/src/log/group.ts#L7">src/log/group.ts:7</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -165,7 +179,7 @@
 					<div class="tsd-signature tsd-kind-icon">log<wbr>Level<span class="tsd-signature-symbol">:</span> <a href="../enums/loglevels.html" class="tsd-signature-type" data-tsd-kind="Enumeration">LogLevels</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/toreda/log/blob/f9931e7/src/log/group.ts#L10">src/log/group.ts:10</a></li>
+							<li>Defined in <a href="https://github.com/toreda/log/blob/582ae43/src/log/group.ts#L11">src/log/group.ts:11</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -175,7 +189,7 @@
 					<div class="tsd-signature tsd-kind-icon">transports<span class="tsd-signature-symbol">:</span> <a href="logtransport.html" class="tsd-signature-type" data-tsd-kind="Class">LogTransport</a><span class="tsd-signature-symbol">[]</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/toreda/log/blob/f9931e7/src/log/group.ts#L8">src/log/group.ts:8</a></li>
+							<li>Defined in <a href="https://github.com/toreda/log/blob/582ae43/src/log/group.ts#L9">src/log/group.ts:9</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -192,7 +206,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/toreda/log/blob/f9931e7/src/log/group.ts#L106">src/log/group.ts:106</a></li>
+									<li>Defined in <a href="https://github.com/toreda/log/blob/582ae43/src/log/group.ts#L119">src/log/group.ts:119</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -225,7 +239,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/toreda/log/blob/f9931e7/src/log/group.ts#L69">src/log/group.ts:69</a></li>
+									<li>Defined in <a href="https://github.com/toreda/log/blob/582ae43/src/log/group.ts#L77">src/log/group.ts:77</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -266,7 +280,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/toreda/log/blob/f9931e7/src/log/group.ts#L181">src/log/group.ts:181</a></li>
+									<li>Defined in <a href="https://github.com/toreda/log/blob/582ae43/src/log/group.ts#L194">src/log/group.ts:194</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -288,7 +302,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/toreda/log/blob/f9931e7/src/log/group.ts#L41">src/log/group.ts:41</a></li>
+									<li>Defined in <a href="https://github.com/toreda/log/blob/582ae43/src/log/group.ts#L49">src/log/group.ts:49</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -328,7 +342,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/toreda/log/blob/f9931e7/src/log/group.ts#L25">src/log/group.ts:25</a></li>
+									<li>Defined in <a href="https://github.com/toreda/log/blob/582ae43/src/log/group.ts#L28">src/log/group.ts:28</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -363,7 +377,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/toreda/log/blob/f9931e7/src/log/group.ts#L137">src/log/group.ts:137</a></li>
+									<li>Defined in <a href="https://github.com/toreda/log/blob/582ae43/src/log/group.ts#L150">src/log/group.ts:150</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -395,7 +409,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/toreda/log/blob/f9931e7/src/log/group.ts#L161">src/log/group.ts:161</a></li>
+									<li>Defined in <a href="https://github.com/toreda/log/blob/582ae43/src/log/group.ts#L174">src/log/group.ts:174</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -426,7 +440,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/toreda/log/blob/f9931e7/src/log/group.ts#L124">src/log/group.ts:124</a></li>
+									<li>Defined in <a href="https://github.com/toreda/log/blob/582ae43/src/log/group.ts#L137">src/log/group.ts:137</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -474,6 +488,9 @@
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class">
 								<a href="loggroup.html#added" class="tsd-kind-icon">added</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class">
+								<a href="loggroup.html#enabled" class="tsd-kind-icon">enabled</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class">
 								<a href="loggroup.html#id" class="tsd-kind-icon">id</a>
