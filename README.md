@@ -8,13 +8,16 @@
 Light TypeScript logger for node, web, and serverless environments. 
 
 Features:
-* Custom Transports
 * Small footprint
-* Browser Compatible
-* Serverless Compatible
-* TypeScript first
+* Simple to use
+* Fully supports TypeScript
+* Custom Transport support
+* Works in Browser, Serverless, and Node environments.
 
 # Contents
+* [**Use Cases**](#use-cases)
+
+* [**What does it do?**](#what-does-it-do)
 * [**Usage**](#usage)
 
 * [**Package**](#Package)
@@ -23,12 +26,21 @@ Features:
 	-	[Build](#build-from-source)
 	-   [License](#license)
 
+# Use Cases
+
+## Custom Transports
+* Configure transports to receive all log events, or only a filtered subset based on class, group, and log level.
+* Custom transports can filter and receive structured log data for specific events you care about. Get the exact functionality you need without writing a whole library.
+ 
+## Granular Control
+* Leave disabled log messages in prod environments which can be turned on later for debugging without a code push.
+* Set log levels for individual functions, classes, and groups. See debug output from the system you're debugging without seeing app-wide debug spam.
+
 # Usage
+`@toreda/log` provides simple and straight forward logging for common use cases, and advanced functionality for use in more complicated situations like server-side and remote debugging.
 
 
-## Typescript
-
-**Import and create Logger**
+**Create Logger**
 ```typescript
 import {Log, LogLevels} from '@toreda/log';
 const log = new Log();
