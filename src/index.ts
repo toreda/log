@@ -1,5 +1,6 @@
 export {Log} from './log';
 export {LogAction} from './log/action';
+export {LogActionConsole} from './log/action/console';
 export {LogGroup} from './log/group';
 export {LogLevels} from './log/levels';
 export {LogMessage} from './log/message';
