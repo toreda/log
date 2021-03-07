@@ -57,6 +57,15 @@ export class LogGroup {
 		return true;
 	}
 
+	/**
+	 * Determine whether group transport can execute target log
+	 * message. Checks msg log level against global log level,
+	 * group log level, and transport log level.
+	 * @param transport
+	 * @param globalLevel
+	 * @param groupLevel
+	 * @param msgLevel
+	 */
 	public canExecute(
 		transport: LogTransport,
 		globalLevel: LogLevels,
@@ -69,7 +78,18 @@ export class LogGroup {
 
 		// Combine all active bits from the global, group, and transport
 		// masks into a single active bitmask.
-		const activeMask = globalLevel | groupLevel | transport.level;
+		let activeMask = 0x0;
+		if (typeof globalLevel === 'number') {
+			activeMask |= globalLevel;
+		}
+
+		if (typeof groupLevel === 'number') {
+			activeMask |= groupLevel;
+		}
+
+		if (typeof transport.level === 'number') {
+			activeMask |= transport.level;
+		}
 
 		// Message level mask contains >= 1 active bits.
 		// Matching 1+ bits allows message to be logged.
@@ -131,6 +151,28 @@ export class LogGroup {
 
 		/** 1 or more deletions is success. */
 		return deleted;
+	}
+
+	/**
+	 * Remove multiple transports in one call by providing an array
+	 * of log transports to remove from this group.
+	 * @param transports
+	 */
+	public removeTransports(transports: LogTransport[]): boolean {
+		if (!Array.isArray(transports)) {
+			return false;
+		}
+
+		let success = false;
+		for (const transport of transports) {
+			const result = this.removeTransport(transport);
+
+			if (result) {
+				success = true;
+			}
+		}
+
+		return success;
 	}
 
 	/**

@@ -71,9 +71,9 @@
 							<h3>Classes</h3>
 							<ul class="tsd-index-list">
 								<li class="tsd-kind-class"><a href="classes/log.html" class="tsd-kind-icon">Log</a></li>
+								<li class="tsd-kind-class"><a href="classes/loggroup.html" class="tsd-kind-icon">Log<wbr>Group</a></li>
 								<li class="tsd-kind-class"><a href="classes/logstate.html" class="tsd-kind-icon">Log<wbr>State</a></li>
 								<li class="tsd-kind-class"><a href="classes/logtransport.html" class="tsd-kind-icon">Log<wbr>Transport</a></li>
-								<li class="tsd-kind-class"><a href="classes/logtransportstate.html" class="tsd-kind-icon">Log<wbr>Transport<wbr>State</a></li>
 							</ul>
 						</section>
 						<section class="tsd-index-section ">
@@ -81,13 +81,12 @@
 							<ul class="tsd-index-list">
 								<li class="tsd-kind-interface"><a href="interfaces/logmessage.html" class="tsd-kind-icon">Log<wbr>Message</a></li>
 								<li class="tsd-kind-interface"><a href="interfaces/logoptions.html" class="tsd-kind-icon">Log<wbr>Options</a></li>
-								<li class="tsd-kind-interface"><a href="interfaces/logtransportoptions.html" class="tsd-kind-icon">Log<wbr>Transport<wbr>Options</a></li>
 							</ul>
 						</section>
 						<section class="tsd-index-section ">
 							<h3>Type aliases</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-type-alias"><a href="modules.html#logtransportaction" class="tsd-kind-icon">Log<wbr>Transport<wbr>Action</a></li>
+								<li class="tsd-kind-type-alias"><a href="modules.html#logaction" class="tsd-kind-icon">Log<wbr>Action</a></li>
 							</ul>
 						</section>
 					</div>
@@ -96,20 +95,27 @@
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Type aliases</h2>
 				<section class="tsd-panel tsd-member tsd-kind-type-alias">
-					<a name="logtransportaction" class="tsd-anchor"></a>
-					<h3>Log<wbr>Transport<wbr>Action</h3>
-					<div class="tsd-signature tsd-kind-icon">Log<wbr>Transport<wbr>Action<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">(</span>logMessage<span class="tsd-signature-symbol">: </span><a href="interfaces/logmessage.html" class="tsd-signature-type" data-tsd-kind="Interface">LogMessage</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">unknown</span><span class="tsd-signature-symbol">&gt;</span></div>
+					<a name="logaction" class="tsd-anchor"></a>
+					<h3>Log<wbr>Action</h3>
+					<div class="tsd-signature tsd-kind-icon">Log<wbr>Action<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">(</span>logMessage<span class="tsd-signature-symbol">: </span><a href="interfaces/logmessage.html" class="tsd-signature-type" data-tsd-kind="Interface">LogMessage</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">&gt;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/toreda/log/blob/e947fd3/src/log/transport/action.ts#L3">src/log/transport/action.ts:3</a></li>
+							<li>Defined in <a href="https://github.com/toreda/log/blob/f9931e7/src/log/action.ts#L8">src/log/action.ts:8</a></li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Custom Action used to create a log transport.
+								Executed by transport once for each received
+							msg matching transport log level.</p>
+						</div>
+					</div>
 					<div class="tsd-type-declaration">
 						<h4>Type declaration</h4>
 						<ul class="tsd-parameters">
 							<li class="tsd-parameter-signature">
 								<ul class="tsd-signatures tsd-kind-type-literal tsd-parent-kind-type-alias">
-									<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>logMessage<span class="tsd-signature-symbol">: </span><a href="interfaces/logmessage.html" class="tsd-signature-type" data-tsd-kind="Interface">LogMessage</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">unknown</span><span class="tsd-signature-symbol">&gt;</span></li>
+									<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>logMessage<span class="tsd-signature-symbol">: </span><a href="interfaces/logmessage.html" class="tsd-signature-type" data-tsd-kind="Interface">LogMessage</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">&gt;</span></li>
 								</ul>
 								<ul class="tsd-descriptions">
 									<li class="tsd-description">
@@ -119,7 +125,7 @@
 												<h5>logMessage: <a href="interfaces/logmessage.html" class="tsd-signature-type" data-tsd-kind="Interface">LogMessage</a></h5>
 											</li>
 										</ul>
-										<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">unknown</span><span class="tsd-signature-symbol">&gt;</span></h4>
+										<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">&gt;</span></h4>
 									</li>
 								</ul>
 							</li>
@@ -132,7 +138,7 @@
 			<nav class="tsd-navigation primary">
 				<ul>
 					<li class="current ">
-						<a href="modules.html">Exports</a>
+						<a href="modules.html">Modules</a>
 					</li>
 				</ul>
 			</nav>
@@ -145,13 +151,13 @@
 						<a href="classes/log.html" class="tsd-kind-icon">Log</a>
 					</li>
 					<li class=" tsd-kind-class">
+						<a href="classes/loggroup.html" class="tsd-kind-icon">Log<wbr>Group</a>
+					</li>
+					<li class=" tsd-kind-class">
 						<a href="classes/logstate.html" class="tsd-kind-icon">Log<wbr>State</a>
 					</li>
 					<li class=" tsd-kind-class">
 						<a href="classes/logtransport.html" class="tsd-kind-icon">Log<wbr>Transport</a>
-					</li>
-					<li class=" tsd-kind-class">
-						<a href="classes/logtransportstate.html" class="tsd-kind-icon">Log<wbr>Transport<wbr>State</a>
 					</li>
 					<li class=" tsd-kind-interface">
 						<a href="interfaces/logmessage.html" class="tsd-kind-icon">Log<wbr>Message</a>
@@ -159,11 +165,8 @@
 					<li class=" tsd-kind-interface">
 						<a href="interfaces/logoptions.html" class="tsd-kind-icon">Log<wbr>Options</a>
 					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/logtransportoptions.html" class="tsd-kind-icon">Log<wbr>Transport<wbr>Options</a>
-					</li>
 					<li class=" tsd-kind-type-alias">
-						<a href="modules.html#logtransportaction" class="tsd-kind-icon">Log<wbr>Transport<wbr>Action</a>
+						<a href="modules.html#logaction" class="tsd-kind-icon">Log<wbr>Action</a>
 					</li>
 				</ul>
 			</nav>
@@ -181,9 +184,6 @@
 			</ul>
 			<ul class="tsd-legend">
 				<li class="tsd-kind-property tsd-parent-kind-interface"><span class="tsd-kind-icon">Property</span></li>
-			</ul>
-			<ul class="tsd-legend">
-				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-static"><span class="tsd-kind-icon">Static property</span></li>
 			</ul>
 		</div>
 	</div>

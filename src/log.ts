@@ -194,16 +194,45 @@ export class Log {
 	 * are used instead of global level when they are set.
 	 * @param logLevel
 	 */
-	public setGlobalLevel(logLevel: LogLevels): void {
-		if (typeof logLevel !== 'number') {
+	public setGlobalLevel(level: LogLevels): void {
+		if (typeof level !== 'number') {
 			return;
 		}
 
-		if (logLevel < 0 || logLevel > LogLevels.ALL) {
+		this.state.globalLogLevel = level;
+	}
+
+	/**
+	 * Add multiple flags to global log level. Performs
+	 * sanity checks on each provided level and discards
+	 * invalid values.
+	 * @param levels
+	 */
+	public addGlobalLevels(levels: number[]): void {
+		if (!Array.isArray(levels)) {
 			return;
 		}
 
-		this.state.globalLogLevel = logLevel;
+		let mask = 0x0;
+		for (const level of levels) {
+			if (typeof level !== 'number') {
+				continue;
+			}
+
+			mask |= level;
+		}
+
+		this.addGlobalLevel(mask);
+	}
+
+	public addGlobalLevel(level: number): void {
+		if (typeof level !== 'number') {
+			return;
+		}
+
+		// Bitwise OR to activate any active bits in the
+		// provided level bitmask.
+		this.state.globalLogLevel |= level;
 	}
 
 	/**

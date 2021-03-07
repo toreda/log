@@ -65,6 +65,13 @@
 <div class="container container-main">
 	<div class="row">
 		<div class="col-8 col-content">
+			<section class="tsd-panel tsd-comment">
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>Bitmasks for each log level.</p>
+					</div>
+				</div>
+			</section>
 			<section class="tsd-panel-group tsd-index-group">
 				<h2>Index</h2>
 				<section class="tsd-panel tsd-index-panel">
@@ -73,9 +80,12 @@
 							<h3>Enumeration members</h3>
 							<ul class="tsd-index-list">
 								<li class="tsd-kind-enum-member tsd-parent-kind-enum"><a href="loglevels.html#all" class="tsd-kind-icon">ALL</a></li>
+								<li class="tsd-kind-enum-member tsd-parent-kind-enum"><a href="loglevels.html#all_custom" class="tsd-kind-icon">ALL_<wbr>CUSTOM</a></li>
+								<li class="tsd-kind-enum-member tsd-parent-kind-enum"><a href="loglevels.html#all_extended" class="tsd-kind-icon">ALL_<wbr>EXTENDED</a></li>
 								<li class="tsd-kind-enum-member tsd-parent-kind-enum"><a href="loglevels.html#debug" class="tsd-kind-icon">DEBUG</a></li>
 								<li class="tsd-kind-enum-member tsd-parent-kind-enum"><a href="loglevels.html#error" class="tsd-kind-icon">ERROR</a></li>
 								<li class="tsd-kind-enum-member tsd-parent-kind-enum"><a href="loglevels.html#info" class="tsd-kind-icon">INFO</a></li>
+								<li class="tsd-kind-enum-member tsd-parent-kind-enum"><a href="loglevels.html#none" class="tsd-kind-icon">NONE</a></li>
 								<li class="tsd-kind-enum-member tsd-parent-kind-enum"><a href="loglevels.html#trace" class="tsd-kind-icon">TRACE</a></li>
 								<li class="tsd-kind-enum-member tsd-parent-kind-enum"><a href="loglevels.html#warn" class="tsd-kind-icon">WARN</a></li>
 							</ul>
@@ -88,12 +98,57 @@
 				<section class="tsd-panel tsd-member tsd-kind-enum-member tsd-parent-kind-enum">
 					<a name="all" class="tsd-anchor"></a>
 					<h3>ALL</h3>
-					<div class="tsd-signature tsd-kind-icon">ALL<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol"> = 31</span></div>
+					<div class="tsd-signature tsd-kind-icon">ALL<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol"> = 255</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/toreda/log/blob/e947fd3/src/log/levels.ts#L7">src/log/levels.ts:7</a></li>
+							<li>Defined in <a href="https://github.com/toreda/log/blob/f9931e7/src/log/levels.ts#L53">src/log/levels.ts:53</a></li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Bitmask for all built-in log levels.
+								BITWISE AND     -     Enable all built-in log levels and disable
+								all custom log levels.
+								BITWISE OR     -    Enable all built-in log levels without
+							affecting custom log levels.</p>
+						</div>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-enum-member tsd-parent-kind-enum">
+					<a name="all_custom" class="tsd-anchor"></a>
+					<h3>ALL_<wbr>CUSTOM</h3>
+					<div class="tsd-signature tsd-kind-icon">ALL_<wbr>CUSTOM<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol"> = 18446744073709552000</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/toreda/log/blob/f9931e7/src/log/levels.ts#L61">src/log/levels.ts:61</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Bitmask for all custom log levels.
+								BITWISE AND     -     Enable all custom levels and disable
+								all built-in log levels.
+								BITWISE OR     -    Enable all custom log levels without affecting
+							built-in log levels.</p>
+						</div>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-enum-member tsd-parent-kind-enum">
+					<a name="all_extended" class="tsd-anchor"></a>
+					<h3>ALL_<wbr>EXTENDED</h3>
+					<div class="tsd-signature tsd-kind-icon">ALL_<wbr>EXTENDED<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol"> = 18446744073709552000</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/toreda/log/blob/f9931e7/src/log/levels.ts#L67">src/log/levels.ts:67</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Bitmask for all log levels.
+								BITWISE AND     -     Enable all built-in and all custom log levels.
+							BITWISE OR     -    Enable all built-in and custom log levels.</p>
+						</div>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-enum-member tsd-parent-kind-enum">
 					<a name="debug" class="tsd-anchor"></a>
@@ -101,9 +156,17 @@
 					<div class="tsd-signature tsd-kind-icon">DEBUG<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol"> = 8</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/toreda/log/blob/e947fd3/src/log/levels.ts#L5">src/log/levels.ts:5</a></li>
+							<li>Defined in <a href="https://github.com/toreda/log/blob/f9931e7/src/log/levels.ts#L38">src/log/levels.ts:38</a></li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Bitmask for Debug log level.
+								BITWISE AND     -     Disable all levels except debug.
+								BITWISE OR     -    Enable debug level without changing other
+							active levels.</p>
+						</div>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-enum-member tsd-parent-kind-enum">
 					<a name="error" class="tsd-anchor"></a>
@@ -111,9 +174,17 @@
 					<div class="tsd-signature tsd-kind-icon">ERROR<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol"> = 1</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/toreda/log/blob/e947fd3/src/log/levels.ts#L2">src/log/levels.ts:2</a></li>
+							<li>Defined in <a href="https://github.com/toreda/log/blob/f9931e7/src/log/levels.ts#L17">src/log/levels.ts:17</a></li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Bitmask for Error log level.
+								BITWISE AND     -     Disable all levels except error.
+								BITWISE OR     -    Enable error level without changing other
+							active levels.</p>
+						</div>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-enum-member tsd-parent-kind-enum">
 					<a name="info" class="tsd-anchor"></a>
@@ -121,9 +192,34 @@
 					<div class="tsd-signature tsd-kind-icon">INFO<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol"> = 4</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/toreda/log/blob/e947fd3/src/log/levels.ts#L4">src/log/levels.ts:4</a></li>
+							<li>Defined in <a href="https://github.com/toreda/log/blob/f9931e7/src/log/levels.ts#L31">src/log/levels.ts:31</a></li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Bitmask for Info log level.
+								BITWISE AND     -     Disable all levels except info.
+								BITWISE OR     -    Enable info level without changing other
+							active levels.</p>
+						</div>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-enum-member tsd-parent-kind-enum">
+					<a name="none" class="tsd-anchor"></a>
+					<h3>NONE</h3>
+					<div class="tsd-signature tsd-kind-icon">NONE<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol"> = 0</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/toreda/log/blob/f9931e7/src/log/levels.ts#L10">src/log/levels.ts:10</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Empty bitmask to disable all levels.
+								BITWISE AND     -     Disable all levels.
+							BITWISE OR     -     No effect.</p>
+						</div>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-enum-member tsd-parent-kind-enum">
 					<a name="trace" class="tsd-anchor"></a>
@@ -131,9 +227,17 @@
 					<div class="tsd-signature tsd-kind-icon">TRACE<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol"> = 16</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/toreda/log/blob/e947fd3/src/log/levels.ts#L6">src/log/levels.ts:6</a></li>
+							<li>Defined in <a href="https://github.com/toreda/log/blob/f9931e7/src/log/levels.ts#L45">src/log/levels.ts:45</a></li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Bitmask for Trace log level.
+								BITWISE AND     -     Disable all levels except trace.
+								BITWISE OR     -    Enable trace level without changing other
+							active levels.</p>
+						</div>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-enum-member tsd-parent-kind-enum">
 					<a name="warn" class="tsd-anchor"></a>
@@ -141,9 +245,17 @@
 					<div class="tsd-signature tsd-kind-icon">WARN<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol"> = 2</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/toreda/log/blob/e947fd3/src/log/levels.ts#L3">src/log/levels.ts:3</a></li>
+							<li>Defined in <a href="https://github.com/toreda/log/blob/f9931e7/src/log/levels.ts#L24">src/log/levels.ts:24</a></li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Bitmask for Warn log level.
+								BITWISE AND     -     Disable all levels except warn.
+								BITWISE OR     -    Enable warn level without changing other
+							active levels.</p>
+						</div>
+					</div>
 				</section>
 			</section>
 		</div>
@@ -151,7 +263,7 @@
 			<nav class="tsd-navigation primary">
 				<ul>
 					<li class=" ">
-						<a href="../modules.html">Exports</a>
+						<a href="../modules.html">Modules</a>
 					</li>
 				</ul>
 			</nav>
@@ -166,6 +278,12 @@
 								<a href="loglevels.html#all" class="tsd-kind-icon">ALL</a>
 							</li>
 							<li class=" tsd-kind-enum-member tsd-parent-kind-enum">
+								<a href="loglevels.html#all_custom" class="tsd-kind-icon">ALL_<wbr>CUSTOM</a>
+							</li>
+							<li class=" tsd-kind-enum-member tsd-parent-kind-enum">
+								<a href="loglevels.html#all_extended" class="tsd-kind-icon">ALL_<wbr>EXTENDED</a>
+							</li>
+							<li class=" tsd-kind-enum-member tsd-parent-kind-enum">
 								<a href="loglevels.html#debug" class="tsd-kind-icon">DEBUG</a>
 							</li>
 							<li class=" tsd-kind-enum-member tsd-parent-kind-enum">
@@ -173,6 +291,9 @@
 							</li>
 							<li class=" tsd-kind-enum-member tsd-parent-kind-enum">
 								<a href="loglevels.html#info" class="tsd-kind-icon">INFO</a>
+							</li>
+							<li class=" tsd-kind-enum-member tsd-parent-kind-enum">
+								<a href="loglevels.html#none" class="tsd-kind-icon">NONE</a>
 							</li>
 							<li class=" tsd-kind-enum-member tsd-parent-kind-enum">
 								<a href="loglevels.html#trace" class="tsd-kind-icon">TRACE</a>
@@ -188,13 +309,13 @@
 						<a href="../classes/log.html" class="tsd-kind-icon">Log</a>
 					</li>
 					<li class=" tsd-kind-class">
+						<a href="../classes/loggroup.html" class="tsd-kind-icon">Log<wbr>Group</a>
+					</li>
+					<li class=" tsd-kind-class">
 						<a href="../classes/logstate.html" class="tsd-kind-icon">Log<wbr>State</a>
 					</li>
 					<li class=" tsd-kind-class">
 						<a href="../classes/logtransport.html" class="tsd-kind-icon">Log<wbr>Transport</a>
-					</li>
-					<li class=" tsd-kind-class">
-						<a href="../classes/logtransportstate.html" class="tsd-kind-icon">Log<wbr>Transport<wbr>State</a>
 					</li>
 					<li class=" tsd-kind-interface">
 						<a href="../interfaces/logmessage.html" class="tsd-kind-icon">Log<wbr>Message</a>
@@ -202,11 +323,8 @@
 					<li class=" tsd-kind-interface">
 						<a href="../interfaces/logoptions.html" class="tsd-kind-icon">Log<wbr>Options</a>
 					</li>
-					<li class=" tsd-kind-interface">
-						<a href="../interfaces/logtransportoptions.html" class="tsd-kind-icon">Log<wbr>Transport<wbr>Options</a>
-					</li>
 					<li class=" tsd-kind-type-alias">
-						<a href="../modules.html#logtransportaction" class="tsd-kind-icon">Log<wbr>Transport<wbr>Action</a>
+						<a href="../modules.html#logaction" class="tsd-kind-icon">Log<wbr>Action</a>
 					</li>
 				</ul>
 			</nav>
@@ -224,9 +342,6 @@
 			</ul>
 			<ul class="tsd-legend">
 				<li class="tsd-kind-property tsd-parent-kind-interface"><span class="tsd-kind-icon">Property</span></li>
-			</ul>
-			<ul class="tsd-legend">
-				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-static"><span class="tsd-kind-icon">Static property</span></li>
 			</ul>
 		</div>
 	</div>

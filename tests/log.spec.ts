@@ -148,14 +148,6 @@ describe('Log', () => {
 				expect(instance.state.globalLogLevel).toBe(0);
 			});
 
-			it('should not change global level when logLevel arg is a negative number', () => {
-				expect(instance.state.globalLogLevel).toBe(LogLevels.DEBUG);
-				instance.setGlobalLevel(-1);
-				instance.setGlobalLevel(-41);
-				instance.setGlobalLevel(-3);
-				expect(instance.state.globalLogLevel).toBe(LogLevels.DEBUG);
-			});
-
 			for (const logLevel of LOG_LEVELS) {
 				it(`should set log level to ${logLevel}`, () => {
 					expect(instance.state.globalLogLevel).toBe(LogLevels.DEBUG);
