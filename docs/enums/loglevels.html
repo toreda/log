@@ -1,0 +1,355 @@
+<!doctype html>
+<html class="default no-js">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>LogLevels | @toreda/log</title>
+	<meta name="description" content="Documentation for @toreda/log">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="../assets/css/main.css">
+	<script async src="../assets/js/search.js" id="search-script"></script>
+</head>
+<body>
+<header>
+	<div class="tsd-page-toolbar">
+		<div class="container">
+			<div class="table-wrap">
+				<div class="table-cell" id="tsd-search" data-index="../assets/js/search.json" data-base="..">
+					<div class="field">
+						<label for="tsd-search-field" class="tsd-widget search no-caption">Search</label>
+						<input id="tsd-search-field" type="text" />
+					</div>
+					<ul class="results">
+						<li class="state loading">Preparing search index...</li>
+						<li class="state failure">The search index is not available</li>
+					</ul>
+					<a href="../index.html" class="title">@toreda/log</a>
+				</div>
+				<div class="table-cell" id="tsd-widgets">
+					<div id="tsd-filter">
+						<a href="#" class="tsd-widget options no-caption" data-toggle="options">Options</a>
+						<div class="tsd-filter-group">
+							<div class="tsd-select" id="tsd-filter-visibility">
+								<span class="tsd-select-label">All</span>
+								<ul class="tsd-select-list">
+									<li data-value="public">Public</li>
+									<li data-value="protected">Public/Protected</li>
+									<li data-value="private" class="selected">All</li>
+								</ul>
+							</div>
+							<input type="checkbox" id="tsd-filter-inherited" checked />
+							<label class="tsd-widget" for="tsd-filter-inherited">Inherited</label>
+							<input type="checkbox" id="tsd-filter-externals" checked />
+							<label class="tsd-widget" for="tsd-filter-externals">Externals</label>
+						</div>
+					</div>
+					<a href="#" class="tsd-widget menu no-caption" data-toggle="menu">Menu</a>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="tsd-page-title">
+		<div class="container">
+			<ul class="tsd-breadcrumb">
+				<li>
+					<a href="../modules.html">@toreda/log</a>
+				</li>
+				<li>
+					<a href="loglevels.html">LogLevels</a>
+				</li>
+			</ul>
+			<h1>Enumeration LogLevels</h1>
+		</div>
+	</div>
+</header>
+<div class="container container-main">
+	<div class="row">
+		<div class="col-8 col-content">
+			<section class="tsd-panel tsd-comment">
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>Bitmasks for each log level.</p>
+					</div>
+				</div>
+			</section>
+			<section class="tsd-panel-group tsd-index-group">
+				<h2>Index</h2>
+				<section class="tsd-panel tsd-index-panel">
+					<div class="tsd-index-content">
+						<section class="tsd-index-section ">
+							<h3>Enumeration members</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-enum-member tsd-parent-kind-enum"><a href="loglevels.html#all" class="tsd-kind-icon">ALL</a></li>
+								<li class="tsd-kind-enum-member tsd-parent-kind-enum"><a href="loglevels.html#all_custom" class="tsd-kind-icon">ALL_<wbr>CUSTOM</a></li>
+								<li class="tsd-kind-enum-member tsd-parent-kind-enum"><a href="loglevels.html#all_extended" class="tsd-kind-icon">ALL_<wbr>EXTENDED</a></li>
+								<li class="tsd-kind-enum-member tsd-parent-kind-enum"><a href="loglevels.html#debug" class="tsd-kind-icon">DEBUG</a></li>
+								<li class="tsd-kind-enum-member tsd-parent-kind-enum"><a href="loglevels.html#error" class="tsd-kind-icon">ERROR</a></li>
+								<li class="tsd-kind-enum-member tsd-parent-kind-enum"><a href="loglevels.html#info" class="tsd-kind-icon">INFO</a></li>
+								<li class="tsd-kind-enum-member tsd-parent-kind-enum"><a href="loglevels.html#none" class="tsd-kind-icon">NONE</a></li>
+								<li class="tsd-kind-enum-member tsd-parent-kind-enum"><a href="loglevels.html#trace" class="tsd-kind-icon">TRACE</a></li>
+								<li class="tsd-kind-enum-member tsd-parent-kind-enum"><a href="loglevels.html#warn" class="tsd-kind-icon">WARN</a></li>
+							</ul>
+						</section>
+					</div>
+				</section>
+			</section>
+			<section class="tsd-panel-group tsd-member-group ">
+				<h2>Enumeration members</h2>
+				<section class="tsd-panel tsd-member tsd-kind-enum-member tsd-parent-kind-enum">
+					<a name="all" class="tsd-anchor"></a>
+					<h3>ALL</h3>
+					<div class="tsd-signature tsd-kind-icon">ALL<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol"> = 255</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/toreda/log/blob/582ae43/src/log/levels.ts#L53">src/log/levels.ts:53</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Bitmask for all built-in log levels.
+								BITWISE AND     -     Enable all built-in log levels and disable
+								all custom log levels.
+								BITWISE OR     -    Enable all built-in log levels without
+							affecting custom log levels.</p>
+						</div>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-enum-member tsd-parent-kind-enum">
+					<a name="all_custom" class="tsd-anchor"></a>
+					<h3>ALL_<wbr>CUSTOM</h3>
+					<div class="tsd-signature tsd-kind-icon">ALL_<wbr>CUSTOM<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol"> = 18446744073709552000</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/toreda/log/blob/582ae43/src/log/levels.ts#L61">src/log/levels.ts:61</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Bitmask for all custom log levels.
+								BITWISE AND     -     Enable all custom levels and disable
+								all built-in log levels.
+								BITWISE OR     -    Enable all custom log levels without affecting
+							built-in log levels.</p>
+						</div>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-enum-member tsd-parent-kind-enum">
+					<a name="all_extended" class="tsd-anchor"></a>
+					<h3>ALL_<wbr>EXTENDED</h3>
+					<div class="tsd-signature tsd-kind-icon">ALL_<wbr>EXTENDED<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol"> = 18446744073709552000</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/toreda/log/blob/582ae43/src/log/levels.ts#L67">src/log/levels.ts:67</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Bitmask for all log levels.
+								BITWISE AND     -     Enable all built-in and all custom log levels.
+							BITWISE OR     -    Enable all built-in and custom log levels.</p>
+						</div>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-enum-member tsd-parent-kind-enum">
+					<a name="debug" class="tsd-anchor"></a>
+					<h3>DEBUG</h3>
+					<div class="tsd-signature tsd-kind-icon">DEBUG<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol"> = 8</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/toreda/log/blob/582ae43/src/log/levels.ts#L38">src/log/levels.ts:38</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Bitmask for Debug log level.
+								BITWISE AND     -     Disable all levels except debug.
+								BITWISE OR     -    Enable debug level without changing other
+							active levels.</p>
+						</div>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-enum-member tsd-parent-kind-enum">
+					<a name="error" class="tsd-anchor"></a>
+					<h3>ERROR</h3>
+					<div class="tsd-signature tsd-kind-icon">ERROR<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol"> = 1</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/toreda/log/blob/582ae43/src/log/levels.ts#L17">src/log/levels.ts:17</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Bitmask for Error log level.
+								BITWISE AND     -     Disable all levels except error.
+								BITWISE OR     -    Enable error level without changing other
+							active levels.</p>
+						</div>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-enum-member tsd-parent-kind-enum">
+					<a name="info" class="tsd-anchor"></a>
+					<h3>INFO</h3>
+					<div class="tsd-signature tsd-kind-icon">INFO<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol"> = 4</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/toreda/log/blob/582ae43/src/log/levels.ts#L31">src/log/levels.ts:31</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Bitmask for Info log level.
+								BITWISE AND     -     Disable all levels except info.
+								BITWISE OR     -    Enable info level without changing other
+							active levels.</p>
+						</div>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-enum-member tsd-parent-kind-enum">
+					<a name="none" class="tsd-anchor"></a>
+					<h3>NONE</h3>
+					<div class="tsd-signature tsd-kind-icon">NONE<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol"> = 0</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/toreda/log/blob/582ae43/src/log/levels.ts#L10">src/log/levels.ts:10</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Empty bitmask to disable all levels.
+								BITWISE AND     -     Disable all levels.
+							BITWISE OR     -     No effect.</p>
+						</div>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-enum-member tsd-parent-kind-enum">
+					<a name="trace" class="tsd-anchor"></a>
+					<h3>TRACE</h3>
+					<div class="tsd-signature tsd-kind-icon">TRACE<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol"> = 16</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/toreda/log/blob/582ae43/src/log/levels.ts#L45">src/log/levels.ts:45</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Bitmask for Trace log level.
+								BITWISE AND     -     Disable all levels except trace.
+								BITWISE OR     -    Enable trace level without changing other
+							active levels.</p>
+						</div>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-enum-member tsd-parent-kind-enum">
+					<a name="warn" class="tsd-anchor"></a>
+					<h3>WARN</h3>
+					<div class="tsd-signature tsd-kind-icon">WARN<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol"> = 2</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/toreda/log/blob/582ae43/src/log/levels.ts#L24">src/log/levels.ts:24</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Bitmask for Warn log level.
+								BITWISE AND     -     Disable all levels except warn.
+								BITWISE OR     -    Enable warn level without changing other
+							active levels.</p>
+						</div>
+					</div>
+				</section>
+			</section>
+		</div>
+		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
+			<nav class="tsd-navigation primary">
+				<ul>
+					<li class=" ">
+						<a href="../modules.html">Modules</a>
+					</li>
+				</ul>
+			</nav>
+			<nav class="tsd-navigation secondary menu-sticky">
+				<ul class="before-current">
+				</ul>
+				<ul class="current">
+					<li class="current tsd-kind-enum">
+						<a href="loglevels.html" class="tsd-kind-icon">Log<wbr>Levels</a>
+						<ul>
+							<li class=" tsd-kind-enum-member tsd-parent-kind-enum">
+								<a href="loglevels.html#all" class="tsd-kind-icon">ALL</a>
+							</li>
+							<li class=" tsd-kind-enum-member tsd-parent-kind-enum">
+								<a href="loglevels.html#all_custom" class="tsd-kind-icon">ALL_<wbr>CUSTOM</a>
+							</li>
+							<li class=" tsd-kind-enum-member tsd-parent-kind-enum">
+								<a href="loglevels.html#all_extended" class="tsd-kind-icon">ALL_<wbr>EXTENDED</a>
+							</li>
+							<li class=" tsd-kind-enum-member tsd-parent-kind-enum">
+								<a href="loglevels.html#debug" class="tsd-kind-icon">DEBUG</a>
+							</li>
+							<li class=" tsd-kind-enum-member tsd-parent-kind-enum">
+								<a href="loglevels.html#error" class="tsd-kind-icon">ERROR</a>
+							</li>
+							<li class=" tsd-kind-enum-member tsd-parent-kind-enum">
+								<a href="loglevels.html#info" class="tsd-kind-icon">INFO</a>
+							</li>
+							<li class=" tsd-kind-enum-member tsd-parent-kind-enum">
+								<a href="loglevels.html#none" class="tsd-kind-icon">NONE</a>
+							</li>
+							<li class=" tsd-kind-enum-member tsd-parent-kind-enum">
+								<a href="loglevels.html#trace" class="tsd-kind-icon">TRACE</a>
+							</li>
+							<li class=" tsd-kind-enum-member tsd-parent-kind-enum">
+								<a href="loglevels.html#warn" class="tsd-kind-icon">WARN</a>
+							</li>
+						</ul>
+					</li>
+				</ul>
+				<ul class="after-current">
+					<li class=" tsd-kind-class">
+						<a href="../classes/log.html" class="tsd-kind-icon">Log</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="../classes/loggroup.html" class="tsd-kind-icon">Log<wbr>Group</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="../classes/logstate.html" class="tsd-kind-icon">Log<wbr>State</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="../classes/logtransport.html" class="tsd-kind-icon">Log<wbr>Transport</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="../interfaces/logmessage.html" class="tsd-kind-icon">Log<wbr>Message</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="../interfaces/logoptions.html" class="tsd-kind-icon">Log<wbr>Options</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="../modules.html#logaction" class="tsd-kind-icon">Log<wbr>Action</a>
+					</li>
+				</ul>
+			</nav>
+		</div>
+	</div>
+</div>
+<footer class="with-border-bottom">
+	<div class="container">
+		<h2>Legend</h2>
+		<div class="tsd-legend-group">
+			<ul class="tsd-legend">
+				<li class="tsd-kind-constructor tsd-parent-kind-class"><span class="tsd-kind-icon">Constructor</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-class"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class"><span class="tsd-kind-icon">Method</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-interface"><span class="tsd-kind-icon">Property</span></li>
+			</ul>
+		</div>
+	</div>
+</footer>
+<div class="container tsd-generator">
+	<p>Generated using <a href="https://typedoc.org/" target="_blank">TypeDoc</a></p>
+</div>
+<div class="overlay"></div>
+<script src="../assets/js/main.js"></script>
+</body>
+</html>

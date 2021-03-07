@@ -1,82 +1,146 @@
-# ArmorJS - Log
 
-![CI](https://github.com/armorjs/log/workflows/CI/badge.svg?branch=master) [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=armorjs_log&metric=coverage)](https://sonarcloud.io/dashboard?id=armorjs_log) [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=armorjs_log&metric=alert_status)](https://sonarcloud.io/dashboard?id=armorjs_log)
+# `@toreda/log` - Dynamic Logger
 
-@armorjs/log provides a lightweight and flexible logging typescript + javascript package that runs in node, web, and serverless environments. Use built-in logging, or write your own log handlers. Control when and how log messages are generated and send them anywhere.
+![Toreda](https://content.toreda.com/logo/toreda-logo.png)
+
+![CI](https://github.com/toreda/log/workflows/CI/badge.svg?branch=master) [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=toreda_log&metric=coverage)](https://sonarcloud.io/dashboard?id=toreda_log) [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=toreda_log&metric=alert_status)](https://sonarcloud.io/dashboard?id=toreda_log)
+
+Light TypeScript logger for node, web, and serverless environments. 
+
+Features:
+* Small footprint
+* Simple to use
+* Fully supports TypeScript
+* Custom Transport support
+* Works in Browser, Serverless, and Node environments.
+
+# Contents
+* [**Use Cases**](#use-cases)
+
+* [**What does it do?**](#what-does-it-do)
+* [**Usage**](#usage)
+
+* [**Package**](#Package)
+	-	[Install](#Install)
+	-	[Run Tests](#run-tests)
+	-	[Build](#build-from-source)
+	-   [License](#license)
+
+# Use Cases
+
+## Custom Transports
+* Configure transports to receive all log events, or only a filtered subset based on class, group, and log level.
+* Custom transports can filter and receive structured log data for specific events you care about. Get the exact functionality you need without writing a whole library.
+ 
+## Granular Control
+* Leave disabled log messages in prod environments which can be turned on later for debugging without a code push.
+* Set log levels for individual functions, classes, and groups. See debug output from the system you're debugging without seeing app-wide debug spam.
+
+# Usage
+`@toreda/log` provides simple and straight forward logging for common use cases, and advanced functionality for use in more complicated situations like server-side and remote debugging.
 
 
-## Contents
-- [About ArmorJS](#about-armorjs)
-- [Installation](#Installation)
-- [Usage](#usage)
-- [Build](#build)
-- [Testing](#testing)
-- [License](#license)
+**Create Logger**
+```typescript
+import {Log, LogLevels} from '@toreda/log';
+const log = new Log();
+```
 
-## About ArmorJS
-ArmorJS solves unique challenges in the enterprise node ecosystem. Auditing projects for security, reliability, and even license compatibility are monumental tasks when a project includes thousands of frequently changing dependencies.
+**Log Levels**
+```typescript
+import {Log, LogLevels} from '@toreda/log';
+const log = new Log();
+// Change log level:
+log.setGlobalLevel(LogLevels.ALL);
+// Trace
+log.trace('Trace message here');
+// Debug
+log.debug('Debug message here');
+// Info
+log.info('Info message here');
+// Warn
+log.warn('Warn message here');
+// Error
+log.error('my', 'message', 'here');
+```
+**Global Transports**
+Global Log Transports receive all log messages with matching active log levels, for all log groups. 
 
-ArmorJS standards:
-* Full typescript support.
-* Consistent API between releases.
-* Extremely small footprint (for webpacking).
-* No more than 5 external dependencies (excluding dev dependencies).
-* Compatible with web, node, and serverless deployment.
-* Thorough test coverage.
-* MIT License.
+```typescript
+import {Log, LogLevels} from '@toreda/log';
+const log = new Log();
+
+// Example dummy example.
+// Custom actions can perform any async activity.
+const action = async (msg: LogMessage): Promise<void> => {
+   return true;
+}
+// Transports take a string ID, initial log level,
+// and async action function.
+const transport = new LogTransport('tid1', LogLevels.ALL, action);
+
+// Add transport to global listeners.
+log.addGlobalTransport(transport);
+```
+
+
+**Removing Global Transports**
+
+```typescript
+// Remove the same transport
+// NOTE: Requires access to original transport object
+// now being removed.
+log.removeGlobalTransport(transport);
+
+// Remove global transport by ID.
+// Use ID to remove global transports if you no
+// longer have a reference to target transport.
+log.removeGlobalTransportById('tid1');
+```
+
+
+# Package
 
 ## Install
+Install `@toreda/log` directly from NPM.
 
-***With yarn (preferred):***
-```yarn add @armorjs/log```
-
-With NPM:
-```npm install @armorjs/log```
-
-## Usage
-
-### Library Usage
-
-#### Typescript
-```
-import { ArmorLog } from '@armorjs/log';
+### Install with Yarn (preferred)
+```bash
+yarn add @toreda/log --dev
 ```
 
-#### Node
-```
-const ArmorLog = require('@armorjs/log');
-```
-
-## Build
-Build (or rebuild) the log package:
-
-***With Yarn (preferred):***
-```
-yarn install
-yarn build
+### Install using NPM
+```bash
+npm install @toreda/log --save-dev
 ```
 
-With NPM:
-```
-npm install
-npm run-script build
-```
 
-## Testing
+## Run Tests
+Install or clone `@toreda/log` [(see above)](#install).
 
-Log implements unit tests using jest. Run the following commands from the directory where log has been installed.
+Toreda Unit Tests use [Jest](https://jestjs.io/).
 
-***With yarn (preferred):***
-```
-yarn install
+Installing jest is not required after project dependencies are installed ([see above](#install)).
+```bash
 yarn test
 ```
 
-With NPM:
-```
-npm install
-npm run-script test
+# Build from source
+
+The next steps are the same whether you installed the package using NPM or cloned the repo from Github.
+
+### Build with Yarn
+ Enter the following commands in order from the log project root.
+```bash
+yarn build
 ```
 
-## License
-[MIT](LICENSE) &copy; Michael Brich
+### Build with NPM
+ Enter the following commands in order from the log project root.
+```bash
+npm run-script build
+```
+
+# License
+
+[MIT](LICENSE) &copy; Toreda, Inc.
