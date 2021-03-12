@@ -1,11 +1,12 @@
-import {LogMessage} from '../message';
 import {LogLevels} from '../levels';
+import {LogMessage} from '../message';
 
 /**
  * Action intended for development and debugging where console
  * logs may be needed.
  * @param msg
  */
+
 export async function LogActionConsole(msg: LogMessage): Promise<boolean> {
 	switch (msg.level) {
 		case LogLevels.ERROR:

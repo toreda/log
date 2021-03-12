@@ -1,15 +1,18 @@
-import {LogLevels} from './log/levels';
-import {LogOptions} from './log/options';
-import {LogTransport} from './log/transport';
-import {LogGroup} from './log/group';
-import {LogState} from './log/state';
-import {LogMessage} from './log/message';
 import {isType} from '@toreda/strong-types';
+
 import {LogActionConsole} from './log/action/console';
+import {LogGroup} from './log/group';
+import {LogLevels} from './log/levels';
+import {LogMessage} from './log/message';
+import {LogOptions} from './log/options';
+import {LogState} from './log/state';
+import {LogTransport} from './log/transport';
+
 /**
  * Main log class holding attached transports and internal state
  * data, and logging configuration.
  */
+
 export class Log {
 	/** Serializable internal state data */
 	public readonly state: LogState;
@@ -38,6 +41,7 @@ export class Log {
 			}
 		}
 	}
+
 	/**
 	 * Add transport to target group.
 	 * @param groupId			Target group to add transport to. When null the default 'all'
@@ -335,7 +339,7 @@ export class Log {
 		if (typeof groupId === 'string' && this.state.groups[groupId]) {
 			this.state.groups[groupId].log(this.state.globalLogLevel, logMsg);
 		} else {
-			this.state.groups['all'].log(this.state.globalLogLevel, logMsg);
+			this.state.groups.all.log(this.state.globalLogLevel, logMsg);
 		}
 
 		this.state.groups.global.log(this.state.globalLogLevel, logMsg);

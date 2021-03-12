@@ -1,15 +1,17 @@
-import {LogLevels} from './levels';
-import {LogGroup} from './group';
+import {StrongBoolean, StrongMap, makeBoolean} from '@toreda/strong-types';
+
 import {LogOptions} from '../log/options';
-import {StrongMap, StrongBoolean, makeBoolean} from '@toreda/strong-types';
+import {LogGroup} from './group';
+import {LogLevels} from './levels';
 
 /**
  * Holds internal state data, settings, and log groups for a
  * single log instance.
  */
+
 export class LogState extends StrongMap {
 	public globalLogLevel: number;
-	public readonly groups: Record<'all' | 'global' | string, LogGroup>;
+	public readonly groups: Record<'all' | 'global', LogGroup> & Record<string, LogGroup>;
 	public readonly groupKeys: string[];
 	public readonly groupsDefaultEnabled: StrongBoolean;
 	public readonly consoleEnabled: StrongBoolean;

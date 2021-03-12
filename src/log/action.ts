@@ -5,4 +5,5 @@ import {LogMessage} from './message';
  * Executed by transport once for each received
  * msg matching transport log level.
  */
+
 export type LogAction = (logMessage: LogMessage) => Promise<boolean>;

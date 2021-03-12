@@ -1,6 +1,6 @@
-import {LogMessage} from './message';
 import {LogAction} from './action';
 import {LogLevels} from './levels';
+import {LogMessage} from './message';
 
 export class LogTransport {
 	public readonly id: string;
