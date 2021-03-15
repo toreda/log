@@ -1,9 +1,10 @@
-import {LogGroup} from '../../src/log/group';
-import {LogLevels} from '../../src/log/levels';
-import {LogTransport} from '../../src/log/transport';
+import {LogAction} from 'src/log/action';
+import {LogGroup} from 'src/log/group';
+import {LogLevels} from 'src/log/levels';
+import {LogMessage} from 'src/log/message';
+import {LogTransport} from 'src/log/transport';
+
 import {isType} from '@toreda/strong-types';
-import {LogMessage} from '../../src/log/message';
-import {LogAction} from '../../src/log/action';
 
 const MOCK_ID = 'group_id_155129414';
 const MOCK_LEVEL = LogLevels.NONE | LogLevels.ERROR;

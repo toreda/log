@@ -1,28 +1,19 @@
 module.exports = {
-	"roots": [
-		"./"
+	roots: ['./'],
+	coverageDirectory: './coverage',
+	coveragePathIgnorePatterns: [
+		'.node/',
+		'coverage/',
+		'jest/',
+		'node_modules/',
+		'tests/',
+		'webpack.config.js'
 	],
-	"coverageDirectory": "./coverage",
-	"coveragePathIgnorePatterns": [
-		"tests/",
-		"node_modules/",
-		".node/",
-		"jest/",
-		"coverage/",
-		"webpack.config.js"
-	],
-	"testPathIgnorePatterns": [
-		"/node_modules/"
-	],
-	"testEnvironment": "node",
-	"transform": {
-		"^.+\\.tsx?$": "ts-jest"
-	},
-	"testRegex": "(/__tests__/.*|(\\.|/)(spec))\\.ts$",
-	"moduleFileExtensions": [
-		"ts",
-		"js",
-		"json"
-	],
-	"testResultsProcessor": "jest-sonar-reporter"
-}
+	moduleFileExtensions: ['ts', 'js', 'json'],
+	moduleNameMapper: {'^src/(.*)': '<rootDir>/src/$1'},
+	testEnvironment: 'node',
+	testPathIgnorePatterns: ['/node_modules/'],
+	testRegex: '(/__tests__/.*|(\\.|/)(spec))\\.ts$',
+	testResultsProcessor: 'jest-sonar-reporter',
+	transform: {'^.+\\.tsx?$': 'ts-jest'}
+};

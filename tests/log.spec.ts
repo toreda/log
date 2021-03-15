@@ -1,9 +1,9 @@
-import {Log} from '../src/log';
-import {LogLevels} from '../src/log/levels';
-import {LogTransport} from '../src/log/transport';
-import {LogAction} from '../src/log/action';
-import {LogMessage} from '../src/log/message';
-import {LogGroup} from '../src/log/group';
+import {Log} from 'src/log';
+import {LogAction} from 'src/log/action';
+import {LogGroup} from 'src/log/group';
+import {LogLevels} from 'src/log/levels';
+import {LogMessage} from 'src/log/message';
+import {LogTransport} from 'src/log/transport';
 
 const MOCK_ID = '149714971_92872981';
 const MOCK_MSG = 'msg here';

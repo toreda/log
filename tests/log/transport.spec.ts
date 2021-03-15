@@ -1,7 +1,7 @@
-import {LogMessage} from '../../src/log/message';
-import {LogTransport} from '../../src/log/transport';
-import {LogAction} from '../../src/log/action';
-import {LogLevels} from '../../src/log/levels';
+import {LogAction} from 'src/log/action';
+import {LogLevels} from 'src/log/levels';
+import {LogMessage} from 'src/log/message';
+import {LogTransport} from 'src/log/transport';
 
 const MOCK_ID = 'log_transport_id';
 const MOCK_LEVEL: LogLevels = LogLevels.NONE | LogLevels.ERROR;

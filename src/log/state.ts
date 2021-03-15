@@ -43,7 +43,9 @@ export class LogState extends StrongMap {
 			this.globalLogLevel = options.globalLogLevel;
 		}
 
-		this.parse(options);
+		if (options != null) {
+			this.parse(options);
+		}
 	}
 
 	/**

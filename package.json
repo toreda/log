@@ -32,7 +32,7 @@
 	},
 	"homepage": "https://github.com/toreda/log#readme",
 	"devDependencies": {
-		"@toreda/eslint-config": "^2.0.0",
+		"@toreda/eslint-config": "^2.1.0",
 		"@toreda/prettier-config": "^1.0.1",
 		"@types/jest": "^26.0.20",
 		"@types/node": "^14.14.31",
