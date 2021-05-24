@@ -41,7 +41,7 @@ export class Log {
 		}
 	}
 
-  /**
+	/**
 	 * Add transport to target group.
 	 * @param groupId			Target group to add transport to. When null the default 'all'
 	 * 							group is used. When target is non-null and target group does

@@ -35,9 +35,7 @@ export class LogState extends StrongMap {
 		// Starting Global log level
 		this.globalLogLevel = makeInt(LogLevels.ALL & ~LogLevels.DEBUG & LogLevels.TRACE);
 
-		if (options != null) {
-			this.parse(options);
-		}
+		this.parse(options);
 	}
 
 	/**
