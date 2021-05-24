@@ -3,6 +3,6 @@ import {LogLevels} from './levels';
 export interface LogOptions {
 	globalLogLevel?: LogLevels;
 	groupLevels?: {groupId: string; level: LogLevels}[];
-	consoleLogEnabled?: boolean;
+	consoleEnabled?: boolean;
 	groupsDisableOnStart?: boolean;
 }

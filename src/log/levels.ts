@@ -1,6 +1,7 @@
 /**
  * Bitmasks for each log level.
  */
+
 export enum LogLevels {
 	/**
 	 * Empty bitmask to disable all levels.

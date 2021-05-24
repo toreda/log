@@ -1,7 +1,7 @@
-import {LogTransport} from './transport';
+import {StrongBoolean, isType, makeBoolean} from '@toreda/strong-types';
 import {LogLevels} from './levels';
-import {LogMessage} from '../log/message';
-import {isType, makeBoolean, StrongBoolean} from '@toreda/strong-types';
+import {LogMessage} from './message';
+import {LogTransport} from './transport';
 
 export class LogGroup {
 	public readonly id: string;
