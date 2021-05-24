@@ -1,6 +1,6 @@
-import {LogActionConsole} from 'src/log/action/console';
-import {LogLevels} from 'src/log/levels';
-import {LogMessage} from 'src/log/message';
+import {LogActionConsole} from '../../../src/log/action/console';
+import {LogMessage} from '../../../src/log/message';
+import {LogLevels} from '../../../src/log/levels';
 
 describe('LogActionConsole', () => {
 	let msg: LogMessage;
