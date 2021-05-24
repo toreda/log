@@ -208,7 +208,7 @@ export class Log {
 			return;
 		}
 
-		this.state.globalLogLevel = level;
+		this.state.globalLogLevel(level);
 	}
 
 	/**
@@ -217,7 +217,7 @@ export class Log {
 	 * invalid values.
 	 * @param levels
 	 */
-	public enablelobalLevels(levels: number[]): void {
+	public enableGlobalLevels(levels: number[]): void {
 		if (!Array.isArray(levels)) {
 			return;
 		}
@@ -247,7 +247,9 @@ export class Log {
 
 		// Bitwise OR to activate any active bits in the
 		// provided level bitmask.
-		this.state.globalLogLevel |= level;
+		const globalLogLevel = this.state.globalLogLevel() | level;
+
+		this.state.globalLogLevel(globalLogLevel);
 	}
 
 	/**
@@ -282,7 +284,7 @@ export class Log {
 		}
 
 		this.state.groupKeys.push(groupId);
-		this.state.groups[groupId] = new LogGroup(groupId, logLevel, this.state.groupsDefaultEnabled());
+		this.state.groups[groupId] = new LogGroup(groupId, logLevel, this.state.groupsDisableOnStart());
 		return true;
 	}
 
@@ -337,12 +339,12 @@ export class Log {
 		const logMsg: LogMessage = this.createMessage('', level, ...msg);
 
 		if (typeof groupId === 'string' && this.state.groups[groupId]) {
-			this.state.groups[groupId].log(this.state.globalLogLevel, logMsg);
+			this.state.groups[groupId].log(this.state.globalLogLevel(), logMsg);
 		} else {
-			this.state.groups.all.log(this.state.globalLogLevel, logMsg);
+			this.state.groups['all'].log(this.state.globalLogLevel(), logMsg);
 		}
 
-		this.state.groups.global.log(this.state.globalLogLevel, logMsg);
+		this.state.groups.global.log(this.state.globalLogLevel(), logMsg);
 
 		return this;
 	}

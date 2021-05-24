@@ -1,5 +1,4 @@
-import {StrongBoolean, StrongMap, makeBoolean} from '@toreda/strong-types';
-
+import {StrongBoolean, StrongMap, makeBoolean, makeInt, StrongInt} from '@toreda/strong-types';
 import {LogOptions} from '../log/options';
 import {LogGroup} from './group';
 import {LogLevels} from './levels';
@@ -10,38 +9,31 @@ import {LogLevels} from './levels';
  */
 
 export class LogState extends StrongMap {
-	public globalLogLevel: number;
-	public readonly groups: Record<'all' | 'global', LogGroup> & Record<string, LogGroup>;
-	public readonly groupKeys: string[];
-	public readonly groupsDefaultEnabled: StrongBoolean;
 	public readonly consoleEnabled: StrongBoolean;
+	public readonly globalLogLevel: StrongInt;
+	public readonly groupKeys: string[];
+	public readonly groups: Record<'all' | 'global' | string, LogGroup>;
+	public readonly groupsDisableOnStart: StrongBoolean;
 
 	constructor(options?: LogOptions) {
 		super();
-		this.globalLogLevel =
-			options && typeof options.globalLogLevel === 'number'
-				? options.globalLogLevel
-				: LogLevels.ALL & ~LogLevels.DEBUG & LogLevels.TRACE;
+
 		const defaultGroups = this.createDefaultGroups();
+
+		this.groups = defaultGroups.map;
+		this.groupKeys = defaultGroups.keys;
+
 		// Check whether groups should start enabled or disabled.
 		// Disabled groups do not process logs, even if the group log level
 		// or global log level would otherwise allow it.
-		const groupsEnabled =
-			options && typeof options.groupsDisableOnStart === 'boolean'
-				? !options.groupsDisableOnStart
-				: true;
-		this.groupsDefaultEnabled = makeBoolean(groupsEnabled, true);
-		this.groups = defaultGroups.map;
-		this.groupKeys = defaultGroups.keys;
+		this.groupsDisableOnStart = makeBoolean(true);
+
 		// Whether console output is enabled by default. If disabled,
 		// the built-in console transport can be activated at any time.
-		const enableConsole =
-			options && typeof options.consoleLogEnabled === 'boolean' ? options.consoleLogEnabled : false;
-		this.consoleEnabled = makeBoolean(enableConsole, false);
+		this.consoleEnabled = makeBoolean(false);
+
 		// Starting Global log level
-		if (options && typeof options.globalLogLevel === 'number') {
-			this.globalLogLevel = options.globalLogLevel;
-		}
+		this.globalLogLevel = makeInt(LogLevels.ALL & ~LogLevels.DEBUG & LogLevels.TRACE);
 
 		if (options != null) {
 			this.parse(options);

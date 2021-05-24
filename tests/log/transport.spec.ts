@@ -10,7 +10,7 @@ describe('LogTransport', () => {
 	let action: LogAction;
 	let level: LogLevels;
 	beforeAll(() => {
-		action = async (msg: LogMessage): Promise<boolean> => {
+		action = async (): Promise<boolean> => {
 			return true;
 		};
 	});
@@ -22,31 +22,31 @@ describe('LogTransport', () => {
 	describe('Constructor', () => {
 		it('should throw when id arg is undefined', () => {
 			expect(() => {
-				const custom = new LogTransport(undefined as any, level, action);
+				new LogTransport(undefined as any, level, action);
 			}).toThrow('Log Transport init failure - id arg is missing.');
 		});
 
 		it('should throw when id arg is null', () => {
 			expect(() => {
-				const custom = new LogTransport(null as any, level, action);
+				new LogTransport(null as any, level, action);
 			}).toThrow('Log Transport init failure - id arg is missing.');
 		});
 
 		it('should throw when id arg is not a string', () => {
 			expect(() => {
-				const custom = new LogTransport(14081871 as any, level, action);
+				new LogTransport(14081871 as any, level, action);
 			}).toThrow('Log Transport init failure - id arg must be a non-empty string.');
 		});
 
 		it('should throw when action arg is undefined', () => {
 			expect(() => {
-				const custom = new LogTransport(MOCK_ID, MOCK_LEVEL, undefined as any);
+				new LogTransport(MOCK_ID, MOCK_LEVEL, undefined as any);
 			}).toThrow(`[logtr:${MOCK_ID}] Init failure - action arg is missing.`);
 		});
 
 		it('should throw when id action arg is not a function', () => {
 			expect(() => {
-				const custom = new LogTransport(MOCK_ID, level, 1408141 as any);
+				new LogTransport(MOCK_ID, level, 1408141 as any);
 			}).toThrow(`[logtr:${MOCK_ID}] Init failure - action arg must be a function.`);
 		});
 	});

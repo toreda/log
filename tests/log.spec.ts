@@ -1,9 +1,7 @@
-import {Log} from 'src/log';
-import {LogAction} from 'src/log/action';
-import {LogGroup} from 'src/log/group';
-import {LogLevels} from 'src/log/levels';
-import {LogMessage} from 'src/log/message';
-import {LogTransport} from 'src/log/transport';
+import {Log} from '../src/log';
+import {LogLevels} from '../src/log/levels';
+import {LogTransport} from '../src/log/transport';
+import {LogAction} from '../src/log/action';
 
 const MOCK_ID = '149714971_92872981';
 const MOCK_MSG = 'msg here';
@@ -73,20 +71,13 @@ const LOG_METHODS = [
 
 describe('Log', () => {
 	let instance: Log;
-	let action: LogAction;
-	let transport: LogTransport;
 
 	beforeAll(() => {
 		instance = new Log();
 	});
 
 	beforeEach(() => {
-		action = async (msg: LogMessage): Promise<boolean> => {
-			return true;
-		};
-
 		instance.setGlobalLevel(LogLevels.DEBUG);
-		transport = new LogTransport('test', LogLevels.ALL, action);
 		instance.clearAll();
 	});
 
@@ -97,22 +88,16 @@ describe('Log', () => {
 	});
 
 	describe('Implementation', () => {
-		let spy: jest.SpyInstance;
 		let action: LogAction;
 
 		beforeEach(() => {
-			action = async (msg: LogMessage): Promise<boolean> => {
+			action = async (): Promise<boolean> => {
 				return true;
 			};
 		});
 
 		describe('setGroupLevel', () => {
-			let group: LogGroup;
 			const groupId = '19814_77eF971_VAZ714971';
-
-			beforeAll(() => {
-				group = instance.getGroup(groupId);
-			});
 
 			beforeEach(() => {
 				instance.setGroupLevel(groupId, LogLevels.ERROR);
@@ -137,22 +122,22 @@ describe('Log', () => {
 
 		describe('setGlobalLevel', () => {
 			it('should not change log level when logLevel arg is undefined', () => {
-				expect(instance.state.globalLogLevel).toBe(LogLevels.DEBUG);
+				expect(instance.state.globalLogLevel()).toBe(LogLevels.DEBUG);
 				instance.setGlobalLevel('adfjakha' as any);
-				expect(instance.state.globalLogLevel).toBe(LogLevels.DEBUG);
+				expect(instance.state.globalLogLevel()).toBe(LogLevels.DEBUG);
 			});
 
 			it('should set global log level to 0 when logLevel arg is NONE', () => {
-				expect(instance.state.globalLogLevel).toBe(LogLevels.DEBUG);
+				expect(instance.state.globalLogLevel()).toBe(LogLevels.DEBUG);
 				instance.setGlobalLevel(LogLevels.NONE);
-				expect(instance.state.globalLogLevel).toBe(0);
+				expect(instance.state.globalLogLevel()).toBe(0);
 			});
 
 			for (const logLevel of LOG_LEVELS) {
 				it(`should set log level to ${logLevel}`, () => {
-					expect(instance.state.globalLogLevel).toBe(LogLevels.DEBUG);
+					expect(instance.state.globalLogLevel()).toBe(LogLevels.DEBUG);
 					instance.setGlobalLevel(logLevel);
-					expect(instance.state.globalLogLevel).toBe(logLevel);
+					expect(instance.state.globalLogLevel()).toBe(logLevel);
 				});
 			}
 		});
@@ -185,29 +170,29 @@ describe('Log', () => {
 		describe('enableGlobalLevel', () => {
 			it('should not change global level when level input arg is not a number', () => {
 				const input = '1497197' as any;
-				instance.state.globalLogLevel = LogLevels.ERROR;
+				instance.state.globalLogLevel(LogLevels.ERROR);
 				instance.enableGlobalLevel(input as any);
-				expect(instance.state.globalLogLevel).toBe(LogLevels.ERROR);
+				expect(instance.state.globalLogLevel()).toBe(LogLevels.ERROR);
 
-				instance.state.globalLogLevel = LogLevels.TRACE;
+				instance.state.globalLogLevel(LogLevels.TRACE);
 				instance.enableGlobalLevel(input as any);
-				expect(instance.state.globalLogLevel).toBe(LogLevels.TRACE);
+				expect(instance.state.globalLogLevel()).toBe(LogLevels.TRACE);
 			});
 
 			it('should add target level flag to global log level', () => {
 				const targetLevel = LogLevels.DEBUG;
-				instance.state.globalLogLevel = LogLevels.ERROR;
+				instance.state.globalLogLevel(LogLevels.ERROR);
 
 				instance.enableGlobalLevel(targetLevel);
 				const mask = LogLevels.DEBUG | LogLevels.ERROR;
-				expect(instance.state.globalLogLevel & mask).toBe(mask);
+				expect(instance.state.globalLogLevel() & mask).toBe(mask);
 			});
 
 			it('should not change global log level when target level is none', () => {
-				instance.state.globalLogLevel = LogLevels.ERROR;
+				instance.state.globalLogLevel(LogLevels.ERROR);
 
 				instance.enableGlobalLevel(LogLevels.NONE);
-				expect(instance.state.globalLogLevel).toBe(LogLevels.ERROR);
+				expect(instance.state.globalLogLevel()).toBe(LogLevels.ERROR);
 			});
 		});
 

@@ -1,10 +1,9 @@
-import {LogAction} from 'src/log/action';
-import {LogGroup} from 'src/log/group';
-import {LogLevels} from 'src/log/levels';
-import {LogMessage} from 'src/log/message';
-import {LogTransport} from 'src/log/transport';
-
 import {isType} from '@toreda/strong-types';
+import {LogAction} from '../../src/log/action';
+import {LogGroup} from '../../src/log/group';
+import {LogLevels} from '../../src/log/levels';
+import {LogMessage} from '../../src/log/message';
+import {LogTransport} from '../../src/log/transport';
 
 const MOCK_ID = 'group_id_155129414';
 const MOCK_LEVEL = LogLevels.NONE | LogLevels.ERROR;
@@ -15,7 +14,7 @@ describe('LogGroup', () => {
 
 	beforeAll(() => {
 		instance = new LogGroup(MOCK_ID, MOCK_LEVEL, true);
-		action = async (msg: LogMessage): Promise<boolean> => {
+		action = async (): Promise<boolean> => {
 			return true;
 		};
 	});
@@ -89,11 +88,19 @@ describe('LogGroup', () => {
 				instance.removeTransports([testTransport1, testTransport2, testTransport3]);
 			});
 
-			it('should should not attempt to execute any transports when msg level is 0', async () => {
+			it('should not attempt to execute any transports when msg level is 0', async () => {
 				sampleLogMsg.level = 0x0;
 				expect(executeSpy).not.toHaveBeenCalled();
 				await instance.log(LogLevels.ALL, sampleLogMsg);
 				expect(executeSpy).not.toHaveBeenCalled();
+			});
+
+			it('should not attempt to execute any transports when log is not enabled', async () => {
+				instance.enabled(false);
+				expect(executeSpy).not.toHaveBeenCalled();
+				await instance.log(LogLevels.ALL, sampleLogMsg);
+				expect(executeSpy).not.toHaveBeenCalled();
+				instance.enabled(true);
 			});
 
 			it('should only execute transports matching log level', async () => {
@@ -170,6 +177,16 @@ describe('LogGroup', () => {
 				expect(
 					instance.canExecute(transport, 'FJ678194_HR719971' as any, 'AKHF90497' as any, msgLevel)
 				).toBe(false);
+			});
+
+			it('should return false when log is not enabled', () => {
+				const transport = new LogTransport(MOCK_ID, LogLevels.ERROR, action);
+				const msgLevel = LogLevels.ERROR;
+				instance.enabled(false);
+				expect(instance.canExecute(transport, LogLevels.DEBUG, 'AKHF90497' as any, msgLevel)).toBe(
+					false
+				);
+				instance.enabled(true);
 			});
 
 			it('should return true when global level matches msg level but group and transport levels are non-numbers', () => {

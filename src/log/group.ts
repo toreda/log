@@ -1,5 +1,4 @@
 import {StrongBoolean, isType, makeBoolean} from '@toreda/strong-types';
-
 import {LogMessage} from '../log/message';
 import {LogLevels} from './levels';
 import {LogTransport} from './transport';
