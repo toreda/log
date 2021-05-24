@@ -1,5 +1,4 @@
 import {isType} from '@toreda/strong-types';
-
 import {LogActionConsole} from './log/action/console';
 import {LogGroup} from './log/group';
 import {LogLevels} from './log/levels';

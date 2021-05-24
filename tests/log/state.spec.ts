@@ -1,6 +1,6 @@
-import {LogLevels} from 'src/log/levels';
-import {LogOptions} from 'src/log/options';
-import {LogState} from 'src/log/state';
+import {LogState} from '../../src/log/state';
+import {LogOptions} from '../../src/log/options';
+import {LogLevels} from '../../src/log/levels';
 
 describe('LogState', () => {
 	let instance: LogState;
