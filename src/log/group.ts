@@ -1,6 +1,6 @@
 import {StrongBoolean, isType, makeBoolean} from '@toreda/strong-types';
-import {LogMessage} from '../log/message';
 import {LogLevels} from './levels';
+import {LogMessage} from './message';
 import {LogTransport} from './transport';
 
 export class LogGroup {

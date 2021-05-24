@@ -1,7 +1,7 @@
-import {StrongBoolean, StrongMap, makeBoolean, makeInt, StrongInt} from '@toreda/strong-types';
-import {LogOptions} from '../log/options';
+import {StrongBoolean, StrongInt, StrongMap, makeBoolean, makeInt} from '@toreda/strong-types';
 import {LogGroup} from './group';
 import {LogLevels} from './levels';
+import {LogOptions} from './options';
 
 /**
  * Holds internal state data, settings, and log groups for a
