@@ -554,10 +554,10 @@
   resolved "https://registry.yarnpkg.com/@toreda/prettier-config/-/prettier-config-1.0.1.tgz#bd6c47352aa99560617f0f4a29f16ab7c3070b86"
   integrity sha512-YE13umi84GlKSOVPAEN1WRsoAGPjT3C3VmOGORtQAeZm5bqayL7XRHQM/ifXaF1ZWSkzeEAXYEnFflmIen/4kw==
 
-"@toreda/strong-types@^0.10.0":
-  version "0.10.0"
-  resolved "https://registry.yarnpkg.com/@toreda/strong-types/-/strong-types-0.10.0.tgz#861afb5a1f8691d4ea65b1e480bc2389cfc3c78b"
-  integrity sha512-GCEPT1M9OzwFZA8qzoWhTkvRMpBEWcQSq8t1On++0DQs1mJuKqAgrS3vJRSJEBlJbQipIlThwS83QgErHKr6kg==
+"@toreda/strong-types@^0.11.1":
+  version "0.11.1"
+  resolved "https://registry.yarnpkg.com/@toreda/strong-types/-/strong-types-0.11.1.tgz#bab5f5fcb7a8bb3683a2b18486f4e7c95896482d"
+  integrity sha512-1o15UIR1c5xdPOHx37kj05Fe6YkpbKFdmbkSzA9FkVCMDX2Bcb8fGlw2NSZw+tRl0qk68AkLb0cMfMQzfLDBMw==
 
 "@types/babel__core@^7.0.0", "@types/babel__core@^7.1.7":
   version "7.1.14"

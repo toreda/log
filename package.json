@@ -52,7 +52,7 @@
 		"typescript": "^4.2.2"
 	},
 	"dependencies": {
-		"@toreda/strong-types": "^0.10.0"
+		"@toreda/strong-types": "^0.11.1"
 	},
 	"prettier": "@toreda/prettier-config"
 }

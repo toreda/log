@@ -1,32 +1,32 @@
-import {StrongBoolean, StrongInt, StrongMap, makeBoolean, makeInt} from '@toreda/strong-types';
+import {
+	RecordToStrong,
+	StrongBoolean,
+	StrongInt,
+	StrongMap,
+	makeBoolean,
+	makeInt
+} from '@toreda/strong-types';
 import {LogGroup} from './group';
 import {LogLevels} from './levels';
 import {LogOptions} from './options';
+
+type State = RecordToStrong<LogOptions>;
 
 /**
  * Holds internal state data, settings, and log groups for a
  * single log instance.
  */
 
-export class LogState extends StrongMap {
+export class LogState extends StrongMap implements State {
 	public readonly consoleEnabled: StrongBoolean;
 	public readonly globalLogLevel: StrongInt;
-	public readonly groupKeys: string[];
-	public readonly groups: Record<'all' | 'global' | string, LogGroup>;
 	public readonly groupsDisableOnStart: StrongBoolean;
+
+	public readonly groups: Record<'all' | 'global' | string, LogGroup>;
+	public readonly groupKeys: string[];
 
 	constructor(options?: LogOptions) {
 		super();
-
-		const defaultGroups = this.createDefaultGroups();
-
-		this.groups = defaultGroups.map;
-		this.groupKeys = defaultGroups.keys;
-
-		// Check whether groups should start enabled or disabled.
-		// Disabled groups do not process logs, even if the group log level
-		// or global log level would otherwise allow it.
-		this.groupsDisableOnStart = makeBoolean(true);
 
 		// Whether console output is enabled by default. If disabled,
 		// the built-in console transport can be activated at any time.
@@ -34,6 +34,15 @@ export class LogState extends StrongMap {
 
 		// Starting Global log level
 		this.globalLogLevel = makeInt(LogLevels.ALL & ~LogLevels.DEBUG & LogLevels.TRACE);
+
+		// Check whether groups should start enabled or disabled.
+		// Disabled groups do not process logs, even if the group log level
+		// or global log level would otherwise allow it.
+		this.groupsDisableOnStart = makeBoolean(true);
+
+		const defaultGroups = this.createDefaultGroups();
+		this.groups = defaultGroups.map;
+		this.groupKeys = defaultGroups.keys;
 
 		this.parse(options);
 	}
