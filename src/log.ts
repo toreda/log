@@ -21,8 +21,56 @@ export class Log {
 
 		// Activate console logging if allowed by start options.
 		if (this.state.consoleEnabled()) {
-			this.activateGlobalConsole();
+			this.activateDefaultConsole();
 		}
+	}
+
+	/**
+	 * Enable global console logging for development and debugging.
+	 */
+	public activateDefaultConsole(): void {
+		// Initial log level is NONE, which will rely on the global
+		// log levl.
+		const transport = new LogTransport('console', this.state.globalLogLevel(), LogActionConsole);
+		this.addTransport(transport);
+	}
+
+	/**
+	 * Attempt to make new log group with target groupId. Does not
+	 * overwrite existing groups.
+	 * @param groupId 		target log group to create.
+	 * @returns 			Whether make group operation was successful. `false` when
+	 * 						group already exists or failed. `true` when group with target
+	 * 						id is created successfully.
+	 */
+	public makeGroup(groupId: string, logLevel: LogLevels, startEnabled?: boolean): boolean {
+		if (typeof groupId !== 'string' || !groupId) {
+			return false;
+		}
+
+		if (this.state.groups[groupId]) {
+			return false;
+		}
+
+		const enabled = startEnabled ?? this.state.groupsEnabledOnStart();
+
+		this.state.groupKeys.push(groupId);
+		this.state.groups[groupId] = new LogGroup(groupId, logLevel, enabled);
+		return true;
+	}
+
+	/**
+	 * Make a LogGroup instance where all log levels automatically
+	 * log to the target group ID.
+	 * @param groupId
+	 */
+	public getGroup(groupId: string): LogGroup {
+		if (this.state.groups[groupId]) {
+			return this.state.groups[groupId];
+		}
+
+		this.makeGroup(groupId, LogLevels.ERROR);
+		return this.state.groups[groupId];
 	}
 
 	public initGroups(groups?: {id: string; level: LogLevels}[]): void {
@@ -36,31 +84,27 @@ export class Log {
 
 		for (const group of groups) {
 			if (typeof group.id === 'string' && typeof group.level === 'number') {
-				this.setGroupLevel(group.id, group.level);
+				this.setGroupLevel(group.level, group.id);
 			}
 		}
 	}
 
 	/**
 	 * Add transport to target group.
-	 * @param groupId			Target group to add transport to. When null the default 'all'
+	 * @param transport 		Transport to add to target group.
+	 *
+	 * @param groupId			Target group to add transport to. When null the `default`
 	 * 							group is used. When target is non-null and target group does
 	 * 							not exist, it will be created.
-	 *
-	 * @param transport 		Transport to add to target group.
 	 */
-	public addGroupTransport(groupId: string | null, transport: LogTransport): boolean {
-		if (typeof groupId !== 'string' && groupId !== null) {
-			return false;
-		}
-
+	public addTransport(transport: LogTransport, groupId?: string): boolean {
 		if (!transport || !(transport instanceof LogTransport)) {
-			console.error(new Error('transport is not a LogTransport'));
+			console.error(Error('transport is not a LogTransport.'));
 			return false;
 		}
 
-		if (groupId === null) {
-			return this.state.groups.all.addTransport(transport);
+		if (groupId == null) {
+			return this.state.groups.default.addTransport(transport);
 		}
 
 		const group = this.getGroup(groupId);
@@ -73,64 +117,32 @@ export class Log {
 	}
 
 	/**
-	 * Add transport to default 'all' group. Transports in 'all'
-	 * are only executed for messages which don't provide
-	 * target groupId.
-	 * @param transport		Transport to add to 'all' group.
+	 * Remove transport from target group, or from the 'all' group if
+	 * groupId is null.
+	 * @param transport
+	 * @param groupId
 	 */
-	public addTransport(transport: LogTransport): boolean {
-		return this.addGroupTransport(null, transport);
-	}
+	public removeTransport(transport: LogTransport, groupId?: string): boolean {
+		const idStr = groupId ?? 'default';
+		const group = this.state.groups[idStr];
 
-	/**
-	 * Add global transport. Executed once per log message matching
-	 * transport's log level across all groups.
-	 * @param transport		Target transport to become a global listener.
-	 */
-	public addGlobalTransport(transport: LogTransport): boolean {
-		return this.addGroupTransport('global', transport);
-	}
+		if (!group) {
+			console.error(`remove transport failure - bad group with id '${groupId}'.`);
+			return false;
+		}
 
-	/**
-	 * Remove existing global transsport, if it exists. No changes made
-	 * to global transports when target does not exist. Call only as needed
-	 * for optimal performance. Method must perform an `O(n)` iteration where
-	 * `n` is the current global transport count.
-	 * @param transport		target transport to remove from global list.
-	 *
-	 * @returns 			`true` when transport match was found and removed
-	 * 						from target group. `false` if no match was found.
-	 */
-	public removeGlobalTransport(transport: LogTransport): boolean {
-		return this.removeGroupTransport('global', transport);
-	}
-
-	/**
-	 * Remove global transport using its unique ID when you
-	 * no longer have access to the transport object itself.
-	 * @param id		Transport's unique ID.
-	 */
-	public removeGlobalTransportById(id: string): boolean {
-		return this.removeGroupTransportById('global', id);
-	}
-
-	/**
-	 * Remove transport matching transportId from the default
-	 * 'all' log group.
-	 * @param transportId
-	 */
-	public removeTransportById(transportId: string): boolean {
-		return this.removeGroupTransportById('all', transportId);
+		return group.removeTransport(transport);
 	}
 
 	/**
 	 * Remove transport matching target id from target group if
 	 * both the group exists and the transport is in the group.
-	 * @param groupId
 	 * @param transportId
+	 * @param groupId
 	 */
-	public removeGroupTransportById(groupId: string, transportId: string): boolean {
-		const group = this.getGroup(groupId);
+	public removeTransportById(transportId: string, groupId?: string): boolean {
+		const idStr = groupId ?? 'default';
+		const group = this.state.groups[idStr];
 
 		for (let i = group.transports.length - 1; i >= 0; i--) {
 			const transport = group.transports[i];
@@ -144,33 +156,6 @@ export class Log {
 		}
 
 		return false;
-	}
-
-	/**
-	 * Remove target transport from default 'all' group. Calling
-	 * has no effect when transport does not exist in 'all' group. If
-	 * transport has been added to multiple groups,
-	 * @param transport
-	 */
-	public removeTransport(transport: LogTransport): boolean {
-		return this.removeGroupTransport(null, transport);
-	}
-
-	/**
-	 * Remove transport from target group, or from the 'all' group if
-	 * groupId is null.
-	 * @param groupId
-	 * @param transport
-	 */
-	public removeGroupTransport(groupId: string | null, transport: LogTransport): boolean {
-		const idStr = typeof groupId === 'string' ? groupId : 'all';
-		const group: LogGroup | null = this.getGroup(idStr);
-		if (!group) {
-			console.error(`remove transport failure - bad group with id '${groupId}'.`);
-			return false;
-		}
-
-		return group.removeTransport(transport);
 	}
 
 	/**
@@ -203,11 +188,25 @@ export class Log {
 	 * @param logLevel
 	 */
 	public setGlobalLevel(level: LogLevels): void {
+		this.state.globalLogLevel(level);
+	}
+
+	/**
+	 * Add a level flag to the global log level without
+	 * affecting other global level flags. Has no effect
+	 * if target level flag is already enabled.
+	 * @param level
+	 */
+	public enableGlobalLevel(level: number): void {
 		if (typeof level !== 'number') {
 			return;
 		}
 
-		this.state.globalLogLevel(level);
+		// Bitwise OR to activate any active bits in the
+		// provided level bitmask.
+		const globalLogLevel = this.state.globalLogLevel() | level;
+
+		this.state.globalLogLevel(globalLogLevel);
 	}
 
 	/**
@@ -234,57 +233,19 @@ export class Log {
 	}
 
 	/**
-	 * Add a level flag to the global log level without
-	 * affecting other global level flags. Has no effect
-	 * if target level flag is already enabled.
-	 * @param level
-	 */
-	public enableGlobalLevel(level: number): void {
-		if (typeof level !== 'number') {
-			return;
-		}
-
-		// Bitwise OR to activate any active bits in the
-		// provided level bitmask.
-		const globalLogLevel = this.state.globalLogLevel() | level;
-
-		this.state.globalLogLevel(globalLogLevel);
-	}
-
-	/**
 	 * Set log level for target group.
 	 * @param logLevel
 	 * @param groupId
 	 */
-	public setGroupLevel(groupId: string, logLevel: LogLevels): void {
-		const group = this.getGroup(groupId);
+	public setGroupLevel(logLevel: LogLevels, groupId?: string): void {
+		const idStr = groupId ?? 'default';
+		const group = this.state.groups[idStr];
+
 		if (!group) {
 			return;
 		}
 
 		group.setLogLevel(logLevel);
-	}
-
-	/**
-	 * Attempt to make new log group with target groupId. Does not
-	 * overwrite existing groups.
-	 * @param groupId 		target log group to create.
-	 * @returns 			Whether make group operation was successful. `false` when
-	 * 						group already exists or failed. `true` when group with target
-	 * 						id is created successfully.
-	 */
-	public makeGroup(groupId: string, logLevel: LogLevels): boolean {
-		if (typeof groupId !== 'string' || !groupId) {
-			return false;
-		}
-
-		if (this.state.groups[groupId]) {
-			return false;
-		}
-
-		this.state.groupKeys.push(groupId);
-		this.state.groups[groupId] = new LogGroup(groupId, logLevel, this.state.groupsDisableOnStart());
-		return true;
 	}
 
 	/**
@@ -294,56 +255,50 @@ export class Log {
 	 * @param level			Level bitmask msg was logged with.
 	 * @param msg			Msg that was logged.
 	 */
-	public createMessage(ts: string, level: LogLevels, ...msg: unknown[]): LogMessage {
-		const content = Array.isArray(msg) ? msg.join(' ') : msg;
+	private createMessage(date: string, level: LogLevels, ...msg: unknown[]): LogMessage {
+		let message: string;
 
-		return {
-			date: ts,
-			level: level,
-			message: content
-		};
-	}
-
-	/**
-	 * Enable global console logging for development and debugging.
-	 */
-	public activateGlobalConsole(): void {
-		// Initial log level is NONE, which will rely on the global
-		// log levl.
-		const transport = new LogTransport('console', LogLevels.NONE, LogActionConsole);
-		this.addGlobalTransport(transport);
-	}
-
-	/**
-	 * Make a group logger instance where all log levels automatically
-	 * log to the target group ID.
-	 * @param groupId
-	 */
-	public getGroup(groupId: string): LogGroup {
-		if (this.state.groups[groupId]) {
-			return this.state.groups[groupId];
+		if (msg.length > 1) {
+			message = JSON.stringify(msg);
+		} else if (msg.length === 0) {
+			message = '';
+		} else if (typeof msg[0] === 'string') {
+			message = msg[0];
+		} else {
+			message = JSON.stringify(msg[0]);
 		}
 
-		this.makeGroup(groupId, LogLevels.NONE | LogLevels.ERROR);
-		return this.state.groups[groupId];
+		return {date, level, message};
 	}
 
 	/**
-	 * Log message to target group. If groupId is null,
+	 * Log message to default group.
+	 * @param level
+	 * @param msg
+	 */
+	public log(level: LogLevels, ...msg: unknown[]): Log {
+		const logMsg: LogMessage = this.createMessage('', level, ...msg);
+
+		this.state.groups.all.log(this.state.globalLogLevel(), logMsg);
+		this.state.groups.default.log(this.state.globalLogLevel(), logMsg);
+
+		return this;
+	}
+
+	/**
+	 * Log message to target group. If groupId is null send to global.
 	 * @param groupId 		Target group to send log message to.
 	 * @param level
 	 * @param msg
 	 */
-	public log(groupId: string | null, level: LogLevels, ...msg: unknown[]): Log {
+	public logTo(groupId: string, level: LogLevels, ...msg: unknown[]): Log {
 		const logMsg: LogMessage = this.createMessage('', level, ...msg);
 
-		if (typeof groupId === 'string' && this.state.groups[groupId]) {
-			this.state.groups[groupId].log(this.state.globalLogLevel(), logMsg);
-		} else {
-			this.state.groups['all'].log(this.state.globalLogLevel(), logMsg);
-		}
+		this.state.groups.all.log(this.state.globalLogLevel(), logMsg);
 
-		this.state.groups.global.log(this.state.globalLogLevel(), logMsg);
+		if (this.state.groups[groupId]) {
+			this.state.groups[groupId].log(this.state.globalLogLevel(), logMsg);
+		}
 
 		return this;
 	}
@@ -353,7 +308,7 @@ export class Log {
 	 * @param msg
 	 */
 	public error(...msg: unknown[]): Log {
-		return this.log(null, LogLevels.ERROR, ...msg);
+		return this.logTo('default', LogLevels.ERROR, ...msg);
 	}
 
 	/**
@@ -361,8 +316,8 @@ export class Log {
 	 * @param groupId
 	 * @param msg
 	 */
-	public errorGroup(groupId: string | null, ...msg: unknown[]): Log {
-		return this.log(groupId, LogLevels.ERROR, ...msg);
+	public errorTo(groupId: string, ...msg: unknown[]): Log {
+		return this.logTo(groupId, LogLevels.ERROR, ...msg);
 	}
 
 	/**
@@ -370,7 +325,7 @@ export class Log {
 	 * @param msg
 	 */
 	public warn(...msg: unknown[]): Log {
-		return this.warnGroup(null, ...msg);
+		return this.logTo('default', LogLevels.WARN, ...msg);
 	}
 
 	/**
@@ -378,8 +333,8 @@ export class Log {
 	 * @param groupId
 	 * @param msg
 	 */
-	public warnGroup(groupId: string | null, ...msg: unknown[]): Log {
-		return this.log(groupId, LogLevels.WARN, ...msg);
+	public warnTo(groupId: string, ...msg: unknown[]): Log {
+		return this.logTo(groupId, LogLevels.WARN, ...msg);
 	}
 
 	/**
@@ -387,7 +342,7 @@ export class Log {
 	 * @param args
 	 */
 	public info(...msg: unknown[]): Log {
-		return this.infoGroup(null, ...msg);
+		return this.logTo('default', LogLevels.INFO, ...msg);
 	}
 
 	/**
@@ -395,16 +350,16 @@ export class Log {
 	 * @param groupId
 	 * @param msg
 	 */
-	public infoGroup(groupId: string | null, ...msg: unknown[]): Log {
-		return this.log(groupId, LogLevels.INFO, ...msg);
+	public infoTo(groupId: string, ...msg: unknown[]): Log {
+		return this.logTo(groupId, LogLevels.INFO, ...msg);
 	}
 
-	/*
-	 * Trigger a debug-level log message for no specific group (global).
+	/**
+	 * Trigger a -level log message for no specific group (global).
 	 * @param msg
 	 */
 	public debug(...msg: unknown[]): Log {
-		return this.debugGroup(null, ...msg);
+		return this.logTo('default', LogLevels.DEBUG, ...msg);
 	}
 
 	/**
@@ -412,8 +367,8 @@ export class Log {
 	 * @param groupId
 	 * @param msg
 	 */
-	public debugGroup(groupId: string | null, ...msg: unknown[]): Log {
-		return this.log(groupId, LogLevels.DEBUG, ...msg);
+	public debugTo(groupId: string, ...msg: unknown[]): Log {
+		return this.logTo(groupId, LogLevels.DEBUG, ...msg);
 	}
 
 	/**
@@ -421,7 +376,7 @@ export class Log {
 	 * @param args
 	 */
 	public trace(...msg: unknown[]): Log {
-		return this.traceGroup(null, ...msg);
+		return this.logTo('default', LogLevels.TRACE, ...msg);
 	}
 
 	/**
@@ -429,8 +384,8 @@ export class Log {
 	 * @param groupId
 	 * @param msg
 	 */
-	public traceGroup(groupId: string | null, ...msg: unknown[]): Log {
-		return this.log(groupId, LogLevels.TRACE, ...msg);
+	public traceTo(groupId: string, ...msg: unknown[]): Log {
+		return this.logTo(groupId, LogLevels.TRACE, ...msg);
 	}
 
 	/**
@@ -442,7 +397,7 @@ export class Log {
 		}
 
 		this.state.groupKeys.length = 0;
-		this.state.groupKeys.push('all');
-		this.state.groupKeys.push('global');
+		this.makeGroup('all', LogLevels.ALL);
+		this.makeGroup('default', LogLevels.ALL);
 	}
 }

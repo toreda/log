@@ -10,22 +10,22 @@ import {LogMessage} from '../message';
 export async function LogActionConsole(msg: LogMessage): Promise<boolean> {
 	switch (msg.level) {
 		case LogLevels.ERROR:
-			console.error(`[ERROR] ${msg.message}`);
+			console.error('[ERROR]', msg.message);
 			break;
 		case LogLevels.WARN:
-			console.warn(`[WARN] ${msg.message}`);
+			console.warn('[WARN]', msg.message);
 			break;
 		case LogLevels.INFO:
-			console.info(`[INFO] ${msg.message}`);
+			console.info('[INFO]', msg.message);
 			break;
 		case LogLevels.DEBUG:
-			console.debug(`[DEBUG] ${msg.message}`);
+			console.debug('[DEBUG]', msg.message);
 			break;
 		case LogLevels.TRACE:
-			console.trace(`[TRACE] ${msg.message}`);
+			console.trace('[TRACE]', msg.message);
 			break;
 		default:
-			console.log(msg.message);
+			console.log(`[${msg.level}]`, msg.message);
 			break;
 	}
 

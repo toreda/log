@@ -24,10 +24,10 @@ describe('LogState', () => {
 			expect(custom.groups.all).toBeTruthy();
 		});
 
-		it(`should initialize groups member and include 'global' group`, () => {
+		it(`should initialize groups member and include 'default' group`, () => {
 			const custom = new LogState(options);
 			expect(custom.groups).toBeTruthy();
-			expect(custom.groups.global).toBeTruthy();
+			expect(custom.groups.default).toBeTruthy();
 		});
 
 		it(`should initialize groupKeys member and include 'all' key`, () => {
@@ -36,10 +36,10 @@ describe('LogState', () => {
 			expect(custom.groupKeys.includes('all')).toBe(true);
 		});
 
-		it(`should initialize groupKeys member and include 'global' key`, () => {
+		it(`should initialize groupKeys member and include 'default' key`, () => {
 			const custom = new LogState(options);
 			expect(Array.isArray(custom.groupKeys)).toBe(true);
-			expect(custom.groupKeys.includes('global')).toBe(true);
+			expect(custom.groupKeys.includes('default')).toBe(true);
 		});
 
 		it(`should default consoleEnabled to false when option.consoleEnabled is not provided`, () => {
@@ -84,8 +84,8 @@ describe('LogState', () => {
 				expect(instance.createDefaultGroups().keys.includes('all')).toBe(true);
 			});
 
-			it(`should return 'global' key in keys array`, () => {
-				expect(instance.createDefaultGroups().keys.includes('global')).toBe(true);
+			it(`should return 'default' key in keys array`, () => {
+				expect(instance.createDefaultGroups().keys.includes('default')).toBe(true);
 			});
 		});
 	});

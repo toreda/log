@@ -10,10 +10,10 @@ export class LogGroup {
 	public readonly added: Set<LogTransport>;
 	public logLevel: LogLevels;
 
-	constructor(id: string, logLevel: LogLevels, enable: boolean) {
+	constructor(id: string, logLevel: LogLevels, enabled: boolean) {
 		this.id = id;
 
-		this.enabled = makeBoolean(enable, true);
+		this.enabled = makeBoolean(true, enabled);
 		this.transports = [];
 		this.logLevel = logLevel;
 		this.added = new Set<LogTransport>();
@@ -25,7 +25,7 @@ export class LogGroup {
 	 * @param level		Bitmask level msg was logged with.
 	 * @param msg		Message to be logged.
 	 */
-	public async log(globalLevel: LogLevels, msg: LogMessage): Promise<void> {
+	public async log(globalLvl: LogLevels, msg: LogMessage): Promise<void> {
 		if (typeof msg.level !== 'number' || msg.level === 0) {
 			return;
 		}
@@ -36,7 +36,7 @@ export class LogGroup {
 		}
 
 		for (const transport of this.transports) {
-			await this.execute(transport, globalLevel, this.logLevel, msg);
+			await this.execute(transport, globalLvl, msg);
 		}
 	}
 
@@ -46,13 +46,8 @@ export class LogGroup {
 	 * @param transport
 	 * @param msg
 	 */
-	public async execute(
-		transport: LogTransport,
-		globalLevel: LogLevels,
-		groupLevel: LogLevels,
-		msg: LogMessage
-	): Promise<boolean> {
-		if (!this.canExecute(transport, globalLevel, groupLevel, msg.level)) {
+	private async execute(transport: LogTransport, globalLvl: LogLevels, msg: LogMessage): Promise<boolean> {
+		if (!this.canExecute(transport, globalLvl, msg.level)) {
 			return false;
 		}
 
@@ -70,16 +65,10 @@ export class LogGroup {
 	 * message. Checks msg log level against global log level,
 	 * group log level, and transport log level.
 	 * @param transport
-	 * @param globalLevel
-	 * @param groupLevel
+	 * @param globalLvl
 	 * @param msgLevel
 	 */
-	public canExecute(
-		transport: LogTransport,
-		globalLevel: LogLevels,
-		groupLevel: LogLevels,
-		msgLevel: LogLevels
-	): boolean {
+	private canExecute(transport: LogTransport, globalLvl: LogLevels, msgLevel: LogLevels): boolean {
 		if (!isType(transport, LogTransport)) {
 			return false;
 		}
@@ -91,13 +80,14 @@ export class LogGroup {
 
 		// Combine all active bits from the global, group, and transport
 		// masks into a single active bitmask.
-		let activeMask = 0x0;
-		if (typeof globalLevel === 'number') {
-			activeMask |= globalLevel;
+		let activeMask = 0;
+
+		if (typeof globalLvl === 'number') {
+			activeMask |= globalLvl;
 		}
 
-		if (typeof groupLevel === 'number') {
-			activeMask |= groupLevel;
+		if (typeof this.logLevel === 'number') {
+			activeMask |= this.logLevel;
 		}
 
 		if (typeof transport.level === 'number') {
@@ -107,6 +97,18 @@ export class LogGroup {
 		// Message level mask contains >= 1 active bits.
 		// Matching 1+ bits allows message to be logged.
 		return (activeMask & msgLevel) != 0;
+	}
+
+	/**
+	 * Set active log level for this group.
+	 * @param logLevel
+	 */
+	public setLogLevel(logLevel: LogLevels): void {
+		if (typeof logLevel !== 'number') {
+			return;
+		}
+
+		this.logLevel = logLevel;
 	}
 
 	/**
@@ -128,18 +130,6 @@ export class LogGroup {
 		this.added.add(transport);
 		this.transports.push(transport);
 		return true;
-	}
-
-	/**
-	 * Set active log level for this group.
-	 * @param logLevel
-	 */
-	public setLogLevel(logLevel: LogLevels): void {
-		if (typeof logLevel !== 'number') {
-			return;
-		}
-
-		this.logLevel = logLevel;
 	}
 
 	/**

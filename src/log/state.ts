@@ -20,9 +20,9 @@ type State = RecordToStrong<LogOptions>;
 export class LogState extends StrongMap implements State {
 	public readonly consoleEnabled: StrongBoolean;
 	public readonly globalLogLevel: StrongInt;
-	public readonly groupsDisableOnStart: StrongBoolean;
+	public readonly groupsEnabledOnStart: StrongBoolean;
 
-	public readonly groups: Record<'all' | 'global' | string, LogGroup>;
+	public readonly groups: Record<'all' | 'default' | string, LogGroup>;
 	public readonly groupKeys: string[];
 
 	constructor(options?: LogOptions) {
@@ -33,12 +33,12 @@ export class LogState extends StrongMap implements State {
 		this.consoleEnabled = makeBoolean(false);
 
 		// Starting Global log level
-		this.globalLogLevel = makeInt(LogLevels.ALL & ~LogLevels.DEBUG & LogLevels.TRACE);
+		this.globalLogLevel = makeInt(LogLevels.ALL & ~LogLevels.DEBUG & ~LogLevels.TRACE);
 
 		// Check whether groups should start enabled or disabled.
 		// Disabled groups do not process logs, even if the group log level
 		// or global log level would otherwise allow it.
-		this.groupsDisableOnStart = makeBoolean(true);
+		this.groupsEnabledOnStart = makeBoolean(false);
 
 		const defaultGroups = this.createDefaultGroups();
 		this.groups = defaultGroups.map;
@@ -50,12 +50,12 @@ export class LogState extends StrongMap implements State {
 	/**
 	 * Create default groups object with built-in 'all' and 'global' groups.
 	 */
-	public createDefaultGroups(): {keys: string[]; map: Record<'all' | 'global' | string, LogGroup>} {
+	public createDefaultGroups(): {keys: string[]; map: Record<'all' | 'default' | string, LogGroup>} {
 		return {
-			keys: ['all', 'global'],
+			keys: ['all', 'default'],
 			map: {
-				all: new LogGroup('all', LogLevels.ALL, true),
-				global: new LogGroup('global', LogLevels.ALL, true)
+				all: new LogGroup('all', LogLevels.ALL, this.groupsEnabledOnStart()),
+				default: new LogGroup('default', LogLevels.ALL, this.groupsEnabledOnStart())
 			}
 		};
 	}
