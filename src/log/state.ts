@@ -56,7 +56,8 @@ export class LogState extends StrongMap implements State {
 
 		for (const group of startingGroups ?? []) {
 			const enabled = group.enabled ?? this.groupsEnabledOnStart();
-			groups[group.id] = new LogGroup(group.id, group.level, enabled);
+			const level = group.level ?? this.globalLogLevel();
+			groups[group.id] = new LogGroup(group.id, level, enabled);
 		}
 
 		return groups;

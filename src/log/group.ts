@@ -56,13 +56,10 @@ export class LogGroup {
 			return false;
 		}
 
-		try {
-			transport.execute(msg);
-		} catch (e) {
+		return transport.execute(msg).catch((e) => {
 			console.error(`transport execution failure: ${e.message}.`);
-		}
-
-		return true;
+			return false;
+		});
 	}
 
 	/**
@@ -85,14 +82,10 @@ export class LogGroup {
 
 		// Combine all active bits from the global, group, and transport
 		// masks into a single active bitmask.
-		let activeMask = 0;
+		let activeMask = this.logLevel();
 
 		if (typeof globalLvl === 'number') {
 			activeMask |= globalLvl;
-		}
-
-		if (typeof this.logLevel() === 'number') {
-			activeMask |= this.logLevel();
 		}
 
 		if (typeof transport.level === 'number') {

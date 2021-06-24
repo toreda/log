@@ -86,7 +86,9 @@ describe('LogState', () => {
 		});
 
 		it(`should set groups with keys 'all' and 'default' and 'custom' when options.startingGroups has 'custom'`, () => {
-			const custom = new LogState({startingGroups: [{id: 'custom', level: 489, enabled: true}]});
+			const custom = new LogState({
+				startingGroups: [{id: 'custom', level: 489, enabled: true}, {id: 'basic'}]
+			});
 
 			expect(custom.groups.all).toBeDefined();
 			expect(custom.groupKeys.includes('all')).toBeTruthy();
@@ -94,6 +96,8 @@ describe('LogState', () => {
 			expect(custom.groupKeys.includes('default')).toBeTruthy();
 			expect(custom.groups.custom).toBeDefined();
 			expect(custom.groupKeys.includes('custom')).toBeTruthy();
+			expect(custom.groups.custom).toBeDefined();
+			expect(custom.groupKeys.includes('basic')).toBeTruthy();
 		});
 	});
 

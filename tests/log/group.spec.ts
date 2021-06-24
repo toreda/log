@@ -2,8 +2,16 @@ import {isType} from '@toreda/strong-types';
 import {LogAction} from '../../src/log/action';
 import {LogGroup} from '../../src/log/group';
 import {LogLevels} from '../../src/log/levels';
+import {
+	LogLevelDisable,
+	LogLevelDisableMultiple,
+	LogLevelEnable,
+	LogLevelEnableMultiple
+} from '../../src/log/levels/helpers';
 import {LogMessage} from '../../src/log/message';
 import {LogTransport} from '../../src/log/transport';
+
+jest.mock('../../src/log/levels/helpers');
 
 const MOCK_ID = 'group_id_155129414';
 const MOCK_LEVEL = LogLevels.NONE | LogLevels.ERROR;
@@ -52,6 +60,7 @@ describe('LogGroup', () => {
 
 	describe('Implementation', () => {
 		let sampleLogMsg: LogMessage;
+
 		beforeEach(() => {
 			sampleLogMsg = {
 				date: Date.now().toLocaleString(),
@@ -85,7 +94,7 @@ describe('LogGroup', () => {
 
 			afterAll(() => {
 				executeSpy.mockRestore();
-				instance.removeTransports([testTransport1, testTransport2, testTransport3]);
+				instance.clear();
 			});
 
 			it('should not attempt to execute any transports when msg level is 0', async () => {
@@ -114,59 +123,23 @@ describe('LogGroup', () => {
 			});
 		});
 
-		describe('removeTransports', () => {
-			it('should return false when transports is not an array', () => {
-				expect(instance.removeTransports(91714497 as any)).toBe(false);
-				expect(instance.removeTransports({} as any)).toBe(false);
-				expect(instance.removeTransports(true as any)).toBe(false);
+		describe(`execute`, () => {
+			afterAll(() => {
+				instance.clear();
 			});
 
-			it('should return false when transports arg is an empty array', () => {
-				expect(instance.removeTransports([])).toBe(false);
-			});
-
-			it('should return true after removing a transport', () => {
-				const transport = new LogTransport('id', LogLevels.INFO, action);
+			it(`should not throw when transport throws`, () => {
+				const transport = new LogTransport('throws', 1, () => {
+					throw 'thrown';
+				});
 				instance.addTransport(transport);
-				expect(instance.removeTransports([transport])).toBe(true);
-			});
+				const msg: LogMessage = {
+					date: '',
+					level: 1,
+					message: 'to throw'
+				};
 
-			it('should return true after removing multiple transports', () => {
-				const transportA = new LogTransport('id', LogLevels.INFO, action);
-				const transportB = new LogTransport('id', LogLevels.INFO, action);
-				const transportC = new LogTransport('id', LogLevels.INFO, action);
-
-				instance.addTransport(transportA);
-				instance.addTransport(transportB);
-				instance.addTransport(transportC);
-				expect(instance.transports.includes(transportA)).toBe(true);
-				expect(instance.transports.includes(transportB)).toBe(true);
-				expect(instance.transports.includes(transportC)).toBe(true);
-				expect(instance.removeTransports([transportA, transportB, transportC])).toBe(true);
-
-				expect(instance.transports.includes(transportA)).toBe(false);
-				expect(instance.transports.includes(transportB)).toBe(false);
-				expect(instance.transports.includes(transportC)).toBe(false);
-			});
-
-			it('should only removing matching transports', () => {
-				const transportA = new LogTransport('id', LogLevels.INFO, action);
-				const transportB = new LogTransport('id', LogLevels.INFO, action);
-				const transportC = new LogTransport('id', LogLevels.INFO, action);
-
-				instance.addTransport(transportA);
-				instance.addTransport(transportB);
-				instance.addTransport(transportC);
-
-				expect(instance.transports.includes(transportA)).toBe(true);
-				expect(instance.transports.includes(transportB)).toBe(true);
-				expect(instance.transports.includes(transportC)).toBe(true);
-
-				expect(instance.removeTransports([transportA, transportC])).toBe(true);
-
-				expect(instance.transports.includes(transportA)).toBe(false);
-				expect(instance.transports.includes(transportB)).toBe(true);
-				expect(instance.transports.includes(transportC)).toBe(false);
+				expect(instance['execute'](transport, 1, msg)).resolves.not.toThrow();
 			});
 		});
 
@@ -252,6 +225,120 @@ describe('LogGroup', () => {
 				const messageLevels = LogLevels.TRACE | LogLevels.WARN;
 				const transport = new LogTransport(MOCK_ID, transportLevels, action);
 				expect(instance['canExecute'](transport, LogLevels.NONE, messageLevels)).toBe(false);
+			});
+		});
+
+		describe(`log levels`, () => {
+			it(`should call LogLevelEnable`, () => {
+				instance.enableLogLevel(1);
+
+				expect(LogLevelEnable).toBeCalled();
+			});
+
+			it(`should call LogLevelEnableMultiple`, () => {
+				instance.enableLogLevels([1]);
+
+				expect(LogLevelEnableMultiple).toBeCalled();
+			});
+
+			it(`should call LogLevelDisable`, () => {
+				instance.disableLogLevel(1);
+
+				expect(LogLevelDisable).toBeCalled();
+			});
+
+			it(`should call LogLevelDisableMultiple`, () => {
+				instance.disableLogLevels([1]);
+
+				expect(LogLevelDisableMultiple).toBeCalled();
+			});
+		});
+
+		describe(`addTransport`, () => {
+			it(`should not add transport if 'transport' is not a transport`, () => {
+				const transport: any = {};
+
+				const result = instance.addTransport(transport);
+
+				expect(result).toBeFalsy();
+			});
+
+			it(`should not add transport if 'it already exists'`, () => {
+				const transport = new LogTransport('id', 1, action);
+				instance.addTransport(transport);
+
+				const result = instance.addTransport(transport);
+
+				expect(result).toBeFalsy();
+			});
+		});
+
+		describe(`removeTransport`, () => {
+			it(`should return false if transport is falsy`, () => {
+				const result = instance.removeTransport(null as any);
+
+				expect(result).toBeFalsy();
+			});
+		});
+
+		describe('removeTransports', () => {
+			it('should return false when transports is not an array', () => {
+				expect(instance.removeTransports(91714497 as any)).toBe(false);
+				expect(instance.removeTransports({} as any)).toBe(false);
+				expect(instance.removeTransports(true as any)).toBe(false);
+			});
+
+			it('should return false when transports arg is an empty array', () => {
+				expect(instance.removeTransports([])).toBe(false);
+			});
+
+			it(`should return false when no transports are removed`, () => {
+				const transport = new LogTransport('id', LogLevels.INFO, action);
+				expect(instance.removeTransports([transport])).toBe(false);
+			});
+
+			it('should return true after removing a transport', () => {
+				const transport = new LogTransport('id', LogLevels.INFO, action);
+				instance.addTransport(transport);
+				expect(instance.removeTransports([transport])).toBe(true);
+			});
+
+			it('should return true after removing multiple transports', () => {
+				const transportA = new LogTransport('id', LogLevels.INFO, action);
+				const transportB = new LogTransport('id', LogLevels.INFO, action);
+				const transportC = new LogTransport('id', LogLevels.INFO, action);
+
+				instance.addTransport(transportA);
+				instance.addTransport(transportB);
+				instance.addTransport(transportC);
+				expect(instance.transports.includes(transportA)).toBe(true);
+				expect(instance.transports.includes(transportB)).toBe(true);
+				expect(instance.transports.includes(transportC)).toBe(true);
+				expect(instance.removeTransports([transportA, transportB, transportC])).toBe(true);
+
+				expect(instance.transports.includes(transportA)).toBe(false);
+				expect(instance.transports.includes(transportB)).toBe(false);
+				expect(instance.transports.includes(transportC)).toBe(false);
+			});
+
+			it('should only removing matching transports', () => {
+				const transportA = new LogTransport('id', LogLevels.INFO, action);
+				const transportB = new LogTransport('id', LogLevels.INFO, action);
+				const transportC = new LogTransport('id', LogLevels.INFO, action);
+
+				instance.addTransport(transportA);
+				instance.addTransport(transportB);
+				instance.addTransport(transportC);
+
+				expect(instance.transports.includes(transportA)).toBe(true);
+				expect(instance.transports.includes(transportB)).toBe(true);
+				expect(instance.transports.includes(transportC)).toBe(true);
+
+				expect(instance.removeTransports([transportA, transportC])).toBe(true);
+
+				expect(instance.transports.includes(transportA)).toBe(false);
+				expect(instance.transports.includes(transportB)).toBe(true);
+				expect(instance.transports.includes(transportC)).toBe(false);
 			});
 		});
 	});
