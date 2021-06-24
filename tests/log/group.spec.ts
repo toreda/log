@@ -29,7 +29,7 @@ describe('LogGroup', () => {
 		it('should set logLevel to provided logLevel arg', () => {
 			const sampleLevel = LogLevels.INFO & ~LogLevels.WARN;
 			const custom = new LogGroup(MOCK_ID, sampleLevel, true);
-			expect(custom.logLevel).toBe(sampleLevel);
+			expect(custom.logLevel()).toBe(sampleLevel);
 		});
 
 		it('should initialize added to an empty set', () => {
@@ -172,15 +172,14 @@ describe('LogGroup', () => {
 
 		describe('canExecute', () => {
 			beforeEach(() => {
-				instance.logLevel = MOCK_LEVEL;
+				instance.logLevel(MOCK_LEVEL);
 			});
 
 			afterAll(() => {
-				instance.logLevel = MOCK_LEVEL;
+				instance.logLevel(MOCK_LEVEL);
 			});
 
-			it('should return false when global, group, and transport log levels are not number', () => {
-				instance.logLevel = 'asdfiou_i90023f' as any;
+			it('should return false when global and transport log levels are not number', () => {
 				const transport = new LogTransport(MOCK_ID, 'a917afJHF' as any, action);
 				const msgLevel = LogLevels.DEBUG;
 				expect(instance['canExecute'](transport, 'FJ678194_HR719971' as any, msgLevel)).toBe(false);
@@ -194,8 +193,7 @@ describe('LogGroup', () => {
 				instance.enabled(true);
 			});
 
-			it('should return true when global level matches msg level but group and transport levels are non-numbers', () => {
-				instance.logLevel = 'oixucvo_d9flkasdf' as any;
+			it('should return true when global level matches msg level but transport level is a non-number', () => {
 				const transport = new LogTransport(MOCK_ID, 'a917afJHF' as any, action);
 				const msgLevel = LogLevels.DEBUG;
 				expect(instance['canExecute'](transport, LogLevels.DEBUG, msgLevel)).toBe(true);
@@ -204,12 +202,11 @@ describe('LogGroup', () => {
 			it('should return true when group level matches msg level but transport and global levels are non-numbers', () => {
 				const transport = new LogTransport(MOCK_ID, 'LAnvalk11974197' as any, action);
 				const msgLevel = LogLevels.TRACE;
-				instance.logLevel = msgLevel;
+				instance.logLevel(msgLevel);
 				expect(instance['canExecute'](transport, 'LJFA974197' as any, msgLevel)).toBe(true);
 			});
 
-			it('should return true when transport level matches msg level but group and global levels are non-numbers', () => {
-				instance.logLevel = '8as38fdg_098xcv03f' as any;
+			it('should return true when transport level matches msg level but global level is a non-number', () => {
 				const transport = new LogTransport(MOCK_ID, LogLevels.ERROR, action);
 				const msgLevel = LogLevels.ERROR;
 				expect(instance['canExecute'](transport, 'LJFA974197' as any, msgLevel)).toBe(true);
@@ -240,7 +237,7 @@ describe('LogGroup', () => {
 
 			it('should return true when transport one active log levels', () => {
 				const transport = new LogTransport(MOCK_ID, LogLevels.ERROR, action);
-				instance.logLevel = LogLevels.INFO;
+				instance.logLevel(LogLevels.INFO);
 				expect(instance['canExecute'](transport, LogLevels.NONE, LogLevels.INFO)).toBe(true);
 			});
 

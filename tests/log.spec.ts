@@ -98,19 +98,19 @@ describe('Log', () => {
 
 		describe('makeGroup', () => {
 			it('should return false when groupId arg is an empty string', () => {
-				expect(instance.makeGroup(EMPTY_STRING, LogLevels.DEBUG)).toBe(false);
+				expect(instance.makeGroup({id: EMPTY_STRING, level: LogLevels.DEBUG})).toBe(false);
 			});
 
 			it('should return false when groupId already exists', () => {
 				const groupId = '194714_8841978AF';
-				instance.makeGroup(groupId, LogLevels.DEBUG);
-				expect(instance.makeGroup(groupId, LogLevels.DEBUG)).toBe(false);
+				instance.makeGroup({id: groupId, level: LogLevels.DEBUG});
+				expect(instance.makeGroup({id: groupId, level: LogLevels.DEBUG})).toBe(false);
 			});
 
 			it('should return true when groupId is created', () => {
 				const groupId = '491719714';
 				expect(instance.state.groups[groupId]).toBeUndefined();
-				expect(instance.makeGroup(groupId, LogLevels.DEBUG)).toBe(true);
+				expect(instance.makeGroup({id: groupId, level: LogLevels.DEBUG})).toBe(true);
 				expect(instance.state.groups[groupId]).toHaveProperty('transports');
 			});
 		});
@@ -346,7 +346,7 @@ describe('Log', () => {
 			const groupId = '19814_77eF971_VAZ714971';
 
 			beforeAll(() => {
-				instance.makeGroup(groupId, 0);
+				instance.makeGroup({id: groupId, level: 0});
 			});
 
 			beforeEach(() => {
@@ -356,16 +356,16 @@ describe('Log', () => {
 			it('should not change group log level when logLevel arg is undefined', () => {
 				const groupId = '97149_974646_MVVCJ196714';
 				const group = instance.getGroup(groupId);
-				group!.logLevel = LogLevels.TRACE;
+				group!.logLevel(LogLevels.TRACE);
 				instance.setGroupLevel(undefined as any, groupId);
-				expect(group!.logLevel).toBe(LogLevels.TRACE);
+				expect(group!.logLevel()).toBe(LogLevels.TRACE);
 			});
 
 			for (const level of LOG_LEVELS) {
 				it(`should set group level to ${level} set to ${level}`, () => {
-					expect(instance.state.groups[groupId].logLevel).toBe(LogLevels.ERROR);
+					expect(instance.state.groups[groupId].logLevel()).toBe(LogLevels.ERROR);
 					instance.setGroupLevel(level, groupId);
-					expect(instance.state.groups[groupId].logLevel).toBe(level);
+					expect(instance.state.groups[groupId].logLevel()).toBe(level);
 				});
 			}
 		});

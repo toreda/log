@@ -1,7 +1,14 @@
 import {isType} from '@toreda/strong-types';
 import {LogActionConsole} from './log/action/console';
 import {LogGroup} from './log/group';
+import {LogGroupData} from './log/group/data';
 import {LogLevels} from './log/levels';
+import {
+	LogLevelDisable,
+	LogLevelDisableMultiple,
+	LogLevelEnable,
+	LogLevelEnableMultiple
+} from './log/levels/helpers';
 import {LogMessage} from './log/message';
 import {LogOptions} from './log/options';
 import {LogState} from './log/state';
@@ -28,10 +35,9 @@ export class Log {
 	/**
 	 * Enable global console logging for development and debugging.
 	 */
-	public activateDefaultConsole(): void {
-		// Initial log level is NONE, which will rely on the global
-		// log levl.
-		const transport = new LogTransport('console', this.state.globalLogLevel(), LogActionConsole);
+	public activateDefaultConsole(level?: number): void {
+		level = level ?? this.state.globalLogLevel();
+		const transport = new LogTransport('console', level, LogActionConsole);
 		this.addTransport(transport);
 	}
 
@@ -43,19 +49,19 @@ export class Log {
 	 * 						group already exists or failed. `true` when group with target
 	 * 						id is created successfully.
 	 */
-	public makeGroup(groupId: string, logLevel: LogLevels, startEnabled?: boolean): boolean {
-		if (typeof groupId !== 'string' || !groupId) {
+	public makeGroup(group: LogGroupData): boolean {
+		if (typeof group.id !== 'string' || !group.id) {
 			return false;
 		}
 
-		if (this.state.groups[groupId]) {
+		if (this.state.groups[group.id]) {
 			return false;
 		}
 
-		const enabled = startEnabled ?? this.state.groupsEnabledOnStart();
+		const enabled = group.enabled ?? this.state.groupsEnabledOnStart();
 
-		this.state.groupKeys.push(groupId);
-		this.state.groups[groupId] = new LogGroup(groupId, logLevel, enabled);
+		this.state.groupKeys.push(group.id);
+		this.state.groups[group.id] = new LogGroup(group.id, group.level, enabled);
 		return true;
 	}
 
@@ -69,11 +75,11 @@ export class Log {
 			return this.state.groups[groupId];
 		}
 
-		this.makeGroup(groupId, LogLevels.ERROR);
+		this.makeGroup({id: groupId, level: LogLevels.ERROR});
 		return this.state.groups[groupId];
 	}
 
-	public initGroups(groups?: {id: string; level: LogLevels}[]): void {
+	public initGroups(groups?: LogGroupData[]): void {
 		if (!groups) {
 			return;
 		}
@@ -187,7 +193,7 @@ export class Log {
 	 * are used instead of global level when they are set.
 	 * @param logLevel
 	 */
-	public setGlobalLevel(level: LogLevels): void {
+	public setGlobalLevel(level: number): void {
 		this.state.globalLogLevel(level);
 	}
 
@@ -197,16 +203,8 @@ export class Log {
 	 * if target level flag is already enabled.
 	 * @param level
 	 */
-	public enableGlobalLevel(level: number): void {
-		if (typeof level !== 'number') {
-			return;
-		}
-
-		// Bitwise OR to activate any active bits in the
-		// provided level bitmask.
-		const globalLogLevel = this.state.globalLogLevel() | level;
-
-		this.state.globalLogLevel(globalLogLevel);
+	public enableGlobalLevel(logLevel: number): void {
+		LogLevelEnable(this.state.globalLogLevel, logLevel);
 	}
 
 	/**
@@ -215,21 +213,16 @@ export class Log {
 	 * invalid values.
 	 * @param levels
 	 */
-	public enableGlobalLevels(levels: number[]): void {
-		if (!Array.isArray(levels)) {
-			return;
-		}
+	public enableGlobalLevels(logLevels: number[]): void {
+		LogLevelEnableMultiple(this.state.globalLogLevel, logLevels);
+	}
 
-		let mask = 0x0;
-		for (const level of levels) {
-			if (typeof level !== 'number') {
-				continue;
-			}
+	public disableGlobalLevel(logLevel: number): void {
+		LogLevelDisable(this.state.globalLogLevel, logLevel);
+	}
 
-			mask |= level;
-		}
-
-		this.enableGlobalLevel(mask);
+	public disableGlobalLevels(logLevels: number[]): void {
+		LogLevelDisableMultiple(this.state.globalLogLevel, logLevels);
 	}
 
 	/**
@@ -237,7 +230,7 @@ export class Log {
 	 * @param logLevel
 	 * @param groupId
 	 */
-	public setGroupLevel(logLevel: LogLevels, groupId?: string): void {
+	public setGroupLevel(logLevel: number, groupId?: string): void {
 		const idStr = groupId ?? 'default';
 		const group = this.state.groups[idStr];
 
@@ -248,6 +241,50 @@ export class Log {
 		group.setLogLevel(logLevel);
 	}
 
+	public enableGroupLevel(logLevel: number, groupId?: string): void {
+		const idStr = groupId ?? 'default';
+		const group = this.state.groups[idStr];
+
+		if (!group) {
+			return;
+		}
+
+		group.enableLogLevel(logLevel);
+	}
+
+	public enableGroupLevels(logLevels: number[], groupId?: string): void {
+		const idStr = groupId ?? 'default';
+		const group = this.state.groups[idStr];
+
+		if (!group) {
+			return;
+		}
+
+		group.enableLogLevels(logLevels);
+	}
+
+	public disableGroupLevel(logLevel: number, groupId?: string): void {
+		const idStr = groupId ?? 'default';
+		const group = this.state.groups[idStr];
+
+		if (!group) {
+			return;
+		}
+
+		group.disableLogLevel(logLevel);
+	}
+
+	public disableGroupLevels(logLevels: number[], groupId?: string): void {
+		const idStr = groupId ?? 'default';
+		const group = this.state.groups[idStr];
+
+		if (!group) {
+			return;
+		}
+
+		group.disableLogLevels(logLevels);
+	}
+
 	/**
 	 * Create structured log message. Provided as a call argument
 	 * during transport execution.
@@ -255,7 +292,7 @@ export class Log {
 	 * @param level			Level bitmask msg was logged with.
 	 * @param msg			Msg that was logged.
 	 */
-	private createMessage(date: string, level: LogLevels, ...msg: unknown[]): LogMessage {
+	private createMessage(date: string, level: number, ...msg: unknown[]): LogMessage {
 		let message: string;
 
 		if (msg.length > 1) {
@@ -276,7 +313,7 @@ export class Log {
 	 * @param level
 	 * @param msg
 	 */
-	public log(level: LogLevels, ...msg: unknown[]): Log {
+	public log(level: number, ...msg: unknown[]): Log {
 		const logMsg: LogMessage = this.createMessage('', level, ...msg);
 
 		this.state.groups.all.log(this.state.globalLogLevel(), logMsg);
@@ -291,7 +328,7 @@ export class Log {
 	 * @param level
 	 * @param msg
 	 */
-	public logTo(groupId: string, level: LogLevels, ...msg: unknown[]): Log {
+	public logTo(groupId: string, level: number, ...msg: unknown[]): Log {
 		const logMsg: LogMessage = this.createMessage('', level, ...msg);
 
 		this.state.groups.all.log(this.state.globalLogLevel(), logMsg);
@@ -397,7 +434,7 @@ export class Log {
 		}
 
 		this.state.groupKeys.length = 0;
-		this.makeGroup('all', LogLevels.ALL);
-		this.makeGroup('default', LogLevels.ALL);
+		this.makeGroup({id: 'all', level: LogLevels.ALL});
+		this.makeGroup({id: 'default', level: LogLevels.ALL});
 	}
 }

@@ -1,6 +1,6 @@
-import {LogState} from '../../src/log/state';
-import {LogOptions} from '../../src/log/options';
 import {LogLevels} from '../../src/log/levels';
+import {LogOptions} from '../../src/log/options';
+import {LogState} from '../../src/log/state';
 
 describe('LogState', () => {
 	let instance: LogState;
@@ -70,22 +70,57 @@ describe('LogState', () => {
 				globalLogLevel: LogLevels.ERROR,
 				consoleEnabled: 14971 as any
 			});
+
 			expect(custom.consoleEnabled()).toBe(false);
+		});
+
+		it(`should set groups with keys 'all' and 'default' when options.startingGroups is undefined`, () => {
+			const custom = new LogState();
+
+			expect(custom.groups.all).toBeDefined();
+			expect(custom.groupKeys.includes('all')).toBeTruthy();
+			expect(custom.groups.default).toBeDefined();
+			expect(custom.groupKeys.includes('default')).toBeTruthy();
+			expect(custom.groups.custom).toBeUndefined();
+			expect(custom.groupKeys.includes('custom')).toBeFalsy();
+		});
+
+		it(`should set groups with keys 'all' and 'default' and 'custom' when options.startingGroups has 'custom'`, () => {
+			const custom = new LogState({startingGroups: [{id: 'custom', level: 489, enabled: true}]});
+
+			expect(custom.groups.all).toBeDefined();
+			expect(custom.groupKeys.includes('all')).toBeTruthy();
+			expect(custom.groups.default).toBeDefined();
+			expect(custom.groupKeys.includes('default')).toBeTruthy();
+			expect(custom.groups.custom).toBeDefined();
+			expect(custom.groupKeys.includes('custom')).toBeTruthy();
 		});
 	});
 
 	describe('Implementation', () => {
-		describe('createDefaultGroups', () => {
-			it('should return keys array', () => {
-				expect(Array.isArray(instance.createDefaultGroups().keys)).toBe(true);
+		describe('createGroups', () => {
+			it(`should return 'all' group in result record`, () => {
+				const result = instance['createGroups']();
+
+				expect(result['all']).toBeDefined();
+				expect(result['custom']).toBeUndefined();
 			});
 
-			it(`should return 'all' key in keys array`, () => {
-				expect(instance.createDefaultGroups().keys.includes('all')).toBe(true);
+			it(`should return 'default' group in result record`, () => {
+				const result = instance['createGroups']();
+
+				expect(result['default']).toBeDefined();
+				expect(result['custom']).toBeUndefined();
 			});
 
-			it(`should return 'default' key in keys array`, () => {
-				expect(instance.createDefaultGroups().keys.includes('default')).toBe(true);
+			it(`should return 'custom' group in result record`, () => {
+				const custom = {id: 'custom', level: 555};
+
+				const result = instance['createGroups']([custom]);
+
+				expect(result['custom']).toBeDefined();
+				expect(result['all']).toBeDefined();
+				expect(result['default']).toBeDefined();
 			});
 		});
 	});

@@ -7,10 +7,12 @@ import {
 	makeInt
 } from '@toreda/strong-types';
 import {LogGroup} from './group';
+import {LogGroupData} from './group/data';
 import {LogLevels} from './levels';
 import {LogOptions} from './options';
 
-type State = RecordToStrong<LogOptions>;
+type LogOptionsExclude = 'startingGroups';
+type State = RecordToStrong<Omit<LogOptions, LogOptionsExclude>>;
 
 /**
  * Holds internal state data, settings, and log groups for a
@@ -22,7 +24,7 @@ export class LogState extends StrongMap implements State {
 	public readonly globalLogLevel: StrongInt;
 	public readonly groupsEnabledOnStart: StrongBoolean;
 
-	public readonly groups: Record<'all' | 'default' | string, LogGroup>;
+	public readonly groups: Record<string, LogGroup>;
 	public readonly groupKeys: string[];
 
 	constructor(options?: LogOptions) {
@@ -40,23 +42,23 @@ export class LogState extends StrongMap implements State {
 		// or global log level would otherwise allow it.
 		this.groupsEnabledOnStart = makeBoolean(false);
 
-		const defaultGroups = this.createDefaultGroups();
-		this.groups = defaultGroups.map;
-		this.groupKeys = defaultGroups.keys;
-
 		this.parse(options);
+
+		this.groups = this.createGroups(options?.startingGroups);
+		this.groupKeys = Object.keys(this.groups);
 	}
 
-	/**
-	 * Create default groups object with built-in 'all' and 'global' groups.
-	 */
-	public createDefaultGroups(): {keys: string[]; map: Record<'all' | 'default' | string, LogGroup>} {
-		return {
-			keys: ['all', 'default'],
-			map: {
-				all: new LogGroup('all', LogLevels.ALL, this.groupsEnabledOnStart()),
-				default: new LogGroup('default', LogLevels.ALL, this.groupsEnabledOnStart())
-			}
+	private createGroups(startingGroups?: LogGroupData[]): Record<string, LogGroup> {
+		const groups = {
+			all: new LogGroup('all', LogLevels.ALL, this.groupsEnabledOnStart()),
+			default: new LogGroup('default', LogLevels.ALL, this.groupsEnabledOnStart())
 		};
+
+		for (const group of startingGroups ?? []) {
+			const enabled = group.enabled ?? this.groupsEnabledOnStart();
+			groups[group.id] = new LogGroup(group.id, group.level, enabled);
+		}
+
+		return groups;
 	}
 }

@@ -2,6 +2,7 @@ export {Log} from './log';
 export {LogAction} from './log/action';
 export {LogActionConsole} from './log/action/console';
 export {LogGroup} from './log/group';
+export {LogGroupData} from './log/group/data';
 export {LogLevels} from './log/levels';
 export {LogMessage} from './log/message';
 export {LogOptions} from './log/options';

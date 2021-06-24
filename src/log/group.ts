@@ -1,5 +1,10 @@
-import {StrongBoolean, isType, makeBoolean} from '@toreda/strong-types';
-import {LogLevels} from './levels';
+import {StrongBoolean, StrongInt, isType, makeBoolean, makeInt} from '@toreda/strong-types';
+import {
+	LogLevelDisable,
+	LogLevelDisableMultiple,
+	LogLevelEnable,
+	LogLevelEnableMultiple
+} from './levels/helpers';
 import {LogMessage} from './message';
 import {LogTransport} from './transport';
 
@@ -8,14 +13,14 @@ export class LogGroup {
 	public readonly enabled: StrongBoolean;
 	public readonly transports: LogTransport[];
 	public readonly added: Set<LogTransport>;
-	public logLevel: LogLevels;
+	public readonly logLevel: StrongInt;
 
-	constructor(id: string, logLevel: LogLevels, enabled: boolean) {
+	constructor(id: string, logLevel: number, enabled: boolean) {
 		this.id = id;
 
 		this.enabled = makeBoolean(true, enabled);
 		this.transports = [];
-		this.logLevel = logLevel;
+		this.logLevel = makeInt(1, logLevel);
 		this.added = new Set<LogTransport>();
 	}
 
@@ -25,7 +30,7 @@ export class LogGroup {
 	 * @param level		Bitmask level msg was logged with.
 	 * @param msg		Message to be logged.
 	 */
-	public async log(globalLvl: LogLevels, msg: LogMessage): Promise<void> {
+	public async log(globalLvl: number, msg: LogMessage): Promise<void> {
 		if (typeof msg.level !== 'number' || msg.level === 0) {
 			return;
 		}
@@ -46,7 +51,7 @@ export class LogGroup {
 	 * @param transport
 	 * @param msg
 	 */
-	private async execute(transport: LogTransport, globalLvl: LogLevels, msg: LogMessage): Promise<boolean> {
+	private async execute(transport: LogTransport, globalLvl: number, msg: LogMessage): Promise<boolean> {
 		if (!this.canExecute(transport, globalLvl, msg.level)) {
 			return false;
 		}
@@ -68,7 +73,7 @@ export class LogGroup {
 	 * @param globalLvl
 	 * @param msgLevel
 	 */
-	private canExecute(transport: LogTransport, globalLvl: LogLevels, msgLevel: LogLevels): boolean {
+	private canExecute(transport: LogTransport, globalLvl: number, msgLevel: number): boolean {
 		if (!isType(transport, LogTransport)) {
 			return false;
 		}
@@ -86,8 +91,8 @@ export class LogGroup {
 			activeMask |= globalLvl;
 		}
 
-		if (typeof this.logLevel === 'number') {
-			activeMask |= this.logLevel;
+		if (typeof this.logLevel() === 'number') {
+			activeMask |= this.logLevel();
 		}
 
 		if (typeof transport.level === 'number') {
@@ -103,12 +108,24 @@ export class LogGroup {
 	 * Set active log level for this group.
 	 * @param logLevel
 	 */
-	public setLogLevel(logLevel: LogLevels): void {
-		if (typeof logLevel !== 'number') {
-			return;
-		}
+	public setLogLevel(logLevel: number): void {
+		this.logLevel(logLevel);
+	}
 
-		this.logLevel = logLevel;
+	public enableLogLevel(logLevel: number): void {
+		LogLevelEnable(this.logLevel, logLevel);
+	}
+
+	public enableLogLevels(logLevels: number[]): void {
+		LogLevelEnableMultiple(this.logLevel, logLevels);
+	}
+
+	public disableLogLevel(logLevel: number): void {
+		LogLevelDisable(this.logLevel, logLevel);
+	}
+
+	public disableLogLevels(logLevels: number[]): void {
+		LogLevelDisableMultiple(this.logLevel, logLevels);
 	}
 
 	/**
