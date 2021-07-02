@@ -1,457 +1,611 @@
+import {Levels} from '../src/levels';
 import {Log} from '../src/log';
-import {LogLevels} from '../src/log/levels';
-import {LogTransport} from '../src/log/transport';
-import {LogAction} from '../src/log/action';
+import {Transport} from '../src/transport';
 
-const MOCK_ID = '149714971_92872981';
+const MOCK_TRANSPORT_ID = '149714971_92872981';
 const MOCK_MSG = 'msg here';
 const EMPTY_STRING = '';
 
 const LOG_LEVELS: number[] = [
-	LogLevels.ERROR,
-	LogLevels.WARN,
-	LogLevels.TRACE,
-	LogLevels.INFO,
-	LogLevels.DEBUG,
-	LogLevels.TRACE
+	Levels.ERROR,
+	Levels.WARN,
+	Levels.TRACE,
+	Levels.INFO,
+	Levels.DEBUG,
+	Levels.TRACE
 ];
 
 const LOG_METHODS = [
 	{
 		name: 'error',
-		level: LogLevels.ERROR,
-		groupId: null
+		level: Levels.ERROR
 	},
 	{
 		name: 'warn',
-		level: LogLevels.WARN,
-		groupId: null
+		level: Levels.WARN
 	},
 	{
 		name: 'info',
-		level: LogLevels.INFO,
-		groupId: null
+		level: Levels.INFO
 	},
 	{
 		name: 'debug',
-		level: LogLevels.DEBUG,
-		groupId: null
+		level: Levels.DEBUG
 	},
 	{
 		name: 'trace',
-		level: LogLevels.TRACE,
-		groupId: null
-	},
-	{
-		name: 'errorGroup',
-		level: LogLevels.ERROR,
-		groupId: '104814081'
-	},
-	{
-		name: 'warnGroup',
-		level: LogLevels.WARN,
-		groupId: '4662191908'
-	},
-	{
-		name: 'infoGroup',
-		level: LogLevels.INFO,
-		groupId: '48719190'
-	},
-	{
-		name: 'debugGroup',
-		level: LogLevels.DEBUG,
-		groupId: '98198198'
-	},
-	{
-		name: 'traceGroup',
-		level: LogLevels.TRACE,
-		groupId: '98149814'
+		level: Levels.TRACE
 	}
 ];
 
 describe('Log', () => {
-	let instance: Log;
-
-	beforeAll(() => {
-		instance = new Log();
-	});
-
-	beforeEach(() => {
-		instance.setGlobalLevel(LogLevels.DEBUG);
-		instance.clearAll();
-	});
+	const log = new Log({groupsStartEnabled: true});
+	const action = jest.fn(() => true);
+	const transport = new Transport(MOCK_TRANSPORT_ID, Levels.ALL, action);
 
 	describe('Constructor', () => {
 		it('should instantiate when no args are given', () => {
 			expect(new Log()).toBeInstanceOf(Log);
 		});
+
+		it(`should class 'activateDefaultConsole' if 'consoleEnabled' is true`, () => {
+			const spy = jest.spyOn(Log.prototype, 'activateDefaultConsole');
+			expect(spy).not.toHaveBeenCalled();
+
+			new Log({id: 'consoleEnabled', consoleEnabled: true});
+
+			expect(spy).toHaveBeenCalled();
+		});
+
+		it(`should throw when 'state' is not a LogStateGlobal`, () => {
+			expect(() => {
+				new Log({state: {} as any});
+			}).toThrow(`Failed to create Log - 'state' was not an instance of LogStateGlobal.`);
+		});
 	});
 
 	describe('Implementation', () => {
-		let action: LogAction;
+		describe(`activateDefaultConsole`, () => {
+			it(`should create a transport with level arg`, () => {
+				const level = 13;
+				expect(level).not.toBe(log.globalState.globalLevel());
+				expect(log.groupState.transports.size).toBe(0);
 
-		beforeEach(() => {
-			action = async (): Promise<boolean> => {
-				return true;
-			};
+				log.activateDefaultConsole(level);
+
+				expect(log.groupState.transports.size).toBe(1);
+				expect(log.groupState.transports.values().next().value.level()).toBe(level);
+				log.reset();
+			});
 		});
 
-		describe('setGroupLevel', () => {
-			const groupId = '19814_77eF971_VAZ714971';
-
-			beforeEach(() => {
-				instance.setGroupLevel(groupId, LogLevels.ERROR);
+		describe('makeLog', () => {
+			it('should return null when id arg is an empty string', () => {
+				expect(log.makeLog(EMPTY_STRING, {level: Levels.DEBUG})).toBeNull();
 			});
 
-			it('should not change group log level when logLevel arg is undefined', () => {
-				const groupId = '97149_974646_MVVCJ196714';
-				const group = instance.getGroup(groupId);
-				group!.logLevel = LogLevels.TRACE;
-				instance.setGroupLevel(groupId, undefined as any);
-				expect(group!.logLevel).toBe(LogLevels.TRACE);
+			it('should return group when id already exists', () => {
+				const id = '194714_8841978AF';
+				const expected = log.makeLog(id, {level: Levels.DEBUG});
+
+				const result = log.makeLog(id);
+
+				expect(result).toBe(expected);
 			});
 
-			for (const level of LOG_LEVELS) {
-				it(`should set group level to ${level} set to ${level}`, () => {
-					expect(instance.state.groups[groupId].logLevel).toBe(LogLevels.ERROR);
-					instance.setGroupLevel(groupId, level);
-					expect(instance.state.groups[groupId].logLevel).toBe(level);
-				});
-			}
-		});
+			it('should return group when id is created', () => {
+				const id = '491719714';
+				expect(log.globalState.groups[id]).toBeUndefined();
 
-		describe('setGlobalLevel', () => {
-			it('should not change log level when logLevel arg is undefined', () => {
-				expect(instance.state.globalLogLevel()).toBe(LogLevels.DEBUG);
-				instance.setGlobalLevel('adfjakha' as any);
-				expect(instance.state.globalLogLevel()).toBe(LogLevels.DEBUG);
+				const result = log.makeLog(id, {level: Levels.DEBUG, enabled: false});
+
+				expect(result).toBeInstanceOf(Log);
+
+				const groupId = result.groupState.id();
+				expect(log.globalState.groups.get(groupId)).toHaveProperty('groupState');
 			});
-
-			it('should set global log level to 0 when logLevel arg is NONE', () => {
-				expect(instance.state.globalLogLevel()).toBe(LogLevels.DEBUG);
-				instance.setGlobalLevel(LogLevels.NONE);
-				expect(instance.state.globalLogLevel()).toBe(0);
-			});
-
-			for (const logLevel of LOG_LEVELS) {
-				it(`should set log level to ${logLevel}`, () => {
-					expect(instance.state.globalLogLevel()).toBe(LogLevels.DEBUG);
-					instance.setGlobalLevel(logLevel);
-					expect(instance.state.globalLogLevel()).toBe(logLevel);
-				});
-			}
 		});
 
 		describe('addTransport', () => {
-			it('should return false when transport arg is undefined', () => {
-				expect(instance.addTransport(undefined as any)).toBe(false);
-			});
-
-			it('should return false when transport arg is null', () => {
-				expect(instance.addTransport(null as any)).toBe(false);
-			});
-
-			it('should return true when transport is added', () => {
-				const transport = new LogTransport('test', LogLevels.ALL, action);
-
-				expect(instance.addTransport(transport)).toBe(true);
-			});
-
 			it('should not add the same transport more than once', () => {
-				const transport = new LogTransport('test', LogLevels.ALL, action);
-				const log = new Log();
 				log.addTransport(transport);
+
 				for (let i = 0; i < 5; i++) {
 					expect(log.addTransport(transport)).toBe(false);
 				}
-			});
-		});
 
-		describe('enableGlobalLevel', () => {
-			it('should not change global level when level input arg is not a number', () => {
-				const input = '1497197' as any;
-				instance.state.globalLogLevel(LogLevels.ERROR);
-				instance.enableGlobalLevel(input as any);
-				expect(instance.state.globalLogLevel()).toBe(LogLevels.ERROR);
-
-				instance.state.globalLogLevel(LogLevels.TRACE);
-				instance.enableGlobalLevel(input as any);
-				expect(instance.state.globalLogLevel()).toBe(LogLevels.TRACE);
-			});
-
-			it('should add target level flag to global log level', () => {
-				const targetLevel = LogLevels.DEBUG;
-				instance.state.globalLogLevel(LogLevels.ERROR);
-
-				instance.enableGlobalLevel(targetLevel);
-				const mask = LogLevels.DEBUG | LogLevels.ERROR;
-				expect(instance.state.globalLogLevel() & mask).toBe(mask);
-			});
-
-			it('should not change global log level when target level is none', () => {
-				instance.state.globalLogLevel(LogLevels.ERROR);
-
-				instance.enableGlobalLevel(LogLevels.NONE);
-				expect(instance.state.globalLogLevel()).toBe(LogLevels.ERROR);
-			});
-		});
-
-		describe('addGroupTransport', () => {
-			it('should create group and add transport when group does not exist', () => {
-				const groupId = '@97141876';
-				const transport = new LogTransport('test', LogLevels.ALL, action);
-				instance.addGroupTransport(groupId, transport);
-				const group = instance.state.groups[groupId];
-
-				expect(group).not.toBeUndefined();
-				expect(Array.isArray(group.transports)).toBe(true);
-				expect(group.transports[0]).toBe(transport);
-			});
-
-			it('should return true when add transport is successful', () => {
-				const groupId = '@97141876';
-				const transport = new LogTransport('id', LogLevels.ALL, action);
-				expect(instance.addGroupTransport(groupId, transport)).toBe(true);
+				log.clear();
 			});
 
 			it('should return false and should not add a transport when transport arg is undefined', () => {
-				const groupId = '90249274';
-				const group = instance.getGroup(groupId);
-				expect(group!.transports).toHaveLength(0);
-				expect(instance.addGroupTransport(groupId, undefined as any)).toBe(false);
-				expect(group!.transports).toHaveLength(0);
+				expect(log.groupState.transports.size).toBe(0);
+
+				expect(log.addTransport(undefined as any)).toBe(false);
+
+				expect(log.groupState.transports.size).toBe(0);
 			});
 
 			it('should return false and should not add a transport when transport arg is null', () => {
-				const groupId = '30891408';
-				const group = instance.getGroup(groupId);
-				expect(group!.transports).toHaveLength(0);
-				expect(instance.addGroupTransport(groupId, null as any)).toBe(false);
-				expect(group!.transports).toHaveLength(0);
+				expect(log.groupState.transports.size).toBe(0);
+
+				expect(log.addTransport(null as any)).toBe(false);
+
+				expect(log.groupState.transports.size).toBe(0);
 			});
 
-			it(`should add transport to 'all' when groupId is null`, () => {
-				const transport = new LogTransport('11097141', LogLevels.ALL, action);
-				expect(instance.state.groups.all.transports).toHaveLength(0);
-				instance.addGroupTransport(null, transport);
-				expect(instance.state.groups.all.transports).toHaveLength(1);
-			});
+			it(`should add transport to group`, () => {
+				const transport = new Transport('11097141', Levels.ALL, action);
+				expect(log.groupState.transports.size).toBe(0);
 
-			it('should return false when groupId arg is undefined', () => {
-				const transport = new LogTransport(MOCK_ID, LogLevels.ALL, action);
-				expect(instance.addGroupTransport(undefined as any, transport)).toBe(false);
-			});
+				log.addTransport(transport);
 
-			it('should return false when groupId arg is not a string and is not null', () => {
-				const transport = new LogTransport(MOCK_ID, LogLevels.ALL, action);
-				expect(instance.addGroupTransport(8767187182 as any, transport)).toBe(false);
-			});
-		});
-
-		describe('makeGroup', () => {
-			it('should return false when groupId arg is an empty string', () => {
-				expect(instance.makeGroup(EMPTY_STRING, LogLevels.DEBUG)).toBe(false);
-			});
-
-			it('should return false when groupId already exists', () => {
-				const groupId = '194714_8841978AF';
-				instance.makeGroup(groupId, LogLevels.DEBUG);
-				expect(instance.makeGroup(groupId, LogLevels.DEBUG)).toBe(false);
-			});
-
-			it('should return true when groupId is created', () => {
-				const groupId = '491719714';
-				expect(instance.state.groups[groupId]).toBeUndefined();
-				expect(instance.makeGroup(groupId, LogLevels.DEBUG)).toBe(true);
-				expect(instance.state.groups[groupId]).toHaveProperty('transports');
+				expect(log.groupState.transports.size).toBe(1);
+				log.clear();
 			});
 		});
 
 		describe('removeTransport', () => {
-			it('should return false when target transport does not exist in default group', () => {
-				const transport = new LogTransport('id', LogLevels.ALL, action);
-				const log = new Log();
+			it('should return false when transport does not exist in group', () => {
 				expect(log.removeTransport(transport)).toBe(false);
 			});
 
 			it('should return false when transport arg is undefined', () => {
-				const log = new Log();
 				expect(log.removeTransport(undefined as any)).toBe(false);
 			});
 
-			it('should remove target transport from default group', () => {
-				const transport = new LogTransport('id', LogLevels.ALL, action);
-				const log = new Log();
-				expect(log.state.groups.all.transports).toHaveLength(0);
+			it('should remove transport group', () => {
+				expect(log.groupState.transports.size).toBe(0);
 				log.addTransport(transport);
-				expect(log.state.groups.all.transports).toHaveLength(1);
+				expect(log.groupState.transports.size).toBe(1);
 				log.removeTransport(transport);
-				expect(log.state.groups.all.transports).toHaveLength(0);
+				expect(log.groupState.transports.size).toBe(0);
 			});
 
-			it('should return true when target transport is removed from default group', () => {
-				const transport = new LogTransport('test', LogLevels.ALL, action);
-				const log = new Log();
-				expect(log.state.groups.all.transports).toHaveLength(0);
+			it('should return true when transport is removed', () => {
+				expect(log.groupState.transports.size).toBe(0);
 				log.addTransport(transport);
-				expect(log.state.groups.all.transports).toHaveLength(1);
+				expect(log.groupState.transports.size).toBe(1);
 				const result = log.removeTransport(transport);
-				expect(log.state.groups.all.transports).toHaveLength(0);
+				expect(log.groupState.transports.size).toBe(0);
 				expect(result).toBe(true);
+			});
+		});
+
+		describe('removeTransportById', () => {
+			it('should remove transport from group', () => {
+				const transport = new Transport('id', Levels.ALL, action);
+				expect(log.groupState.transports.size).toBe(0);
+				log.addTransport(transport);
+				expect(log.groupState.transports.size).toBe(1);
+				const result = log.removeTransportById('id');
+				expect(log.groupState.transports.size).toBe(0);
+				expect(result).toBeTruthy();
+			});
+
+			it('should return false if no transports are removed', () => {
+				const transport = new Transport('id', Levels.ALL, action);
+				expect(log.groupState.transports.size).toBe(0);
+				log.addTransport(transport);
+				expect(log.groupState.transports.size).toBe(1);
+				const result = log.removeTransportById('id2');
+				expect(log.groupState.transports.size).toBe(1);
+				expect(result).toBeFalsy();
+			});
+		});
+
+		describe('removeTransports', () => {
+			it('should return false when transports is not an array', () => {
+				const result = log.removeTransports(null as any);
+
+				expect(result).toBe(false);
+			});
+
+			it('should return false when no transports are removed', () => {
+				const result = log.removeTransports([transport]);
+
+				expect(result).toBe(false);
+			});
+
+			it('should return true when a transport is removed', () => {
+				log.clear();
+				expect(log.groupState.transports.size).toBe(0);
+				log.addTransport(transport);
+				expect(log.groupState.transports.size).toBe(1);
+
+				const result = log.removeTransports([transport]);
+
+				expect(result).toBe(true);
+				expect(log.groupState.transports.size).toBe(0);
 			});
 		});
 
 		describe('removeTransportEverywhere', () => {
 			it('should return false when transport is undefined', () => {
-				expect(instance.removeTransportEverywhere(undefined as any)).toBe(false);
+				expect(log.removeTransportEverywhere(undefined as any)).toBe(false);
 			});
 
 			it('should return false when transport is null', () => {
-				expect(instance.removeTransportEverywhere(null as any)).toBe(false);
+				expect(log.removeTransportEverywhere(null as any)).toBe(false);
 			});
 
-			it('should return false when transport arg is provided but is not a LogTransport', () => {
-				expect(instance.removeTransportEverywhere(141971 as any)).toBe(false);
+			it('should return false when transport arg is provided but is not a Transport', () => {
+				expect(log.removeTransportEverywhere(141971 as any)).toBe(false);
 			});
 
-			it('should remove target transport from all groups', () => {
-				const transport = new LogTransport(MOCK_ID, LogLevels.ALL, action);
-				const groupId1 = '14971497_7d7AKHF';
-				const groupId2 = '149719971_f7f7AA';
-				const groupId3 = '778910891_KHF8M4';
+			it('should remove transport from all groups', () => {
+				const group1 = log.makeLog('14971497_7d7AKHF');
+				const group2 = log.makeLog('149719971_f7f7AA');
+				const group3 = log.makeLog('778910891_KHF8M4');
 
-				instance.addGroupTransport(groupId1, transport);
-				instance.addGroupTransport(groupId2, transport);
-				instance.addGroupTransport(groupId3, transport);
+				group1.addTransport(transport);
+				group2.addTransport(transport);
+				group3.addTransport(transport);
 
-				expect(instance.state.groups[groupId1].transports).toHaveLength(1);
-				expect(instance.state.groups[groupId2].transports).toHaveLength(1);
-				expect(instance.state.groups[groupId3].transports).toHaveLength(1);
+				expect(group1.groupState.transports.size).toBe(1);
+				expect(group2.groupState.transports.size).toBe(1);
+				expect(group3.groupState.transports.size).toBe(1);
 
-				instance.removeTransportEverywhere(transport);
+				log.removeTransportEverywhere(transport);
 
-				expect(instance.state.groups[groupId1].transports).toHaveLength(0);
-				expect(instance.state.groups[groupId2].transports).toHaveLength(0);
-				expect(instance.state.groups[groupId3].transports).toHaveLength(0);
-			});
-		});
-
-		describe('getGroup', () => {
-			it('should return existing group', () => {
-				const groupId = '149714917_9174179';
-				const log = new Log();
-				const group = log.getGroup(groupId);
-				expect(log.getGroup(groupId)).toEqual(group);
-			});
-
-			it('should create and return group when groupId does not exist', () => {
-				const log = new Log();
-				const groupId = '29J09FV100';
-				expect(log.state.groups[groupId]).toBeUndefined();
-				const group = log.getGroup(groupId);
-				expect(group).toBeDefined();
+				expect(group1.groupState.transports.size).toBe(0);
+				expect(group2.groupState.transports.size).toBe(0);
+				expect(group3.groupState.transports.size).toBe(0);
 			});
 		});
 
-		describe('initGroups', () => {
-			let setGroupLevelMock: jest.SpyInstance;
+		describe(`global levels`, () => {
+			describe('setGlobalLevel', () => {
+				it('should not change level when level arg is undefined', () => {
+					const expected = log.globalState.globalLevel();
 
-			beforeAll(() => {
-				setGroupLevelMock = jest.spyOn(instance, 'setGroupLevel');
+					log.setGlobalLevel('adfjakha' as any);
+
+					expect(log.globalState.globalLevel()).toBe(expected);
+				});
+
+				it('should set global level to 0 when level arg is NONE', () => {
+					expect(log.globalState.globalLevel()).not.toBe(Levels.NONE);
+
+					log.setGlobalLevel(Levels.NONE);
+
+					expect(log.globalState.globalLevel()).toBe(0);
+				});
+
+				for (const level of LOG_LEVELS) {
+					it(`should set level to ${level}`, () => {
+						expect(log.globalState.globalLevel()).not.toBe(level);
+						log.setGlobalLevel(level);
+						expect(log.globalState.globalLevel()).toBe(level);
+					});
+				}
 			});
 
-			beforeEach(() => {
-				setGroupLevelMock.mockClear();
+			it(`should call enableLogLevel`, () => {
+				const spy = jest.spyOn(log.globalState.globalLevel, 'enableLogLevel');
+				expect(spy).not.toBeCalled();
+
+				log.enableGlobalLevel(1);
+
+				expect(spy).toBeCalled();
 			});
 
-			it('should not call setGroupLevel when groups arg is undefined or null', () => {
-				instance.initGroups(undefined);
-				instance.initGroups(null as any);
-				expect(setGroupLevelMock).not.toHaveBeenCalled();
+			it(`should call enableMultipleLevels`, () => {
+				const spy = jest.spyOn(log.globalState.globalLevel, 'enableMultipleLevels');
+				expect(spy).not.toBeCalled();
+
+				log.enableGlobalLevels([1]);
+
+				expect(spy).toBeCalled();
 			});
 
-			it('should not call setGroupLevel when groups arg is not an array', () => {
-				instance.initGroups(1971497 as any);
-				expect(setGroupLevelMock).not.toHaveBeenCalled();
+			it(`should call disableLogLevel`, () => {
+				const spy = jest.spyOn(log.globalState.globalLevel, 'disableLogLevel');
+				expect(spy).not.toBeCalled();
+
+				log.disableGlobalLevel(1);
+
+				expect(spy).toBeCalled();
 			});
 
-			it('should not call setGroupLevel when groups is an empty array', () => {
-				instance.initGroups([]);
-				expect(setGroupLevelMock).not.toHaveBeenCalled();
+			it(`should call disableMultipleLevels`, () => {
+				const spy = jest.spyOn(log.globalState.globalLevel, 'disableMultipleLevels');
+				expect(spy).not.toBeCalled();
+
+				log.disableGlobalLevels([1]);
+
+				expect(spy).toBeCalled();
+			});
+		});
+
+		describe(`group levels`, () => {
+			describe('setGroupLevel', () => {
+				beforeEach(() => {
+					log.setGroupLevel(Levels.ERROR);
+				});
+
+				it('should not change group level when level arg is undefined', () => {
+					log.groupState.level(Levels.TRACE);
+					log.setGroupLevel(undefined as any);
+					expect(log.groupState.level()).toBe(Levels.TRACE);
+				});
+
+				for (const level of LOG_LEVELS) {
+					it(`should set group level to ${level} set to ${level}`, () => {
+						expect(log.groupState.level()).toBe(Levels.ERROR);
+						log.setGroupLevel(level);
+						expect(log.groupState.level()).toBe(level);
+					});
+				}
 			});
 
-			it('should not call setGroupLevel for elements missing a groupId string', () => {
-				const item1 = {id: 149197 as any, level: LogLevels.ALL};
-				const item2 = {id: '499181', level: LogLevels.DEBUG};
-				const item3 = {id: 'i6568712867', level: LogLevels.INFO};
-				const item4 = {id: 'i6568712867', level: LogLevels.INFO};
-				instance.initGroups([item1, item2, item3, item4]);
-				expect(setGroupLevelMock).toHaveBeenCalledTimes(3);
+			it(`should call enableLogLevel`, () => {
+				const spy = jest.spyOn(log.groupState.level, 'enableLogLevel');
+				expect(spy).not.toBeCalled();
+
+				log.enableGroupLevel(1);
+
+				expect(spy).toBeCalled();
 			});
 
-			it('should not call setGroupLevel for elements missing a level', () => {
-				const item1 = {id: '1490714971', level: 'stringhere' as any};
-				const item2 = {id: '499181', level: LogLevels.DEBUG};
-				const item3 = {id: 'i6568712867', level: LogLevels.INFO};
-				instance.initGroups([item1, item2, item3]);
-				expect(setGroupLevelMock).toHaveBeenCalledTimes(2);
+			it(`should call enableMultipleLevels`, () => {
+				const spy = jest.spyOn(log.groupState.level, 'enableMultipleLevels');
+				expect(spy).not.toBeCalled();
+
+				log.enableGroupLevels([1]);
+
+				expect(spy).toBeCalled();
+			});
+
+			it(`should call disableLogLevel`, () => {
+				const spy = jest.spyOn(log.groupState.level, 'disableLogLevel');
+				expect(spy).not.toBeCalled();
+
+				log.disableGroupLevel(1);
+
+				expect(spy).toBeCalled();
+			});
+
+			it(`should call disableMultipleLevels`, () => {
+				const spy = jest.spyOn(log.groupState.level, 'disableMultipleLevels');
+				expect(spy).not.toBeCalled();
+
+				log.disableGroupLevels([1]);
+
+				expect(spy).toBeCalled();
+			});
+		});
+
+		describe(`createMessage`, () => {
+			const level = 1;
+
+			it(`should return with a string message if msg.length > 1`, () => {
+				const result = log['createMessage'](level, ['def'], 1, 2, 3, 4);
+
+				expect(typeof result.message).toBe('string');
+			});
+
+			it(`should return with a string message if msg.length === 0`, () => {
+				const result = log['createMessage'](level, ['def']);
+
+				expect(typeof result.message).toBe('string');
+			});
+
+			it(`should return with a string message if msg is a single string`, () => {
+				const result = log['createMessage'](level, ['def'], 'single string message');
+
+				expect(typeof result.message).toBe('string');
+			});
+
+			it(`should return with a string message if msg is a single non string`, () => {
+				const result = log['createMessage'](level, ['def'], {a: 'b'});
+
+				expect(typeof result.message).toBe('string');
+			});
+		});
+
+		describe('canExecute', () => {
+			const LogLevel = 0b1010;
+			const ceLog = log.makeLog('canExecute', {level: LogLevel});
+
+			it('should return false when transport arg is undefined', () => {
+				const result = ceLog['canExecute'](undefined as any, Levels.ALL);
+
+				expect(result).toBe(false);
+			});
+
+			it('should return false when transport arg is null', () => {
+				const result = ceLog['canExecute'](null as any, Levels.ALL);
+
+				expect(result).toBe(false);
+			});
+
+			it('should return false when transport arg is not a Transport', () => {
+				const result = ceLog['canExecute'](ceLog as any, Levels.ALL);
+
+				expect(result).toBe(false);
+			});
+
+			it('should return false when group is not enabled', () => {
+				ceLog.groupState.enabled(false);
+
+				const result = ceLog['canExecute'](transport.level(), Levels.ALL);
+				ceLog.groupState.enabled(true);
+
+				expect(result).toBe(false);
+			});
+
+			const BadMsgLevels: any[] = [-1, 0, 0.5, 5.7, '1'];
+			it.each(BadMsgLevels)(`should return false: msgLevel '%p' not a positive integer`, (level) => {
+				const result = ceLog['canExecute'](transport.level(), level);
+
+				expect(result).toBe(false);
+			});
+
+			it('should return false when global and group levels have no active levels', () => {
+				ceLog.setGlobalLevel(0);
+				ceLog.setGroupLevel(0);
+
+				const result = ceLog['canExecute'](transport.level(), Levels.ALL);
+
+				expect(result).toBe(false);
+			});
+
+			it(`should return false when transport level does not match active levels`, () => {
+				transport.level(0b0001);
+				expect(transport.level() & ceLog.groupState.level()).toBe(0);
+
+				const result = ceLog['canExecute'](transport.level(), Levels.ALL);
+				transport.level(Levels.ALL);
+
+				expect(result).toBe(false);
+			});
+
+			it(`should return false when msgLevel does not match transport level`, () => {
+				const msgLevel = Levels.ALL_CUSTOM;
+				expect(transport.level() & msgLevel).toBe(0);
+
+				const result = ceLog['canExecute'](transport.level(), msgLevel);
+
+				expect(result).toBe(false);
+			});
+
+			it(`should return true when global/group, transport, and message all share a level`, () => {
+				ceLog.setGroupLevel(Levels.ALL);
+				const msgLevel = Levels.WARN;
+				expect(msgLevel & transport.level() & ceLog.groupState.level()).toBeGreaterThan(0);
+
+				const result = ceLog['canExecute'](transport.level(), msgLevel);
+
+				expect(result).toBe(true);
 			});
 		});
 
 		describe('log', () => {
-			it('should send log to target group when groupId is non-null', () => {
-				const groupId = '149719714';
-				const sampleMsg = 'badger-badger-badger-badger';
-				const custom = new Log();
-				custom.getGroup(groupId);
-				const spy = jest.spyOn(custom.state.groups[groupId], 'log');
+			let executeSpy: jest.SpyInstance;
 
-				custom.log(groupId, LogLevels.ALL, sampleMsg);
-				expect(spy).toHaveBeenCalledTimes(1);
-				const lastMsg = spy.mock.calls[0][1];
-				expect(lastMsg.level).toBe(LogLevels.ALL);
-				expect(lastMsg.message).toBe(sampleMsg);
-
-				spy.mockRestore();
+			beforeAll(() => {
+				executeSpy = jest.spyOn(transport, 'execute');
+				log.addTransport(transport);
 			});
 
-			it(`should send log to 'all' group when groupId arg is null`, () => {
-				const log = new Log();
-				const sampleMsg = 'aaaaaa14145';
-				const spy = jest.spyOn(log.state.groups.all, 'log');
-				log.log(null, LogLevels.ALL, sampleMsg);
-				expect(spy).toHaveBeenCalledTimes(1);
-				const lastMsg = spy.mock.calls[0][1];
-				expect(lastMsg.level).toBe(LogLevels.ALL);
-				expect(lastMsg.message).toBe(sampleMsg);
-
-				spy.mockRestore();
+			beforeEach(() => {
+				action.mockClear();
+				executeSpy.mockClear();
 			});
-		});
 
-		describe('Log Level', () => {
-			it('should execute transports when group and transport log level are active but global level is 0', () => {
-				const activeInactive = jest.fn();
-				const transportInactive = new LogTransport('inactive', LogLevels.NONE, activeInactive);
-				const actionActive = jest.fn();
-				const transportActive = new LogTransport('active', LogLevels.DEBUG, actionActive);
-				instance.setGlobalLevel(LogLevels.NONE);
-				instance.addGroupTransport('149719_7419', transportInactive);
-				instance.addGroupTransport('4741798_8811', transportInactive);
+			it('should not attempt to execute any transports when msg level is 0', async () => {
+				expect(executeSpy).not.toHaveBeenCalled();
 
-				const gid = '19GHVC_7149714_917477a6333AVH';
-				instance.addGroupTransport(gid, transportActive);
-				const group = instance.getGroup(gid);
-				group.setLogLevel(LogLevels.DEBUG);
+				await log.log(Levels.NONE, '11111111111');
+
+				expect(executeSpy).not.toHaveBeenCalled();
+			});
+
+			it('should not attempt to execute any transports when log is not enabled', async () => {
+				log.groupState.enabled(false);
+				expect(executeSpy).not.toHaveBeenCalled();
+
+				await log.log(Levels.ALL, '33333333333');
+				log.groupState.enabled(true);
+
+				expect(executeSpy).not.toHaveBeenCalled();
+			});
+
+			it('should only execute transports matching log level', async () => {
+				expect(action).not.toHaveBeenCalled();
+				transport.level(Levels.DEBUG);
+				log.setGlobalLevel(Levels.NONE);
+				log.setGroupLevel(Levels.WARN);
+				const oppositeTransport = new Transport('opposite', Levels.WARN, action);
+				log.clear();
+				log.addTransport(transport);
+				log.addTransport(oppositeTransport);
+
+				await log.log(Levels.WARN, '5555555555');
+				log.removeTransport(oppositeTransport);
+
+				expect(action).toHaveBeenCalledTimes(1);
+			});
+
+			it(`should not throw when transport throws`, (done) => {
+				log.enableGroupLevel(1);
+				const transport = new Transport('SyncAction', 1, () => {
+					throw Error('Sync Err');
+				});
+				const transportAsync = new Transport('AsyncAction', 1, async () => {
+					throw Error('Async Err');
+				});
+
+				log.addTransport(transportAsync);
+				log.addTransport(transport);
+
+				log.log(1, 'throw')
+					.catch((err) => {
+						fail(err);
+					})
+					.finally(() => {
+						log.clearAll();
+						done();
+					});
+			});
+
+			it(`should return list of failures when transports return false`, (done) => {
+				log.enableGroupLevel(1);
+				const transport = new Transport('SyncAction', 1, () => {
+					return false;
+				});
+				const transportAsync = new Transport('AsyncAction', 1, async () => {
+					throw 'err';
+				});
+
+				log.addTransport(transportAsync);
+				log.addTransport(transport);
+
+				log.log(1, 'fails')
+					.then((res) => {
+						const expected = {
+							SyncAction: false,
+							AsyncAction: 'err'
+						};
+						expect(res).toEqual(expect.objectContaining(expected));
+					})
+					.catch((err) => {
+						fail(err);
+					})
+					.finally(() => {
+						log.clearAll();
+						done();
+					});
+			});
+
+			it(`should return list of failure when transports return false`, (done) => {
+				log.enableGroupLevel(1);
+				const transport = new Transport('SyncAction', 1, () => {
+					return true;
+				});
+				const transportAsync = new Transport('AsyncAction', 1, async () => {
+					return true;
+				});
+
+				log.addTransport(transportAsync);
+				log.addTransport(transport);
+
+				log.log(1, 'works')
+					.then((res) => {
+						expect(res).toBe(true);
+					})
+					.catch((err) => {
+						fail(err);
+					})
+					.finally(() => {
+						log.clearAll();
+						done();
+					});
 			});
 		});
 
 		describe('Log Methods', () => {
-			let logSpy: jest.SpyInstance;
-
-			beforeAll(() => {
-				logSpy = jest.spyOn(instance, 'log');
-			});
+			const logSpy = jest.spyOn(log, 'log');
 
 			beforeEach(() => {
 				logSpy.mockClear();
@@ -463,57 +617,26 @@ describe('Log', () => {
 			});
 
 			for (const method of LOG_METHODS) {
-				describe(`${method.name} method`, () => {
+				describe(`${method.name}`, () => {
 					it('should call log method exactly once', () => {
-						if (method.groupId === null) {
-							instance[method.name](MOCK_MSG);
-						} else {
-							instance[method.name](method.groupId, MOCK_MSG);
-						}
+						log[method.name](MOCK_MSG);
 
 						expect(logSpy).toHaveBeenCalledTimes(1);
 					});
 
-					it(`should pass '${method.groupId}' groupId to log method`, () => {
-						if (method.groupId === null) {
-							instance[method.name](MOCK_MSG);
-						} else {
-							instance[method.name](method.groupId, MOCK_MSG);
-						}
+					it(`should pass level '${method.level}' to log method`, () => {
+						log[method.name](MOCK_MSG);
 
-						expect(logSpy).toHaveBeenLastCalledWith(
-							method.groupId,
-							expect.anything(),
-							expect.anything()
-						);
-						expect(logSpy).toHaveBeenCalledTimes(1);
-					});
-
-					it(`should pass log level '${method.level}' to log method`, () => {
-						if (method.groupId === null) {
-							instance[method.name](MOCK_MSG);
-						} else {
-							instance[method.name](method.groupId, MOCK_MSG);
-						}
-
-						expect(logSpy).toHaveBeenLastCalledWith(
-							method.groupId,
-							method.level,
-							expect.anything()
-						);
+						expect(logSpy).toHaveBeenLastCalledWith(method.level, expect.anything());
 						expect(logSpy).toHaveBeenCalledTimes(1);
 					});
 
 					it('should pass msg to log method', () => {
 						const sampleMsg = 'AAA0814108';
 
-						if (method.groupId === null) {
-							instance[method.name](sampleMsg);
-						} else {
-							instance[method.name](method.groupId, sampleMsg);
-						}
+						log[method.name](sampleMsg);
 
-						expect(logSpy).toHaveBeenLastCalledWith(method.groupId, expect.anything(), sampleMsg);
+						expect(logSpy).toHaveBeenLastCalledWith(expect.anything(), sampleMsg);
 						expect(logSpy).toHaveBeenCalledTimes(1);
 					});
 				});

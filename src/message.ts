@@ -3,9 +3,10 @@
  * each log message matching its transport log level.
  */
 
-export interface LogMessage {
+export interface Message {
 	/** UTC Timestamp when log message was originally created. */
-	date: string;
+	date: number;
 	level: number;
 	message: string;
+	path: string[];
 }

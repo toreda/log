@@ -1,0 +1,35 @@
+import {Levels} from './levels';
+import {Message} from './message';
+
+/**
+ * Action intended for development and debugging where console
+ * logs may be needed.
+ * @param msg
+ */
+
+export function logToConsole(msg: Message): boolean {
+	const path = msg.path.join('.');
+
+	switch (msg.level) {
+		case Levels.ERROR:
+			console.error(`[${path}][ERROR]`, msg.message);
+			break;
+		case Levels.WARN:
+			console.warn(`[${path}][WARN]`, msg.message);
+			break;
+		case Levels.INFO:
+			console.info(`[${path}][INFO]`, msg.message);
+			break;
+		case Levels.DEBUG:
+			console.debug(`[${path}][DEBUG]`, msg.message);
+			break;
+		case Levels.TRACE:
+			console.trace(`[${path}][TRACE]`, msg.message);
+			break;
+		default:
+			console.log(`[${msg.level}]`, msg.message);
+			break;
+	}
+
+	return true;
+}

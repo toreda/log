@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>LogTransport | @toreda/log</title>
+	<title>Transport | @toreda/log</title>
 	<meta name="description" content="Documentation for @toreda/log">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -55,10 +55,10 @@
 					<a href="../modules.html">@toreda/log</a>
 				</li>
 				<li>
-					<a href="logtransport.html">LogTransport</a>
+					<a href="transport.html">Transport</a>
 				</li>
 			</ul>
-			<h1>Class LogTransport</h1>
+			<h1>Class Transport</h1>
 		</div>
 	</div>
 </header>
@@ -69,7 +69,7 @@
 				<h3>Hierarchy</h3>
 				<ul class="tsd-hierarchy">
 					<li>
-						<span class="target">LogTransport</span>
+						<span class="target">Transport</span>
 					</li>
 				</ul>
 			</section>
@@ -80,21 +80,21 @@
 						<section class="tsd-index-section ">
 							<h3>Constructors</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-constructor tsd-parent-kind-class"><a href="logtransport.html#constructor" class="tsd-kind-icon">constructor</a></li>
+								<li class="tsd-kind-constructor tsd-parent-kind-class"><a href="transport.html#constructor" class="tsd-kind-icon">constructor</a></li>
 							</ul>
 						</section>
 						<section class="tsd-index-section ">
 							<h3>Properties</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-property tsd-parent-kind-class"><a href="logtransport.html#action" class="tsd-kind-icon">action</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-class"><a href="logtransport.html#id" class="tsd-kind-icon">id</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-class"><a href="logtransport.html#level" class="tsd-kind-icon">level</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="transport.html#action" class="tsd-kind-icon">action</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="transport.html#id" class="tsd-kind-icon">id</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="transport.html#level" class="tsd-kind-icon">level</a></li>
 							</ul>
 						</section>
 						<section class="tsd-index-section ">
 							<h3>Methods</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-method tsd-parent-kind-class"><a href="logtransport.html#execute" class="tsd-kind-icon">execute</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="transport.html#execute" class="tsd-kind-icon">execute</a></li>
 							</ul>
 						</section>
 					</div>
@@ -106,13 +106,13 @@
 					<a name="constructor" class="tsd-anchor"></a>
 					<h3>constructor</h3>
 					<ul class="tsd-signatures tsd-kind-constructor tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">new <wbr>Log<wbr>Transport<span class="tsd-signature-symbol">(</span>id<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, level<span class="tsd-signature-symbol">: </span><a href="../enums/loglevels.html" class="tsd-signature-type" data-tsd-kind="Enumeration">LogLevels</a>, action<span class="tsd-signature-symbol">: </span><a href="../modules.html#logaction" class="tsd-signature-type" data-tsd-kind="Type alias">LogAction</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="logtransport.html" class="tsd-signature-type" data-tsd-kind="Class">LogTransport</a></li>
+						<li class="tsd-signature tsd-kind-icon">new <wbr>Transport<span class="tsd-signature-symbol">(</span>id<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, level<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, action<span class="tsd-signature-symbol">: </span><a href="../modules.html#transportaction" class="tsd-signature-type" data-tsd-kind="Type alias">TransportAction</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="transport.html" class="tsd-signature-type" data-tsd-kind="Class">Transport</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/toreda/log/blob/582ae43/src/log/transport.ts#L8">src/log/transport.ts:8</a></li>
+									<li>Defined in src/transport.ts:9</li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -121,13 +121,13 @@
 									<h5>id: <span class="tsd-signature-type">string</span></h5>
 								</li>
 								<li>
-									<h5>level: <a href="../enums/loglevels.html" class="tsd-signature-type" data-tsd-kind="Enumeration">LogLevels</a></h5>
+									<h5>level: <span class="tsd-signature-type">number</span></h5>
 								</li>
 								<li>
-									<h5>action: <a href="../modules.html#logaction" class="tsd-signature-type" data-tsd-kind="Type alias">LogAction</a></h5>
+									<h5>action: <a href="../modules.html#transportaction" class="tsd-signature-type" data-tsd-kind="Type alias">TransportAction</a></h5>
 								</li>
 							</ul>
-							<h4 class="tsd-returns-title">Returns <a href="logtransport.html" class="tsd-signature-type" data-tsd-kind="Class">LogTransport</a></h4>
+							<h4 class="tsd-returns-title">Returns <a href="transport.html" class="tsd-signature-type" data-tsd-kind="Class">Transport</a></h4>
 						</li>
 					</ul>
 				</section>
@@ -137,30 +137,30 @@
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
 					<a name="action" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagReadonly">Readonly</span> action</h3>
-					<div class="tsd-signature tsd-kind-icon">action<span class="tsd-signature-symbol">:</span> <a href="../modules.html#logaction" class="tsd-signature-type" data-tsd-kind="Type alias">LogAction</a></div>
+					<div class="tsd-signature tsd-kind-icon">action<span class="tsd-signature-symbol">:</span> <a href="../modules.html#transportaction" class="tsd-signature-type" data-tsd-kind="Type alias">TransportAction</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/toreda/log/blob/582ae43/src/log/transport.ts#L7">src/log/transport.ts:7</a></li>
+							<li>Defined in src/transport.ts:8</li>
 						</ul>
 					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
 					<a name="id" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagReadonly">Readonly</span> id</h3>
-					<div class="tsd-signature tsd-kind-icon">id<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
+					<div class="tsd-signature tsd-kind-icon">id<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">StrongString</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/toreda/log/blob/582ae43/src/log/transport.ts#L6">src/log/transport.ts:6</a></li>
+							<li>Defined in src/transport.ts:7</li>
 						</ul>
 					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
 					<a name="level" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagReadonly">Readonly</span> level</h3>
-					<div class="tsd-signature tsd-kind-icon">level<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
+					<div class="tsd-signature tsd-kind-icon">level<span class="tsd-signature-symbol">:</span> <a href="../interfaces/stronglevel.html" class="tsd-signature-type" data-tsd-kind="Interface">StrongLevel</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/toreda/log/blob/582ae43/src/log/transport.ts#L8">src/log/transport.ts:8</a></li>
+							<li>Defined in src/transport.ts:9</li>
 						</ul>
 					</aside>
 				</section>
@@ -171,22 +171,22 @@
 					<a name="execute" class="tsd-anchor"></a>
 					<h3>execute</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">execute<span class="tsd-signature-symbol">(</span>msg<span class="tsd-signature-symbol">: </span><a href="../interfaces/logmessage.html" class="tsd-signature-type" data-tsd-kind="Interface">LogMessage</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">&gt;</span></li>
+						<li class="tsd-signature tsd-kind-icon">execute<span class="tsd-signature-symbol">(</span>msg<span class="tsd-signature-symbol">: </span><a href="../interfaces/message.html" class="tsd-signature-type" data-tsd-kind="Interface">Message</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Error</span><span class="tsd-signature-symbol">&gt;</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/toreda/log/blob/582ae43/src/log/transport.ts#L32">src/log/transport.ts:32</a></li>
+									<li>Defined in src/transport.ts:33</li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>msg: <a href="../interfaces/logmessage.html" class="tsd-signature-type" data-tsd-kind="Interface">LogMessage</a></h5>
+									<h5>msg: <a href="../interfaces/message.html" class="tsd-signature-type" data-tsd-kind="Interface">Message</a></h5>
 								</li>
 							</ul>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">&gt;</span></h4>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Error</span><span class="tsd-signature-symbol">&gt;</span></h4>
 						</li>
 					</ul>
 				</section>
@@ -203,49 +203,64 @@
 			<nav class="tsd-navigation secondary menu-sticky">
 				<ul class="before-current">
 					<li class=" tsd-kind-enum">
-						<a href="../enums/loglevels.html" class="tsd-kind-icon">Log<wbr>Levels</a>
+						<a href="../enums/levels.html" class="tsd-kind-icon">Levels</a>
 					</li>
 					<li class=" tsd-kind-class">
 						<a href="log.html" class="tsd-kind-icon">Log</a>
 					</li>
 					<li class=" tsd-kind-class">
-						<a href="loggroup.html" class="tsd-kind-icon">Log<wbr>Group</a>
+						<a href="logstateglobal.html" class="tsd-kind-icon">Log<wbr>State<wbr>Global</a>
 					</li>
 					<li class=" tsd-kind-class">
-						<a href="logstate.html" class="tsd-kind-icon">Log<wbr>State</a>
+						<a href="logstategroup.html" class="tsd-kind-icon">Log<wbr>State<wbr>Group</a>
 					</li>
 				</ul>
 				<ul class="current">
 					<li class="current tsd-kind-class">
-						<a href="logtransport.html" class="tsd-kind-icon">Log<wbr>Transport</a>
+						<a href="transport.html" class="tsd-kind-icon">Transport</a>
 						<ul>
 							<li class=" tsd-kind-constructor tsd-parent-kind-class">
-								<a href="logtransport.html#constructor" class="tsd-kind-icon">constructor</a>
+								<a href="transport.html#constructor" class="tsd-kind-icon">constructor</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class">
-								<a href="logtransport.html#action" class="tsd-kind-icon">action</a>
+								<a href="transport.html#action" class="tsd-kind-icon">action</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class">
-								<a href="logtransport.html#id" class="tsd-kind-icon">id</a>
+								<a href="transport.html#id" class="tsd-kind-icon">id</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class">
-								<a href="logtransport.html#level" class="tsd-kind-icon">level</a>
+								<a href="transport.html#level" class="tsd-kind-icon">level</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
-								<a href="logtransport.html#execute" class="tsd-kind-icon">execute</a>
+								<a href="transport.html#execute" class="tsd-kind-icon">execute</a>
 							</li>
 						</ul>
 					</li>
 				</ul>
 				<ul class="after-current">
 					<li class=" tsd-kind-interface">
-						<a href="../interfaces/logmessage.html" class="tsd-kind-icon">Log<wbr>Message</a>
+						<a href="../interfaces/logoptionsglobal.html" class="tsd-kind-icon">Log<wbr>Options<wbr>Global</a>
 					</li>
 					<li class=" tsd-kind-interface">
-						<a href="../interfaces/logoptions.html" class="tsd-kind-icon">Log<wbr>Options</a>
+						<a href="../interfaces/logoptionsgroup.html" class="tsd-kind-icon">Log<wbr>Options<wbr>Group</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="../interfaces/message.html" class="tsd-kind-icon">Message</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="../interfaces/stronglevel.html" class="tsd-kind-icon">Strong<wbr>Level</a>
 					</li>
 					<li class=" tsd-kind-type-alias">
-						<a href="../modules.html#logaction" class="tsd-kind-icon">Log<wbr>Action</a>
+						<a href="../modules.html#logoptions" class="tsd-kind-icon">Log<wbr>Options</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="../modules.html#transportaction" class="tsd-kind-icon">Transport<wbr>Action</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="../modules.html#logtoconsole" class="tsd-kind-icon">log<wbr>ToConsole</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="../modules.html#makelevel" class="tsd-kind-icon">make<wbr>Level</a>
 					</li>
 				</ul>
 			</nav>
@@ -263,6 +278,9 @@
 			</ul>
 			<ul class="tsd-legend">
 				<li class="tsd-kind-property tsd-parent-kind-interface"><span class="tsd-kind-icon">Property</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private method</span></li>
 			</ul>
 		</div>
 	</div>
