@@ -11,8 +11,10 @@ import {StrongLevel, makeLevel} from '../../strong-level';
 import {Transport} from '../../transport';
 import {LogOptionsGroup} from '../options';
 
-type Options = Omit<LogOptionsGroup, 'state'>;
-type State = RecordToStrong<Omit<LogOptionsGroup, 'state'>>;
+type KeysExludedFromOptions = 'state';
+type Options = Omit<LogOptionsGroup, KeysExludedFromOptions>;
+type KeysExludedFromState = KeysExludedFromOptions;
+type State = RecordToStrong<Omit<LogOptionsGroup, KeysExludedFromState>>;
 
 export class LogStateGroup extends StrongMap implements State {
 	public readonly id: StrongString;

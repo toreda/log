@@ -66,16 +66,20 @@
 				<p>Light TypeScript logger for node, web, and serverless environments. </p>
 				<p>Features:</p>
 				<ul>
-					<li>Custom Transports</li>
 					<li>Small footprint</li>
-					<li>Browser Compatible</li>
-					<li>Serverless Compatible</li>
-					<li>TypeScript first</li>
+					<li>Simple to use</li>
+					<li>Fully supports TypeScript</li>
+					<li>Custom Transport support</li>
+					<li>Works in Browser, Serverless, and Node environments.</li>
 				</ul>
 				<a href="#contents" id="contents" style="color: inherit; text-decoration: none;">
 					<h1>Contents</h1>
 				</a>
 				<ul>
+					<li><p><a href="#use-cases"><strong>Use Cases</strong></a></p>
+					</li>
+					<li><p><a href="#what-does-it-do"><strong>What does it do?</strong></a></p>
+					</li>
 					<li><p><a href="#usage"><strong>Usage</strong></a></p>
 					</li>
 					<li><p><a href="#Package"><strong>Package</strong></a></p>
@@ -87,13 +91,28 @@
 						</ul>
 					</li>
 				</ul>
+				<a href="#use-cases" id="use-cases" style="color: inherit; text-decoration: none;">
+					<h1>Use Cases</h1>
+				</a>
+				<a href="#custom-transports" id="custom-transports" style="color: inherit; text-decoration: none;">
+					<h2>Custom Transports</h2>
+				</a>
+				<ul>
+					<li>Configure transports to receive all log events, or only a filtered subset based on class, group, and log level.</li>
+					<li>Custom transports can filter and receive structured log data for specific events you care about. Get the exact functionality you need without writing a whole library.</li>
+				</ul>
+				<a href="#granular-control" id="granular-control" style="color: inherit; text-decoration: none;">
+					<h2>Granular Control</h2>
+				</a>
+				<ul>
+					<li>Leave disabled log messages in prod environments which can be turned on later for debugging without a code push.</li>
+					<li>Set log levels for individual functions, classes, and groups. See debug output from the system you&#39;re debugging without seeing app-wide debug spam.</li>
+				</ul>
 				<a href="#usage" id="usage" style="color: inherit; text-decoration: none;">
 					<h1>Usage</h1>
 				</a>
-				<a href="#typescript" id="typescript" style="color: inherit; text-decoration: none;">
-					<h2>Typescript</h2>
-				</a>
-				<p><strong>Import and create Logger</strong></p>
+				<p><code>@toreda/log</code> provides simple and straight forward logging for common use cases, and advanced functionality for use in more complicated situations like server-side and remote debugging.</p>
+				<p><strong>Create Logger</strong></p>
 				<pre><code class="language-typescript"><span style="color: #AF00DB">import</span><span style="color: #000000"> {</span><span style="color: #001080">Log</span><span style="color: #000000">, </span><span style="color: #001080">LogLevels</span><span style="color: #000000">} </span><span style="color: #AF00DB">from</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;@toreda/log&#039;</span><span style="color: #000000">;</span>
 <span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">log</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #795E26">Log</span><span style="color: #000000">();</span>
 </code></pre>
@@ -199,28 +218,43 @@
 			<nav class="tsd-navigation secondary menu-sticky">
 				<ul class="before-current">
 					<li class=" tsd-kind-enum">
-						<a href="enums/loglevels.html" class="tsd-kind-icon">Log<wbr>Levels</a>
+						<a href="enums/levels.html" class="tsd-kind-icon">Levels</a>
 					</li>
 					<li class=" tsd-kind-class">
 						<a href="classes/log.html" class="tsd-kind-icon">Log</a>
 					</li>
 					<li class=" tsd-kind-class">
-						<a href="classes/loggroup.html" class="tsd-kind-icon">Log<wbr>Group</a>
+						<a href="classes/logstateglobal.html" class="tsd-kind-icon">Log<wbr>State<wbr>Global</a>
 					</li>
 					<li class=" tsd-kind-class">
-						<a href="classes/logstate.html" class="tsd-kind-icon">Log<wbr>State</a>
+						<a href="classes/logstategroup.html" class="tsd-kind-icon">Log<wbr>State<wbr>Group</a>
 					</li>
 					<li class=" tsd-kind-class">
-						<a href="classes/logtransport.html" class="tsd-kind-icon">Log<wbr>Transport</a>
+						<a href="classes/transport.html" class="tsd-kind-icon">Transport</a>
 					</li>
 					<li class=" tsd-kind-interface">
-						<a href="interfaces/logmessage.html" class="tsd-kind-icon">Log<wbr>Message</a>
+						<a href="interfaces/logoptionsglobal.html" class="tsd-kind-icon">Log<wbr>Options<wbr>Global</a>
 					</li>
 					<li class=" tsd-kind-interface">
-						<a href="interfaces/logoptions.html" class="tsd-kind-icon">Log<wbr>Options</a>
+						<a href="interfaces/logoptionsgroup.html" class="tsd-kind-icon">Log<wbr>Options<wbr>Group</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/message.html" class="tsd-kind-icon">Message</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/stronglevel.html" class="tsd-kind-icon">Strong<wbr>Level</a>
 					</li>
 					<li class=" tsd-kind-type-alias">
-						<a href="modules.html#logaction" class="tsd-kind-icon">Log<wbr>Action</a>
+						<a href="modules.html#logoptions" class="tsd-kind-icon">Log<wbr>Options</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="modules.html#transportaction" class="tsd-kind-icon">Transport<wbr>Action</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="modules.html#logtoconsole" class="tsd-kind-icon">log<wbr>ToConsole</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="modules.html#makelevel" class="tsd-kind-icon">make<wbr>Level</a>
 					</li>
 				</ul>
 			</nav>
@@ -238,6 +272,9 @@
 			</ul>
 			<ul class="tsd-legend">
 				<li class="tsd-kind-property tsd-parent-kind-interface"><span class="tsd-kind-icon">Property</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private method</span></li>
 			</ul>
 		</div>
 	</div>

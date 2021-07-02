@@ -56,6 +56,12 @@ describe('Log', () => {
 
 			expect(spy).toHaveBeenCalled();
 		});
+
+		it(`should throw when 'state' is not a LogStateGlobal`, () => {
+			expect(() => {
+				new Log({state: {} as any});
+			}).toThrow(`Failed to create Log - 'state' was not an instance of LogStateGlobal.`);
+		});
 	});
 
 	describe('Implementation', () => {

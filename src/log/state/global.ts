@@ -4,8 +4,10 @@ import {Log} from '../../log';
 import {StrongLevel, makeLevel} from '../../strong-level';
 import {LogOptionsGlobal} from '../options';
 
-type Options = Omit<LogOptionsGlobal, 'state' | 'path'>;
-type State = RecordToStrong<Omit<LogOptionsGlobal, 'state' | 'id' | 'startingGroups' | 'path'>>;
+type KeysExludedFromOptions = 'state' | 'path';
+type Options = Omit<LogOptionsGlobal, KeysExludedFromOptions>;
+type KeysExludedFromState = KeysExludedFromOptions | 'id' | 'startingGroups';
+type State = RecordToStrong<Omit<LogOptionsGlobal, KeysExludedFromState>>;
 
 /**
  * Holds internal state data, settings, and log groups for a

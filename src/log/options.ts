@@ -1,6 +1,7 @@
 import {LogStateGlobal} from './state/global';
+import {Expand} from '@toreda/types';
 
-export type LogOptions = LogOptionsGlobal | Required<LogOptionsGroup>;
+export type LogOptions = Expand<Required<LogOptionsGroup> | LogOptionsGlobal>;
 
 /**
  * Used when creating a brand new Log

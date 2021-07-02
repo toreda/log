@@ -2,10 +2,10 @@ import {isType} from '@toreda/strong-types';
 import {Expand} from '@toreda/types';
 import {logToConsole} from './console';
 import {Levels} from './levels';
-import {Message} from './message';
 import {LogOptions, LogOptionsGroup} from './log/options';
 import {LogStateGlobal} from './log/state/global';
 import {LogStateGroup} from './log/state/group';
+import {Message} from './message';
 import {isPositiveInteger} from './strong-level';
 import {Transport} from './transport';
 
@@ -30,11 +30,13 @@ export class Log {
 			this.globalState.groups.set(options?.id ?? 'default', this);
 			level = this.globalState.globalLevel();
 			enabled = this.globalState.groupsStartEnabled();
-		} else {
+		} else if (isType(options.state, LogStateGlobal)) {
 			this.globalState = options.state;
 			path = options.id.split('.');
 			level = options.level;
 			enabled = options.enabled;
+		} else {
+			throw Error(`Failed to create Log - 'state' was not an instance of LogStateGlobal.`);
 		}
 
 		this.groupState = new LogStateGroup({id: path.join('.'), path, level, enabled});

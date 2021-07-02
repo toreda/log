@@ -42,16 +42,25 @@ Features:
 
 **Create Logger**
 ```typescript
-import {Log, LogLevels} from '@toreda/log';
+import {Log} from '@toreda/log';
 const log = new Log();
 ```
 
+
 **Log Levels**
 ```typescript
-import {Log, LogLevels} from '@toreda/log';
-const log = new Log();
+import {Log, Levels} from '@toreda/log';
+const log = new Log({globalLevel: Levels.DEBUG});
 // Change log level:
-log.setGlobalLevel(LogLevels.ALL);
+log.setGlobalLevel(Levels.ALL);
+// Disable a specific log level only
+log.disableGlobalLevel(Levels.TRACE)
+// Disable specific log levels only
+log.disableGlobalLevels([Levels.DEBUG, Levels.INFO])
+// Enable a specific log level only
+log.enableGlobalLevel(Levels.DEBUG)
+// Enable specific log levels only
+log.enableGlobalLevels([Levels.TRACE, Levels.INFO])
 // Trace
 log.trace('Trace message here');
 // Debug
@@ -62,40 +71,86 @@ log.info('Info message here');
 log.warn('Warn message here');
 // Error
 log.error('my', 'message', 'here');
+// Multple
+log.log(Levels.ERROR & Levels.TRACE, 'trace and error message here');
+// Custom
+const customLevel = 
+log.log(0b0010_0000_0000, 'custom logging level');
 ```
-**Global Transports**
-Global Log Transports receive all log messages with matching active log levels, for all log groups. 
 
+**Groups**
+New logs can be created from existing logs. The new logs share a state with
+the log that created them and have an id that tracks the origin of of the log.
 ```typescript
-import {Log, LogLevels} from '@toreda/log';
-const log = new Log();
+import {Log} from '@toreda/log';
+const log = new Log({id: 'ClassLog'});
+const subLog = log.makeLog('FunctionLog');
 
+// Message has id 'ClassLog'
+log.info('Class constructor started.');
+// Message has id 'ClassLog.FunctionLog'
+subLog.info('Function call started.');
+
+log.globalState === subLog.globalState; // returns true
+```
+
+
+**Transports**
+Transports attach to logs and handle the messages.
+
+A default transport that logs to console can be actived when creating the log.
+```typescript
+import {Log} from '@toreda/log';
+const log = new Log({consoleEnabled: true});
+const sublog = log.makeLog('sublog');
+
+// Logs to the console
+log.info('Info Message');
+// Logs to the console
+sublog.info('Info Message');
+```
+
+It can also be activated later
+```typescript
+import {Log} from '@toreda/log';
+const log = new Log();
+log.activateDefaultConsole();
+const sublog = log.makeLog('sublog');
+
+// Logs to the console
+log.info('Info Message');
+// Does not log to the console
+sublog.info('Info Message');
+```
+
+Custom transports can also be created
+```typescript
+import {Log, LogMessage, Transport} from '@toreda/log';
+const log = new Log();
 // Example dummy example.
 // Custom actions can perform any async activity.
-const action = async (msg: LogMessage): Promise<void> => {
+const action = async (msg: LogMessage): Promise<boolean> => {
    return true;
 }
 // Transports take a string ID, initial log level,
 // and async action function.
-const transport = new LogTransport('tid1', LogLevels.ALL, action);
+const transport = new Transport('tid1', LogLevels.ALL, action);
 
 // Add transport to global listeners.
-log.addGlobalTransport(transport);
+log.addTransport(transport);
 ```
 
-
-**Removing Global Transports**
-
+**Removing Transports**
 ```typescript
 // Remove the same transport
 // NOTE: Requires access to original transport object
 // now being removed.
-log.removeGlobalTransport(transport);
+log.removeTransport(transport);
 
 // Remove global transport by ID.
 // Use ID to remove global transports if you no
 // longer have a reference to target transport.
-log.removeGlobalTransportById('tid1');
+log.removeTransportById('tid1');
 ```
 
 

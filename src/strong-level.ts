@@ -1,7 +1,6 @@
-import {STRules, makeStrong} from '@toreda/strong-types';
-import {StrongNumber} from '@toreda/strong-types/dist/strong-number';
+import {STRules, StrongInt, makeStrong} from '@toreda/strong-types';
 
-export interface StrongLevel extends StrongNumber {
+export interface StrongLevel extends StrongInt {
 	enableLogLevel: (level: number) => void;
 	enableMultipleLevels: (levels: number[]) => void;
 	disableLogLevel: (level: number) => void;
