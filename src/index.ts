@@ -1,10 +1,13 @@
 export {Log} from './log';
-export {LogAction} from './log/action';
-export {LogActionConsole} from './log/action/console';
-export {LogGroup} from './log/group';
-export {LogGroupData} from './log/group/data';
-export {LogLevels} from './log/levels';
-export {LogMessage} from './log/message';
-export {LogOptions} from './log/options';
-export {LogState} from './log/state';
-export {LogTransport} from './log/transport';
+export {LogOptions, LogOptionsGlobal, LogOptionsGroup} from './log/options';
+export {LogStateGlobal} from './log/state/global';
+export {LogStateGroup} from './log/state/group';
+
+export {Transport} from './transport';
+export {TransportAction} from './transport/action';
+export {logToConsole} from './console';
+
+export {Message} from './message';
+
+export {StrongLevel, makeLevel} from './strong-level';
+export {Levels} from './levels';

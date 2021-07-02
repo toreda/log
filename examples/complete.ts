@@ -1,20 +1,18 @@
-import {Logger, LogTransport, LogLevels} from '@toreda/log';
+import {Levels, Log, Transport} from '@toreda/log';
+import {appendFileSync} from 'fs';
 
 // Create a new Logger
-const myLogger = new Log();
-const myLoggerWithOptions = new Log({
-	id: 'myLoggerId'
-})
+const log = new Log({
+	id: 'myApp'
+});
 
-// Create a new LogTransport that outputs to console
-const myTransport = new LogTransport(LogTransport.logToConsole) // random id
-const myTransportWithOptions = new LogTransport(LogTransport.logToConsole, {
-	id: 'myTransportId'
-})
+// Creates a transport that logs to the console
+log.activateDefaultConsole();
 
-// Create a new LogTransport with a random id that outputs to file
-import {appendFileSync} from 'fs';
-const myTransportToFile = new LogTransport((logMessage)=>{
+// Create a log that extends the old log
+const classLog = log.makeLog('className');
+
+const fsTransport = new Transport('logFile', Levels.ERROR, (logMessage) => {
 	return new Promise((resolve, reject) => {
 		const message = JSON.stringify(logMessage);
 		try {
@@ -24,32 +22,16 @@ const myTransportToFile = new LogTransport((logMessage)=>{
 			reject(error);
 		}
 	}).catch((result) => result);
-})
+});
 
-// Attach a LogTransport to a logger
-myLogger.attachTransport(myTransportToFile); // catches every log, returns {payload: id}
-myLogger.attachTransport(myTransport, LogLevels.WARN); // only catches WARN & ERROR logs
-
-const result = myLogger.attachTransport(new LogTransport((msg) => {
-	// do something
-}, {
-	id: 'customTransport'
-}
-), [LogLevel.ERROR, LogLevel.DEBUG]); // only catches ERROR & DEBUG logs, returns {payload: id}
+// Add a Transport to a log
+classLog.addTransport(fsTransport);
 
 // Remove a LogTransport
-myLogger.removeTransport(myTransportToFile); // returns {payload: LogTransport}
-myLogger.removeTransport(myLogger.getTransportFromId(result.payload))); // returns {payload: LogTransport}
+classLog.removeTransport(fsTransport);
 
-
-// Reattach File Logger
-myLogger.attachTransport(myTransportToFile, LogLevels.DEBUG); // catches all logs expect TRACE
-
-// Log using Logger
-myLogger.error('Some error has occured');
-myLogger.warn('This is a warning');
-myLogger.info(leftHandValue === rightHandValue);
-myLogger.debug(leftHandValue, rightHandValue);
-myLogger.trace('someFunction called');
-
-myLogger.log(LogLevel.ERROR, 'Same thing as calling myLogger.error' );
+classLog.error('Some error has occured');
+log.info('info level msg');
+classLog.warn('This is a warning');
+log.log(Levels.ALL, 'all built-in levels msg');
+classLog.trace('someFunction called');

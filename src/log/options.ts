@@ -1,9 +1,30 @@
-import {LogLevels} from './levels';
-import {LogGroupData} from './group/data';
+import {LogStateGlobal} from './state/global';
 
-export interface LogOptions {
+export type LogOptions = LogOptionsGlobal | LogOptionsGroup;
+
+/**
+ * Used when creating a brand new Log
+ */
+export interface LogOptionsGlobal {
+	state?: undefined;
+
+	id?: string;
+
 	consoleEnabled?: boolean;
-	globalLogLevel?: LogLevels;
-	groupsEnabledOnStart?: boolean;
-	startingGroups?: LogGroupData[];
+	globalLevel?: number;
+	groupsStartEnabled?: boolean;
+	startingGroups?: LogOptionsGroup[];
+}
+
+/**
+ * Used by makeGroup in a existing Log
+ */
+export interface LogOptionsGroup {
+	state: LogStateGlobal;
+
+	id: string;
+	path?: string[];
+
+	enabled?: boolean;
+	level?: number;
 }

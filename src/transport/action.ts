@@ -1,4 +1,4 @@
-import {LogMessage} from './message';
+import {Message} from '../message';
 
 /**
  * Custom Action used to create a log transport.
@@ -6,4 +6,4 @@ import {LogMessage} from './message';
  * msg matching transport log level.
  */
 
-export type LogAction = (logMessage: LogMessage) => Promise<boolean>;
+export type TransportAction = (logMessage: Message) => boolean | Promise<boolean>;
