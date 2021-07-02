@@ -1,6 +1,6 @@
 import {logToConsole} from '../src/console';
 import {Levels} from '../src/levels';
-import {Message} from '../src/log/message';
+import {Message} from '../src/message';
 
 const spys = {
 	error: jest.spyOn(global.console, 'error').mockImplementation(() => {}),

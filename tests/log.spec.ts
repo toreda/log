@@ -1,5 +1,5 @@
-import {Log} from '../src/log';
 import {Levels} from '../src/levels';
+import {Log} from '../src/log';
 import {Transport} from '../src/transport';
 
 const MOCK_TRANSPORT_ID = '149714971_92872981';
@@ -85,7 +85,7 @@ describe('Log', () => {
 				const result = log.makeLog(id, {level: Levels.DEBUG});
 
 				expect(result).toBeInstanceOf(Log);
-				expect(log.globalState.groups.get(id)).toHaveProperty('group');
+				expect(log.globalState.groups.get(id)).toHaveProperty('groupState');
 			});
 		});
 

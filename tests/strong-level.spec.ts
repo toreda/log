@@ -93,4 +93,20 @@ describe(`StrongLevel`, () => {
 			expect(result).toBeFalsy();
 		});
 	});
+
+	describe(`increment`, () => {
+		it(`should return null`, () => {
+			const result = levelObj.increment();
+
+			expect(result).toBeNull();
+		});
+	});
+
+	describe(`decrement`, () => {
+		it(`should return null`, () => {
+			const result = levelObj.decrement();
+
+			expect(result).toBeNull();
+		});
+	});
 });

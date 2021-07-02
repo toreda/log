@@ -1,7 +1,7 @@
-import {TransportAction} from '../src/log/action';
 import {Levels} from '../src/levels';
-import {Message} from '../src/log/message';
+import {Message} from '../src/message';
 import {Transport} from '../src/transport';
+import {TransportAction} from '../src/transport/action';
 
 const MOCK_ID = 'log_transport_id';
 const MOCK_LEVEL: Levels = Levels.NONE | Levels.ERROR;
