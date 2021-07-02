@@ -47,6 +47,15 @@ describe('Log', () => {
 		it('should instantiate when no args are given', () => {
 			expect(new Log()).toBeInstanceOf(Log);
 		});
+
+		it(`should class 'activateDefaultConsole' if 'consoleEnabled' is true`, () => {
+			const spy = jest.spyOn(Log.prototype, 'activateDefaultConsole');
+			expect(spy).not.toHaveBeenCalled();
+
+			new Log({id: 'consoleEnabled', consoleEnabled: true});
+
+			expect(spy).toHaveBeenCalled();
+		});
 	});
 
 	describe('Implementation', () => {
@@ -82,10 +91,12 @@ describe('Log', () => {
 				const id = '491719714';
 				expect(log.globalState.groups[id]).toBeUndefined();
 
-				const result = log.makeLog(id, {level: Levels.DEBUG});
+				const result = log.makeLog(id, {level: Levels.DEBUG, enabled: false});
 
 				expect(result).toBeInstanceOf(Log);
-				expect(log.globalState.groups.get(id)).toHaveProperty('groupState');
+
+				const groupId = result.groupState.id();
+				expect(log.globalState.groups.get(groupId)).toHaveProperty('groupState');
 			});
 		});
 
@@ -173,6 +184,32 @@ describe('Log', () => {
 				const result = log.removeTransportById('id2');
 				expect(log.groupState.transports.size).toBe(1);
 				expect(result).toBeFalsy();
+			});
+		});
+
+		describe('removeTransports', () => {
+			it('should return false when transports is not an array', () => {
+				const result = log.removeTransports(null as any);
+
+				expect(result).toBe(false);
+			});
+
+			it('should return false when no transports are removed', () => {
+				const result = log.removeTransports([transport]);
+
+				expect(result).toBe(false);
+			});
+
+			it('should return true when a transport is removed', () => {
+				log.clear();
+				expect(log.groupState.transports.size).toBe(0);
+				log.addTransport(transport);
+				expect(log.groupState.transports.size).toBe(1);
+
+				const result = log.removeTransports([transport]);
+
+				expect(result).toBe(true);
+				expect(log.groupState.transports.size).toBe(0);
 			});
 		});
 

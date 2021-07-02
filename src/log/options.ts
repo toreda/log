@@ -25,6 +25,6 @@ export interface LogOptionsGroup {
 	id: string;
 	path?: string[];
 
-	enabled?: boolean;
-	level?: number;
+	enabled: boolean;
+	level: number;
 }

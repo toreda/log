@@ -33,8 +33,8 @@ export class Log {
 		} else {
 			this.globalState = options.state;
 			path = options.id.split('.');
-			level = options.level ?? this.globalState.globalLevel();
-			enabled = options.enabled ?? this.globalState.groupsStartEnabled();
+			level = options.level;
+			enabled = options.enabled;
 		}
 
 		this.groupState = new LogStateGroup({id: path.join('.'), path, level, enabled});
@@ -430,4 +430,4 @@ export class Log {
 
 type LogResult = Record<string, boolean | Error>;
 type LogActionResult = Promise<[string, boolean | Error]>;
-type MakeLogOptions = Expand<Omit<LogOptionsGroup, 'state' | 'id' | 'path'>>;
+type MakeLogOptions = Expand<Partial<Omit<LogOptionsGroup, 'state' | 'id' | 'path'>>>;
