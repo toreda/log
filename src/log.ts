@@ -430,4 +430,4 @@ export class Log {
 
 type LogResult = Record<string, boolean | Error>;
 type LogActionResult = Promise<[string, boolean | Error]>;
-type MakeLogOptions = Expand<Partial<Omit<LogOptionsGroup, 'state' | 'id' | 'path'>>>;
+type MakeLogOptions = Expand<Omit<LogOptionsGroup, 'state' | 'id' | 'path'>>;

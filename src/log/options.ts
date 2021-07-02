@@ -1,6 +1,6 @@
 import {LogStateGlobal} from './state/global';
 
-export type LogOptions = LogOptionsGlobal | LogOptionsGroup;
+export type LogOptions = LogOptionsGlobal | Required<LogOptionsGroup>;
 
 /**
  * Used when creating a brand new Log
@@ -25,6 +25,6 @@ export interface LogOptionsGroup {
 	id: string;
 	path?: string[];
 
-	enabled: boolean;
-	level: number;
+	enabled?: boolean;
+	level?: number;
 }
