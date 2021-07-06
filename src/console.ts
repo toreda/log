@@ -27,7 +27,7 @@ export function logToConsole(msg: Message): boolean {
 			console.trace(`[${path}][TRACE]`, msg.message);
 			break;
 		default:
-			console.log(`[${msg.level}]`, msg.message);
+			console.log(`[${path}][${msg.level}]`, msg.message);
 			break;
 	}
 
