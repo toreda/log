@@ -1,5 +1,5 @@
 import {Levels} from './levels';
-import {Message} from './message';
+import type {Message} from './message';
 
 /**
  * Action intended for development and debugging where console

@@ -1,7 +1,9 @@
-import {StrongString, makeString} from '@toreda/strong-types';
-import {TransportAction} from './transport/action';
-import {Message} from './message';
-import {StrongLevel, makeLevel} from './strong-level';
+import {makeString} from '@toreda/strong-types';
+import type {StrongString} from '@toreda/strong-types';
+import type {TransportAction} from './transport/action';
+import type {Message} from './message';
+import {makeLevel} from './strong-level';
+import type {StrongLevel} from './strong-level';
 
 export class Transport {
 	public readonly id: StrongString;

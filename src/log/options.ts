@@ -1,5 +1,6 @@
-import {LogStateGlobal} from './state/global';
-import {Expand} from '@toreda/types';
+import type {Expand} from '@toreda/types';
+import type {Log} from '../log';
+import type {LogStateGlobal} from './state/global';
 
 export type LogOptions = Expand<Required<LogOptionsGroup> | LogOptionsGlobal>;
 
@@ -24,6 +25,7 @@ export interface LogOptionsGroup {
 	state: LogStateGlobal;
 
 	id: string;
+	parent?: Log;
 	path?: string[];
 
 	enabled?: boolean;

@@ -1,11 +1,11 @@
 import {isType} from '@toreda/strong-types';
-import {Expand} from '@toreda/types';
+import type {Expand} from '@toreda/types';
 import {logToConsole} from './console';
 import {Levels} from './levels';
-import {LogOptions, LogOptionsGroup} from './log/options';
+import type {LogOptions, LogOptionsGroup} from './log/options';
 import {LogStateGlobal} from './log/state/global';
 import {LogStateGroup} from './log/state/group';
-import {Message} from './message';
+import type {Message} from './message';
 import {isPositiveInteger} from './strong-level';
 import {Transport} from './transport';
 
@@ -22,6 +22,7 @@ export class Log {
 	public constructor(options?: LogOptions) {
 		let enabled: boolean;
 		let level: number;
+		let parent: Log | undefined;
 		let path: string[];
 
 		if (!options?.state) {
@@ -32,6 +33,7 @@ export class Log {
 			enabled = this.globalState.groupsStartEnabled();
 		} else if (isType(options.state, LogStateGlobal)) {
 			this.globalState = options.state;
+			parent = options.parent;
 			path = options.id.split('.');
 			level = options.level;
 			enabled = options.enabled;
@@ -39,7 +41,7 @@ export class Log {
 			throw Error(`Failed to create Log - 'state' was not an instance of LogStateGlobal.`);
 		}
 
-		this.groupState = new LogStateGroup({id: path.join('.'), path, level, enabled});
+		this.groupState = new LogStateGroup({id: path.join('.'), parent, path, level, enabled});
 
 		// Activate console logging if allowed by start options.
 		if (this.globalState.consoleEnabled()) {
@@ -83,7 +85,7 @@ export class Log {
 		const level = options?.level ?? this.globalState.globalLevel();
 		const enabled = options?.enabled ?? this.globalState.groupsStartEnabled();
 
-		const group = new Log({state: this.globalState, id: groupId, path, level, enabled});
+		const group = new Log({state: this.globalState, id: groupId, parent: this, path, level, enabled});
 		this.globalState.groups.set(groupId, group);
 
 		return group;
@@ -325,7 +327,18 @@ export class Log {
 		const message: Message = this.createMessage(msgLevel, this.groupState.path.slice(), ...msg);
 		const actions: LogActionResult[] = [];
 
-		for (const transport of this.groupState.transports) {
+		const transports: Transport[] = [];
+		let group = this as Log | null;
+
+		while (group) {
+			for (const transport of group.groupState.transports) {
+				transports.push(transport);
+			}
+
+			group = group.groupState.parent;
+		}
+
+		for (const transport of transports) {
 			if (this.canExecute(transport.level(), msgLevel)) {
 				const result: LogActionResult = transport.execute(message).then((res) => {
 					return [transport.id(), res];
@@ -432,4 +445,4 @@ export class Log {
 
 type LogResult = Record<string, boolean | Error>;
 type LogActionResult = Promise<[string, boolean | Error]>;
-type MakeLogOptions = Expand<Omit<LogOptionsGroup, 'state' | 'id' | 'path'>>;
+type MakeLogOptions = Expand<Omit<LogOptionsGroup, 'state' | 'id' | 'parent' | 'path'>>;

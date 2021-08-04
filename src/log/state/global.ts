@@ -1,8 +1,10 @@
-import {RecordToStrong, StrongBoolean, StrongMap, makeBoolean} from '@toreda/strong-types';
+import {StrongMap, makeBoolean} from '@toreda/strong-types';
+import type {RecordToStrong, StrongBoolean} from '@toreda/strong-types';
 import {Levels} from '../../levels';
-import {Log} from '../../log';
-import {StrongLevel, makeLevel} from '../../strong-level';
-import {LogOptionsGlobal} from '../options';
+import type {Log} from '../../log';
+import {makeLevel} from '../../strong-level';
+import type {StrongLevel} from '../../strong-level';
+import type {LogOptionsGlobal} from '../options';
 
 type KeysExludedFromOptions = 'state' | 'path';
 type Options = Omit<LogOptionsGlobal, KeysExludedFromOptions>;
