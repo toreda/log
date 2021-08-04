@@ -616,6 +616,18 @@ describe('Log', () => {
 
 				expect(ACTION).toHaveBeenCalled();
 			});
+
+			it(`should not call parent tranports if child has transport with the same id`, async () => {
+				log.clearAll();
+				log.addTransport(TRANSPORT);
+				const childLog = log.makeLog('child', {enabled: true, level: Levels.ALL});
+				childLog.addTransport(TRANSPORT);
+				expect(ACTION).not.toHaveBeenCalled();
+
+				await childLog.error('msg');
+
+				expect(ACTION).toHaveBeenCalledTimes(1);
+			});
 		});
 
 		describe('Log Methods', () => {

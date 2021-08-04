@@ -327,25 +327,27 @@ export class Log {
 		const message: Message = this.createMessage(msgLevel, this.groupState.path.slice(), ...msg);
 		const actions: LogActionResult[] = [];
 
-		const transports: Transport[] = [];
+		const transports: Map<string, Transport> = new Map();
 		let group = this as Log | null;
 
 		while (group) {
 			for (const transport of group.groupState.transports) {
-				transports.push(transport);
+				if (!transports.has(transport.id())) {
+					transports.set(transport.id(), transport);
+				}
 			}
 
 			group = group.groupState.parent;
 		}
 
-		for (const transport of transports) {
+		for (const [id, transport] of transports) {
 			if (this.canExecute(transport.level(), msgLevel)) {
 				const result: LogActionResult = transport.execute(message).then((res) => {
-					return [transport.id(), res];
+					return [id, res];
 				});
 				actions.push(result);
 			} else {
-				actions.push(Promise.resolve([transport.id(), false]));
+				actions.push(Promise.resolve([id, false]));
 			}
 		}
 
