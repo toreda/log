@@ -18,6 +18,7 @@
 			"coverage": true,
 			"**/dist": true
 
-		}
+		},
+		"workspace.isHidden": false
 	}
 }

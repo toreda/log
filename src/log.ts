@@ -198,6 +198,33 @@ export class Log {
 	}
 
 	/**
+	 * All Logs become disabled without changing
+	 * the state of each log individually.
+	 */
+	public enforceGlobalDisable(): void {
+		this.globalState.forceDisabled(true);
+		this.globalState.forceEnabled(false);
+	}
+
+	/**
+	 * All Logs become enabled without changing the
+	 * state of each log individually.
+	 */
+	public enforceGlobalEnable(): void {
+		this.globalState.forceEnabled(true);
+		this.globalState.forceDisabled(false);
+	}
+
+	/**
+	 * Both global enable and disable are turned
+	 * off. Logs rely on their own setting.
+	 */
+	public useGroupEnable(): void {
+		this.globalState.forceDisabled(false);
+		this.globalState.forceEnabled(false);
+	}
+
+	/**
 	 * Change global log level. Individual group levels
 	 * are used instead of global level when they are set.
 	 * @param level
@@ -316,7 +343,11 @@ export class Log {
 	 * @param msg
 	 */
 	public log(msgLevel: number, ...msg: unknown[]): Promise<boolean | LogResult> {
-		if (!this.groupState.enabled()) {
+		if (this.globalState.forceDisabled()) {
+			return Promise.resolve(false);
+		}
+
+		if (!this.groupState.enabled() && !this.globalState.forceEnabled()) {
 			return Promise.resolve(false);
 		}
 

@@ -20,6 +20,8 @@ export class LogStateGlobal extends StrongMap implements State {
 	public readonly groupsStartEnabled: StrongBoolean;
 	public readonly globalLevel: StrongLevel;
 	public readonly consoleEnabled: StrongBoolean;
+	public readonly forceEnabled: StrongBoolean;
+	public readonly forceDisabled: StrongBoolean;
 
 	public readonly groups: Map<string, Log>;
 
@@ -37,6 +39,9 @@ export class LogStateGlobal extends StrongMap implements State {
 		// Whether console output is enabled by default. If disabled,
 		// the built-in console transport can be activated at any time.
 		this.consoleEnabled = makeBoolean(false);
+
+		this.forceEnabled = makeBoolean(false);
+		this.forceDisabled = makeBoolean(false);
 
 		this.parse(options);
 
