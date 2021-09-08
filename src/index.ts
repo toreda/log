@@ -1,14 +1,12 @@
+export {Levels} from './levels';
 export {Log} from './log';
+export {LogLevel} from './log/level';
 export {LogOptions, LogOptionsGlobal, LogOptionsGroup} from './log/options';
 export {LogStateGlobal} from './log/state/global';
 export {LogStateGroup} from './log/state/group';
-
+export {logToConsole} from './console';
+export {Message} from './message';
 export {Transport} from './transport';
 export {TransportAction} from './transport/action';
-export {logToConsole} from './console';
-
-export {Message} from './message';
-
-export {LogLevel} from './log/level';
-export {Levels} from './levels';
+export {validId} from './valid/id';
 export {validLevel} from './valid/level';

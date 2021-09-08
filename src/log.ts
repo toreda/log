@@ -1,5 +1,6 @@
 import type {LogOptions, LogOptionsGroup} from './log/options';
 
+import {Defaults} from './defaults';
 import type {Expand} from '@toreda/types';
 import {Levels} from './levels';
 import {LogStateGlobal} from './log/state/global';
@@ -83,7 +84,8 @@ export class Log {
 			return preexistingGroup;
 		}
 
-		const level = options?.level ?? this.globalState.globalLevel;
+		const level =
+			options && validLevel(options.level) ? options.level : this.globalState.globalLevel.get();
 		const enabled = options?.enabled ?? this.globalState.groupsStartEnabled;
 
 		const group = new Log({state: this.globalState, id: groupId, parent: this, path, level, enabled});
