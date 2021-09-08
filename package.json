@@ -1,14 +1,16 @@
 {
 	"name": "@toreda/log",
-	"version": "0.5.4",
+	"version": "0.6.0",
 	"description": "Lightweight TypeScript logger with flexible custom transports.",
 	"main": "./dist/index.js",
 	"public": true,
 	"scripts": {
-		"build": "yarn lint && yarn tsc",
-		"lint": "yarn eslint src/**",
 		"test": "yarn jest --coverage",
-		"make:docs": "yarn typedoc docs --categorizeByGroup --entryPoints ./src/index.ts"
+		"make:docs": "yarn typedoc docs --categorizeByGroup --entryPoints ./src/index.ts",
+		"lint": "yarn lint:nofix",
+		"lint:nofix": "yarn eslint src/**.{js,ts} --quiet",
+		"lint:fix": "yarn eslint src/**/*.{js,ts,tsx} --quiet --fix",
+		"build": "yarn lint && yarn gulp"
 	},
 	"repository": {
 		"type": "git",
@@ -22,7 +24,6 @@
 		"typescript",
 		"serverless",
 		"web",
-		"stable",
 		"lightweight"
 	],
 	"author": "Toreda, Inc.",
@@ -48,9 +49,13 @@
 		"babel-jest": "^27.1.0",
 		"bufferutil": "^4.0.3",
 		"canvas": "^2.8.0",
+		"del": "^6.0.0",
 		"eslint": "^7.32.0",
 		"eslint-config-prettier": "^8.3.0",
 		"eslint-plugin-prettier": "^4.0.0",
+		"gulp": "^4.0.2",
+		"gulp-eslint": "^6.0.0",
+		"gulp-typescript": "^6.0.0-alpha.1",
 		"jest": "^27.1.0",
 		"jest-cli": "^27.1.0",
 		"jest-config": "^27.1.0",
