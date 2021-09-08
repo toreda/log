@@ -9,5 +9,6 @@ export {logToConsole} from './console';
 
 export {Message} from './message';
 
-export {StrongLevel, makeLevel} from './strong-level';
+export {LogLevel} from './log/level';
 export {Levels} from './levels';
+export {validLevel} from './valid/level';

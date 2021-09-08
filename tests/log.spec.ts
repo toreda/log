@@ -59,7 +59,7 @@ describe('Log', () => {
 		it(`should throw when 'state' is not a LogStateGlobal`, () => {
 			expect(() => {
 				new Log({state: {} as any});
-			}).toThrow(`Failed to create Log - 'state' was not an instance of LogStateGlobal.`);
+			}).toThrow(`Bad Log init - 'state' was not an instance of LogStateGlobal.`);
 		});
 	});
 
@@ -67,13 +67,13 @@ describe('Log', () => {
 		describe(`activateDefaultConsole`, () => {
 			it(`should create a transport with level arg`, () => {
 				const level = 13;
-				expect(level).not.toBe(log.globalState.globalLevel());
+				expect(level).not.toBe(log.globalState.globalLevel.get());
 				expect(log.groupState.transports.size).toBe(0);
 
 				log.activateDefaultConsole(level);
 
 				expect(log.groupState.transports.size).toBe(1);
-				expect(log.groupState.transports.values().next().value.level()).toBe(level);
+				expect(log.groupState.transports.values().next().value.level.get()).toBe(level);
 				log.reset();
 			});
 		});
@@ -100,7 +100,7 @@ describe('Log', () => {
 
 				expect(result).toBeInstanceOf(Log);
 
-				const groupId = result.groupState.id();
+				const groupId = result.groupState.id;
 				expect(log.globalState.groups.get(groupId)).toHaveProperty('groupState');
 			});
 		});
@@ -255,32 +255,32 @@ describe('Log', () => {
 		describe(`global levels`, () => {
 			describe('setGlobalLevel', () => {
 				it('should not change level when level arg is undefined', () => {
-					const expected = log.globalState.globalLevel();
+					const expected = log.globalState.globalLevel.get();
 
 					log.setGlobalLevel('adfjakha' as any);
 
-					expect(log.globalState.globalLevel()).toBe(expected);
+					expect(log.globalState.globalLevel.get()).toBe(expected);
 				});
 
 				it('should set global level to 0 when level arg is NONE', () => {
-					expect(log.globalState.globalLevel()).not.toBe(Levels.NONE);
+					expect(log.globalState.globalLevel.get()).not.toBe(Levels.NONE);
 
 					log.setGlobalLevel(Levels.NONE);
 
-					expect(log.globalState.globalLevel()).toBe(0);
+					expect(log.globalState.globalLevel.get()).toBe(0);
 				});
 
 				for (const level of LOG_LEVELS) {
 					it(`should set level to ${level}`, () => {
-						expect(log.globalState.globalLevel()).not.toBe(level);
+						expect(log.globalState.globalLevel.get()).not.toBe(level);
 						log.setGlobalLevel(level);
-						expect(log.globalState.globalLevel()).toBe(level);
+						expect(log.globalState.globalLevel.get()).toBe(level);
 					});
 				}
 			});
 
 			it(`should call enableLogLevel`, () => {
-				const spy = jest.spyOn(log.globalState.globalLevel, 'enableLogLevel');
+				const spy = jest.spyOn(log.globalState.globalLevel, 'enableLevel');
 				expect(spy).not.toBeCalled();
 
 				log.enableGlobalLevel(1);
@@ -289,7 +289,7 @@ describe('Log', () => {
 			});
 
 			it(`should call enableMultipleLevels`, () => {
-				const spy = jest.spyOn(log.globalState.globalLevel, 'enableMultipleLevels');
+				const spy = jest.spyOn(log.globalState.globalLevel, 'enableLevels');
 				expect(spy).not.toBeCalled();
 
 				log.enableGlobalLevels([1]);
@@ -298,7 +298,7 @@ describe('Log', () => {
 			});
 
 			it(`should call disableLogLevel`, () => {
-				const spy = jest.spyOn(log.globalState.globalLevel, 'disableLogLevel');
+				const spy = jest.spyOn(log.globalState.globalLevel, 'disableLevel');
 				expect(spy).not.toBeCalled();
 
 				log.disableGlobalLevel(1);
@@ -307,7 +307,7 @@ describe('Log', () => {
 			});
 
 			it(`should call disableMultipleLevels`, () => {
-				const spy = jest.spyOn(log.globalState.globalLevel, 'disableMultipleLevels');
+				const spy = jest.spyOn(log.globalState.globalLevel, 'disableLevels');
 				expect(spy).not.toBeCalled();
 
 				log.disableGlobalLevels([1]);
@@ -323,22 +323,22 @@ describe('Log', () => {
 				});
 
 				it('should not change group level when level arg is undefined', () => {
-					log.groupState.level(Levels.TRACE);
+					log.groupState.level.set(Levels.TRACE);
 					log.setGroupLevel(undefined as any);
-					expect(log.groupState.level()).toBe(Levels.TRACE);
+					expect(log.groupState.level.get()).toBe(Levels.TRACE);
 				});
 
 				for (const level of LOG_LEVELS) {
 					it(`should set group level to ${level} set to ${level}`, () => {
-						expect(log.groupState.level()).toBe(Levels.ERROR);
+						expect(log.groupState.level.get()).toBe(Levels.ERROR);
 						log.setGroupLevel(level);
-						expect(log.groupState.level()).toBe(level);
+						expect(log.groupState.level.get()).toBe(level);
 					});
 				}
 			});
 
 			it(`should call enableLogLevel`, () => {
-				const spy = jest.spyOn(log.groupState.level, 'enableLogLevel');
+				const spy = jest.spyOn(log.groupState.level, 'enableLevel');
 				expect(spy).not.toBeCalled();
 
 				log.enableGroupLevel(1);
@@ -347,7 +347,7 @@ describe('Log', () => {
 			});
 
 			it(`should call enableMultipleLevels`, () => {
-				const spy = jest.spyOn(log.groupState.level, 'enableMultipleLevels');
+				const spy = jest.spyOn(log.groupState.level, 'enableLevels');
 				expect(spy).not.toBeCalled();
 
 				log.enableGroupLevels([1]);
@@ -356,7 +356,7 @@ describe('Log', () => {
 			});
 
 			it(`should call disableLogLevel`, () => {
-				const spy = jest.spyOn(log.groupState.level, 'disableLogLevel');
+				const spy = jest.spyOn(log.groupState.level, 'disableLevel');
 				expect(spy).not.toBeCalled();
 
 				log.disableGroupLevel(1);
@@ -365,7 +365,7 @@ describe('Log', () => {
 			});
 
 			it(`should call disableMultipleLevels`, () => {
-				const spy = jest.spyOn(log.groupState.level, 'disableMultipleLevels');
+				const spy = jest.spyOn(log.groupState.level, 'disableLevels');
 				expect(spy).not.toBeCalled();
 
 				log.disableGroupLevels([1]);
@@ -425,17 +425,17 @@ describe('Log', () => {
 			});
 
 			it('should return false when group is not enabled', () => {
-				ceLog.groupState.enabled(false);
+				ceLog.groupState.enabled = false;
 
-				const result = ceLog['canExecute'](TRANSPORT.level(), Levels.ALL);
-				ceLog.groupState.enabled(true);
+				const result = ceLog['canExecute'](TRANSPORT.level.get(), Levels.ALL);
+				ceLog.groupState.enabled = true;
 
 				expect(result).toBe(false);
 			});
 
 			const BadMsgLevels: any[] = [-1, 0, 0.5, 5.7, '1'];
 			it.each(BadMsgLevels)(`should return false: msgLevel '%p' not a positive integer`, (level) => {
-				const result = ceLog['canExecute'](TRANSPORT.level(), level);
+				const result = ceLog['canExecute'](TRANSPORT.level.get(), level);
 
 				expect(result).toBe(false);
 			});
@@ -444,26 +444,26 @@ describe('Log', () => {
 				ceLog.setGlobalLevel(0);
 				ceLog.setGroupLevel(0);
 
-				const result = ceLog['canExecute'](TRANSPORT.level(), Levels.ALL);
+				const result = ceLog['canExecute'](TRANSPORT.level.get(), Levels.ALL);
 
 				expect(result).toBe(false);
 			});
 
 			it(`should return false when transport level does not match active levels`, () => {
-				TRANSPORT.level(0b0001);
-				expect(TRANSPORT.level() & ceLog.groupState.level()).toBe(0);
+				TRANSPORT.level.set(0b0001);
+				expect(TRANSPORT.level.get() & ceLog.groupState.level.get()).toBe(0);
 
-				const result = ceLog['canExecute'](TRANSPORT.level(), Levels.ALL);
-				TRANSPORT.level(Levels.ALL);
+				const result = ceLog['canExecute'](TRANSPORT.level.get(), Levels.ALL);
+				TRANSPORT.level.set(Levels.ALL);
 
 				expect(result).toBe(false);
 			});
 
 			it(`should return false when msgLevel does not match transport level`, () => {
 				const msgLevel = Levels.ALL_CUSTOM;
-				expect(TRANSPORT.level() & msgLevel).toBe(0);
+				expect(TRANSPORT.level.get() & msgLevel).toBe(0);
 
-				const result = ceLog['canExecute'](TRANSPORT.level(), msgLevel);
+				const result = ceLog['canExecute'](TRANSPORT.level.get(), msgLevel);
 
 				expect(result).toBe(false);
 			});
@@ -471,9 +471,9 @@ describe('Log', () => {
 			it(`should return true when global/group, transport, and message all share a level`, () => {
 				ceLog.setGroupLevel(Levels.ALL);
 				const msgLevel = Levels.WARN;
-				expect(msgLevel & TRANSPORT.level() & ceLog.groupState.level()).toBeGreaterThan(0);
+				expect(msgLevel & TRANSPORT.level.get() & ceLog.groupState.level.get()).toBeGreaterThan(0);
 
-				const result = ceLog['canExecute'](TRANSPORT.level(), msgLevel);
+				const result = ceLog['canExecute'](TRANSPORT.level.get(), msgLevel);
 
 				expect(result).toBe(true);
 			});
@@ -501,18 +501,18 @@ describe('Log', () => {
 			});
 
 			it('should not attempt to execute any transports when log is not enabled', async () => {
-				log.groupState.enabled(false);
+				log.groupState.enabled = false;
 				expect(executeSpy).not.toHaveBeenCalled();
 
 				await log.log(Levels.ALL, '33333333333');
-				log.groupState.enabled(true);
+				log.groupState.enabled = true;
 
 				expect(executeSpy).not.toHaveBeenCalled();
 			});
 
 			it('should only execute transports matching log level', async () => {
 				expect(ACTION).not.toHaveBeenCalled();
-				TRANSPORT.level(Levels.DEBUG);
+				TRANSPORT.level.set(Levels.DEBUG);
 				log.setGlobalLevel(Levels.NONE);
 				log.setGroupLevel(Levels.WARN);
 				const oppositeTransport = new Transport('opposite', Levels.WARN, ACTION);
@@ -525,7 +525,7 @@ describe('Log', () => {
 
 				expect(ACTION).toHaveBeenCalledTimes(1);
 
-				TRANSPORT.level(Levels.ALL);
+				TRANSPORT.level.set(Levels.ALL);
 			});
 
 			it(`should not throw when transport throws`, (done) => {

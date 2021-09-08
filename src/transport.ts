@@ -1,14 +1,12 @@
-import {makeString} from '@toreda/strong-types';
-import type {StrongString} from '@toreda/strong-types';
-import type {TransportAction} from './transport/action';
+import {LogLevel} from './log/level';
 import type {Message} from './message';
-import {makeLevel} from './strong-level';
-import type {StrongLevel} from './strong-level';
+//import type {StrongLevel} from './strong-level';
+import type {TransportAction} from './transport/action';
 
 export class Transport {
-	public readonly id: StrongString;
+	public readonly id: string;
 	public readonly action: TransportAction;
-	public readonly level: StrongLevel;
+	public readonly level: LogLevel;
 
 	constructor(id: string, level: number, action: TransportAction) {
 		if (!id && typeof id !== 'string') {
@@ -27,9 +25,9 @@ export class Transport {
 			throw new Error(`[logtr:${id}] Init failure - action arg must be a function.`);
 		}
 
-		this.id = makeString(id);
+		this.id = id;
 		this.action = action;
-		this.level = makeLevel(level);
+		this.level = new LogLevel(level);
 	}
 
 	public execute(msg: Message): Promise<boolean | Error> {

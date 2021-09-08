@@ -1,4 +1,5 @@
 import {Levels} from '../src/levels';
+import {LogLevel} from '../src/log/level';
 import {Message} from '../src/message';
 import {Transport} from '../src/transport';
 import {TransportAction} from '../src/transport/action';

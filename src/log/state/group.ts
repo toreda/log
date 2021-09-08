@@ -1,36 +1,32 @@
-import {StrongMap, makeBoolean, makeString} from '@toreda/strong-types';
-import type {RecordToStrong, StrongBoolean, StrongString} from '@toreda/strong-types';
+import {Defaults} from '../../defaults';
 import {Levels} from '../../levels';
 import type {Log} from '../../log';
-import {makeLevel} from '../../strong-level';
-import type {StrongLevel} from '../../strong-level';
-import type {Transport} from '../../transport';
+import {LogLevel} from '../level';
 import type {LogOptionsGroup} from '../options';
+import type {Transport} from '../../transport';
+import {validId} from '../../valid/id';
+import {validLevel} from '../../valid/level';
 
 type KeysExludedFromOptions = 'state';
 type Options = Omit<LogOptionsGroup, KeysExludedFromOptions>;
 type KeysExludedFromState = KeysExludedFromOptions | 'parent';
-type State = RecordToStrong<Omit<LogOptionsGroup, KeysExludedFromState>>;
 
-export class LogStateGroup extends StrongMap implements State {
-	public readonly id: StrongString;
-	public readonly enabled: StrongBoolean;
-	public readonly level: StrongLevel;
-	public readonly parent: Log | null;
+export class LogStateGroup {
+	public readonly id: string;
+	public enabled: boolean;
+	public level: LogLevel;
+	public parent: Log | null;
 	public readonly path: string[];
 
 	public readonly transports: Set<Transport>;
 
 	constructor(options: Options) {
-		super();
-
-		this.id = makeString('');
-		this.enabled = makeBoolean(false);
-		this.level = makeLevel(Levels.ERROR);
+		this.id = validId(options.id) ? options.id : Defaults.GroupId;
+		this.enabled = options.enabled === true ? true : false;
+		const logLevel = validLevel(options.level) ? options.level : Levels.ERROR;
+		this.level = new LogLevel(logLevel);
 		this.parent = options.parent ?? null;
 		this.path = options.path ?? [];
-
-		this.parse(options);
 
 		this.transports = new Set();
 	}

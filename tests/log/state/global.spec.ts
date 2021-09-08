@@ -11,7 +11,7 @@ describe('LogStateGlobal', () => {
 					id: 'custom'
 				});
 
-				expect(custom.groupsStartEnabled()).toBe(defaultValue);
+				expect(custom.groupsStartEnabled).toBe(defaultValue);
 			});
 
 			it(`should set groupsStartEnabled to true when option.groupsStartEnabled is true`, () => {
@@ -22,7 +22,7 @@ describe('LogStateGlobal', () => {
 					groupsStartEnabled: true
 				});
 
-				expect(custom.groupsStartEnabled()).toBe(expected);
+				expect(custom.groupsStartEnabled).toBe(expected);
 			});
 
 			it(`should set groupsStartEnabled to false when option.groupsStartEnabled is false`, () => {
@@ -33,7 +33,7 @@ describe('LogStateGlobal', () => {
 					groupsStartEnabled: false
 				});
 
-				expect(custom.groupsStartEnabled()).toBe(expected);
+				expect(custom.groupsStartEnabled).toBe(expected);
 			});
 
 			it(`should set groupsStartEnabled to defaultValue when option.groupsStartEnabled is non-boolean truthy `, () => {
@@ -42,7 +42,7 @@ describe('LogStateGlobal', () => {
 					groupsStartEnabled: 14971 as any
 				});
 
-				expect(custom.groupsStartEnabled()).toBe(defaultValue);
+				expect(custom.groupsStartEnabled).toBe(defaultValue);
 			});
 		});
 
@@ -54,7 +54,7 @@ describe('LogStateGlobal', () => {
 					id: 'custom'
 				});
 
-				expect(custom.globalLevel()).toBe(defaultValue);
+				expect(custom.globalLevel.get()).toBe(defaultValue);
 			});
 
 			it(`should set globalLevel to '111' when option.globalLevel is '111'`, () => {
@@ -65,7 +65,7 @@ describe('LogStateGlobal', () => {
 					globalLevel: expected
 				});
 
-				expect(custom.globalLevel()).toBe(expected);
+				expect(custom.globalLevel.get()).toBe(expected);
 			});
 
 			it(`should set globalLevel to defaultValue when option.globalLevel is NaN `, () => {
@@ -74,7 +74,7 @@ describe('LogStateGlobal', () => {
 					globalLevel: NaN
 				});
 
-				expect(custom.globalLevel()).toBe(defaultValue);
+				expect(custom.globalLevel.get()).toBe(defaultValue);
 			});
 
 			it(`should set globalLevel to defaultValue when option.globalLevel is a string `, () => {
@@ -83,7 +83,7 @@ describe('LogStateGlobal', () => {
 					globalLevel: '14971' as any
 				});
 
-				expect(custom.globalLevel()).toBe(defaultValue);
+				expect(custom.globalLevel.get()).toBe(defaultValue);
 			});
 
 			it(`should set globalLevel to defaultValue when option.globalLevel is a negative number `, () => {
@@ -92,7 +92,7 @@ describe('LogStateGlobal', () => {
 					globalLevel: -145
 				});
 
-				expect(custom.globalLevel()).toBe(defaultValue);
+				expect(custom.globalLevel.get()).toBe(defaultValue);
 			});
 		});
 
@@ -104,7 +104,7 @@ describe('LogStateGlobal', () => {
 					id: 'custom'
 				});
 
-				expect(custom.consoleEnabled()).toBe(defaultValue);
+				expect(custom.consoleEnabled).toBe(defaultValue);
 			});
 
 			it(`should set consoleEnabled to true when option.consoleEnabled is true`, () => {
@@ -115,7 +115,7 @@ describe('LogStateGlobal', () => {
 					consoleEnabled: true
 				});
 
-				expect(custom.consoleEnabled()).toBe(expected);
+				expect(custom.consoleEnabled).toBe(expected);
 			});
 
 			it(`should set consoleEnabled to false when option.consoleEnabled is false`, () => {
@@ -126,7 +126,7 @@ describe('LogStateGlobal', () => {
 					consoleEnabled: false
 				});
 
-				expect(custom.consoleEnabled()).toBe(expected);
+				expect(custom.consoleEnabled).toBe(expected);
 			});
 
 			it(`should set consoleEnabled to defaultValue when option.consoleEnabled is non-boolean truthy `, () => {
@@ -135,7 +135,7 @@ describe('LogStateGlobal', () => {
 					consoleEnabled: 14971 as any
 				});
 
-				expect(custom.consoleEnabled()).toBe(defaultValue);
+				expect(custom.consoleEnabled).toBe(defaultValue);
 			});
 		});
 

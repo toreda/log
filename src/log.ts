@@ -1,13 +1,13 @@
-import {isType} from '@toreda/strong-types';
-import type {Expand} from '@toreda/types';
-import {logToConsole} from './console';
-import {Levels} from './levels';
 import type {LogOptions, LogOptionsGroup} from './log/options';
+
+import type {Expand} from '@toreda/types';
+import {Levels} from './levels';
 import {LogStateGlobal} from './log/state/global';
 import {LogStateGroup} from './log/state/group';
 import type {Message} from './message';
-import {isPositiveInteger} from './strong-level';
 import {Transport} from './transport';
+import {logToConsole} from './console';
+import {validLevel} from './valid/level';
 
 /**
  * Main log class holding attached transports and internal state
@@ -29,22 +29,23 @@ export class Log {
 			path = options?.id ? [options.id] : [];
 			this.globalState = new LogStateGlobal(options);
 			this.globalState.groups.set(options?.id ?? 'default', this);
-			level = this.globalState.globalLevel();
-			enabled = this.globalState.groupsStartEnabled();
-		} else if (isType(options.state, LogStateGlobal)) {
+			level = this.globalState.globalLevel.get();
+			this.globalState.globalLevel.set(level);
+			enabled = this.globalState.groupsStartEnabled;
+		} else if (options.state instanceof LogStateGlobal) {
 			this.globalState = options.state;
 			parent = options.parent;
 			path = options.id.split('.');
 			level = options.level;
 			enabled = options.enabled;
 		} else {
-			throw Error(`Failed to create Log - 'state' was not an instance of LogStateGlobal.`);
+			throw Error(`Bad Log init - 'state' was not an instance of LogStateGlobal.`);
 		}
 
 		this.groupState = new LogStateGroup({id: path.join('.'), parent, path, level, enabled});
 
 		// Activate console logging if allowed by start options.
-		if (this.globalState.consoleEnabled()) {
+		if (this.globalState.consoleEnabled) {
 			this.activateDefaultConsole();
 		}
 	}
@@ -53,7 +54,7 @@ export class Log {
 	 * Enable global console logging for development and debugging.
 	 */
 	public activateDefaultConsole(level?: number): void {
-		level = level ?? this.globalState.globalLevel();
+		level = level ?? this.globalState.globalLevel.get();
 		const transport = new Transport('console', level, logToConsole);
 		this.addTransport(transport);
 	}
@@ -82,8 +83,8 @@ export class Log {
 			return preexistingGroup;
 		}
 
-		const level = options?.level ?? this.globalState.globalLevel();
-		const enabled = options?.enabled ?? this.globalState.groupsStartEnabled();
+		const level = options?.level ?? this.globalState.globalLevel;
+		const enabled = options?.enabled ?? this.globalState.groupsStartEnabled;
 
 		const group = new Log({state: this.globalState, id: groupId, parent: this, path, level, enabled});
 		this.globalState.groups.set(groupId, group);
@@ -143,7 +144,7 @@ export class Log {
 		for (const transport of this.groupState.transports) {
 			// Remove matching transport and exit. Only one
 			// of each transport can be added to a group.
-			if (transport.id() === transportId) {
+			if (transport.id === transportId) {
 				this.groupState.transports.delete(transport);
 				return true;
 			}
@@ -182,7 +183,7 @@ export class Log {
 	 * @param transport
 	 */
 	public removeTransportEverywhere(transport: Transport): boolean {
-		if (!transport || !isType(transport, Transport)) {
+		if (!transport || !(transport instanceof Transport)) {
 			return false;
 		}
 
@@ -202,8 +203,8 @@ export class Log {
 	 * the state of each log individually.
 	 */
 	public enforceGlobalDisable(): void {
-		this.globalState.forceDisabled(true);
-		this.globalState.forceEnabled(false);
+		this.globalState.forceDisabled = true;
+		this.globalState.forceEnabled = false;
 	}
 
 	/**
@@ -211,8 +212,8 @@ export class Log {
 	 * state of each log individually.
 	 */
 	public enforceGlobalEnable(): void {
-		this.globalState.forceEnabled(true);
-		this.globalState.forceDisabled(false);
+		this.globalState.forceEnabled = true;
+		this.globalState.forceDisabled = false;
 	}
 
 	/**
@@ -220,8 +221,8 @@ export class Log {
 	 * off. Logs rely on their own setting.
 	 */
 	public useGroupEnable(): void {
-		this.globalState.forceDisabled(false);
-		this.globalState.forceEnabled(false);
+		this.globalState.forceDisabled = false;
+		this.globalState.forceEnabled = false;
 	}
 
 	/**
@@ -230,7 +231,7 @@ export class Log {
 	 * @param level
 	 */
 	public setGlobalLevel(level: number): void {
-		this.globalState.globalLevel(level);
+		this.globalState.globalLevel.set(level);
 	}
 
 	/**
@@ -240,7 +241,7 @@ export class Log {
 	 * @param level
 	 */
 	public enableGlobalLevel(level: number): void {
-		this.globalState.globalLevel.enableLogLevel(level);
+		this.globalState.globalLevel.enableLevel(level);
 	}
 
 	/**
@@ -250,15 +251,15 @@ export class Log {
 	 * @param levels
 	 */
 	public enableGlobalLevels(levels: number[]): void {
-		this.globalState.globalLevel.enableMultipleLevels(levels);
+		this.globalState.globalLevel.enableLevels(levels);
 	}
 
 	public disableGlobalLevel(level: number): void {
-		this.globalState.globalLevel.disableLogLevel(level);
+		this.globalState.globalLevel.disableLevel(level);
 	}
 
 	public disableGlobalLevels(levels: number[]): void {
-		this.globalState.globalLevel.disableMultipleLevels(levels);
+		this.globalState.globalLevel.disableLevels(levels);
 	}
 
 	/**
@@ -267,23 +268,23 @@ export class Log {
 	 * @param id
 	 */
 	public setGroupLevel(level: number): void {
-		this.groupState.level(level);
+		this.groupState.level.set(level);
 	}
 
 	public enableGroupLevel(level: number): void {
-		this.groupState.level.enableLogLevel(level);
+		this.groupState.level.enableLevel(level);
 	}
 
 	public enableGroupLevels(levels: number[]): void {
-		this.groupState.level.enableMultipleLevels(levels);
+		this.groupState.level.enableLevels(levels);
 	}
 
 	public disableGroupLevel(level: number): void {
-		this.groupState.level.disableLogLevel(level);
+		this.groupState.level.disableLevel(level);
 	}
 
 	public disableGroupLevels(levels: number[]): void {
-		this.groupState.level.disableMultipleLevels(levels);
+		this.groupState.level.disableLevels(levels);
 	}
 
 	/**
@@ -320,19 +321,19 @@ export class Log {
 	 * @param msgLevel
 	 */
 	private canExecute(transportLevel: number, msgLevel: number): boolean {
-		if (!this.groupState.enabled()) {
+		if (!this.groupState.enabled === true) {
 			return false;
 		}
 
-		if (!isPositiveInteger(transportLevel)) {
+		if (!validLevel(transportLevel)) {
 			return false;
 		}
 
-		if (!isPositiveInteger(msgLevel)) {
+		if (!validLevel(msgLevel)) {
 			return false;
 		}
 
-		const activeMask = this.globalState.globalLevel() | this.groupState.level();
+		const activeMask = this.globalState.globalLevel.get() | this.groupState.level.get();
 
 		return (activeMask & transportLevel & msgLevel) > 0;
 	}
@@ -343,15 +344,15 @@ export class Log {
 	 * @param msg
 	 */
 	public log(msgLevel: number, ...msg: unknown[]): Promise<boolean | LogResult> {
-		if (this.globalState.forceDisabled()) {
+		if (this.globalState.forceDisabled) {
 			return Promise.resolve(false);
 		}
 
-		if (!this.groupState.enabled() && !this.globalState.forceEnabled()) {
+		if (!this.groupState.enabled && !this.globalState.forceEnabled) {
 			return Promise.resolve(false);
 		}
 
-		if (!isPositiveInteger(msgLevel)) {
+		if (!validLevel(msgLevel)) {
 			return Promise.resolve(false);
 		}
 
@@ -363,8 +364,8 @@ export class Log {
 
 		while (group) {
 			for (const transport of group.groupState.transports) {
-				if (!transports.has(transport.id())) {
-					transports.set(transport.id(), transport);
+				if (!transports.has(transport.id)) {
+					transports.set(transport.id, transport);
 				}
 			}
 
@@ -372,7 +373,7 @@ export class Log {
 		}
 
 		for (const [id, transport] of transports) {
-			if (this.canExecute(transport.level(), msgLevel)) {
+			if (this.canExecute(transport.level.get(), msgLevel)) {
 				const result: LogActionResult = transport.execute(message).then((res) => {
 					return [id, res];
 				});
