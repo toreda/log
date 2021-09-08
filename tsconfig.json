@@ -1,37 +1,26 @@
 {
-	"exclude": [
-		"node_modules",
-		"**/*.spec.ts",
-		"tests",
-		"dist/**"
-	],
-	"include": [
-		"**/src/index.ts"
-	],
-	"filesGlob": [
-		"./src/**/*.ts",
-		"!./node_modules/**"
-	],
-	"rootDir": ".",
+	"exclude": ["node_modules", "**/*.spec.ts", "tests", "dist/**"],
+	"include": ["**/src/index.ts", "./src/**.ts"],
+	"filesGlob": ["./src/**.ts", "!./node_modules/**"],
 	"compilerOptions": {
+		"baseUrl": ".",
 		"allowUnreachableCode": false,
 		"alwaysStrict": true,
-		"baseUrl": ".",
 		"declaration": true,
 		"esModuleInterop": true,
 		"isolatedModules": false,
-		"lib": ["es6", "dom"],
+		"lib": ["es6", "ES2015", "ES2017.TypedArrays"],
 		"module": "commonjs",
 		"moduleResolution": "node",
 		"noImplicitUseStrict": false,
 		"outDir": "./dist",
 		"preserveConstEnums": true,
-		"removeComments": true,
-		"sourceMap": true,
+		"removeComments": false,
+		"rootDir": "./src",
 		"strictBindCallApply": true,
 		"strictNullChecks": true,
 		"strictPropertyInitialization": true,
 		"target": "es6",
-		"traceResolution": false,
+		"traceResolution": false
 	}
 }

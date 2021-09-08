@@ -1,5 +1,5 @@
 //const eslint = require('gulp-eslint');
-import gulp, {series} from 'gulp';
+import gulp, {dest, series, src} from 'gulp';
 
 import del from 'del';
 import ts from 'gulp-typescript';
@@ -18,7 +18,7 @@ function cleanDist() {
 
 function buildSrc() {
 	// Build typescript sources and output them in './dist'.
-	return tsc.src().pipe(tsc()).js.pipe(gulp.dest('dist'));
+	return src(['src/**.ts', 'src/**/*.ts']).pipe(tsc()).pipe(dest('dist'));
 }
 
 exports.default = series(createDist, cleanDist, buildSrc);
