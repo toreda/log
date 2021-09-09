@@ -1,6 +1,5 @@
 import type {LogOptions, LogOptionsGroup} from './log/options';
 
-import {Defaults} from './defaults';
 import type {Expand} from '@toreda/types';
 import {Levels} from './levels';
 import {LogStateGlobal} from './log/state/global';

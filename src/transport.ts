@@ -1,6 +1,5 @@
 import {LogLevel} from './log/level';
 import type {Message} from './message';
-//import type {StrongLevel} from './strong-level';
 import type {TransportAction} from './transport/action';
 
 export class Transport {

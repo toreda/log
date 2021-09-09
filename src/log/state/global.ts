@@ -3,7 +3,7 @@ import type {Log} from '../../log';
 import {LogLevel} from '../level';
 import type {LogOptionsGlobal} from '../options';
 import {LogState} from '../../log/state';
-import {validLevel} from '../../../src/valid/level';
+import {validLevel} from '../../valid/level';
 
 type KeysExludedFromOptions = 'state' | 'path';
 type Options = Omit<LogOptionsGlobal, KeysExludedFromOptions>;

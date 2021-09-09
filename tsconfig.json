@@ -22,5 +22,11 @@
 		"strictPropertyInitialization": true,
 		"target": "es2015",
 		"traceResolution": false
+	},
+	"ts-node": {
+		"module": "commonjs"
+	},
+	"ts-jest": {
+		"module": "commonjs"
 	}
 }
