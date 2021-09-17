@@ -25,7 +25,7 @@ export class LogStateGlobal implements LogState {
 		// Check whether groups should start enabled or disabled.
 		// Disabled groups do not process logs, even if the group log level
 		// or global log level would otherwise allow it.
-		this.groupsStartEnabled = options.groupsStartEnabled === true ? true : false;
+		this.groupsStartEnabled = options.groupsStartEnabled === false ? false : true;
 
 		// Starting Global log level
 		const defaultLevel = Levels.ALL & ~Levels.DEBUG & ~Levels.TRACE;

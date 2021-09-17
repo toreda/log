@@ -12,19 +12,19 @@ export function logToConsole(msg: Message): boolean {
 
 	switch (msg.level) {
 		case Levels.ERROR:
-			console.error(`[${path}][ERROR]`, msg.message);
+			console.error(`[ERROR][${path}]`, msg.message);
 			break;
 		case Levels.WARN:
-			console.warn(`[${path}][WARN]`, msg.message);
+			console.warn(`[WARN][${path}]`, msg.message);
 			break;
 		case Levels.INFO:
-			console.info(`[${path}][INFO]`, msg.message);
+			console.info(`[INFO][${path}]`, msg.message);
 			break;
 		case Levels.DEBUG:
-			console.debug(`[${path}][DEBUG]`, msg.message);
+			console.debug(`[DEBUG][${path}]`, msg.message);
 			break;
 		case Levels.TRACE:
-			console.trace(`[${path}][TRACE]`, msg.message);
+			console.trace(`[TRACE][${path}]`, msg.message);
 			break;
 		default:
 			console.log(`[${path}][${msg.level}]`, msg.message);

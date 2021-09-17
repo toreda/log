@@ -322,7 +322,11 @@ export class Log {
 	 * @param msgLevel
 	 */
 	private canExecute(transportLevel: number, msgLevel: number): boolean {
-		if (!this.groupState.enabled === true) {
+		if (this.globalState.forceDisabled) {
+			return false;
+		}
+
+		if (!this.globalState.forceEnabled && !this.groupState.enabled) {
 			return false;
 		}
 
