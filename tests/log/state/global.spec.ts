@@ -4,7 +4,7 @@ import {LogStateGlobal} from '../../../src/log/state/global';
 describe('LogStateGlobal', () => {
 	describe('Constructor', () => {
 		describe(`groupsStartEnabled`, () => {
-			const defaultValue = false;
+			const defaultValue = true;
 
 			it(`should set groupsStartEnabled to defaultValue when option.groupsStartEnabled is not provided`, () => {
 				const custom = new LogStateGlobal({
