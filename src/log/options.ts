@@ -9,8 +9,11 @@ export type LogOptions = Expand<Required<LogOptionsGroup> | LogOptionsGlobal>;
  */
 export interface LogOptionsGlobal {
 	state?: undefined;
-
 	id?: string;
+	parent?: undefined;
+	path?: undefined;
+	enabled?: undefined;
+	level?: undefined;
 
 	consoleEnabled?: boolean;
 	globalLevel?: number;
