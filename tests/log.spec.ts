@@ -64,17 +64,87 @@ describe('Log', () => {
 	});
 
 	describe('Implementation', () => {
-		describe(`activateDefaultConsole`, () => {
-			it(`should create a transport with level arg`, () => {
-				const level = 13;
-				expect(level).not.toBe(log.globalState.globalLevel.get());
-				expect(log.groupState.transports.size).toBe(0);
+		describe(`DefaultConsole`, () => {
+			describe(`activateDefaultConsole`, () => {
+				it(`should create a transport with level arg`, () => {
+					const level = 13;
+					expect(level).not.toBe(log.globalState.globalLevel.get());
+					expect(log.groupState.transports.size).toBe(0);
 
-				log.activateDefaultConsole(level);
+					log.activateDefaultConsole(level);
 
-				expect(log.groupState.transports.size).toBe(1);
-				expect(log.groupState.transports.values().next().value.level.get()).toBe(level);
-				log.reset();
+					expect(log.groupState.transports.size).toBe(1);
+					expect(log.groupState.transports.values().next().value.level.get()).toBe(level);
+					log.reset();
+				});
+			});
+
+			describe(`deactiveDefaultConsole`, () => {
+				it(`should remove transport with id 'console' from log`, () => {
+					log.activateDefaultConsole();
+
+					expect(log.getTransport('console')).not.toBeNull();
+
+					log.deactivateDefaultConsole();
+
+					expect(log.getTransport('console')).toBeNull();
+
+					log.groupState.transports.clear();
+				});
+			});
+
+			describe(`setLevelDefaultConsole`, () => {
+				it(`should set the level of 'console'`, () => {
+					const startingLevel = 5;
+					const changedLevel = startingLevel * 2;
+
+					log.activateDefaultConsole(startingLevel);
+
+					log.setLevelDefaultConsole(changedLevel);
+
+					const transport = log.getTransport('console');
+					const result = transport?.level.get();
+
+					expect(result).toBe(changedLevel);
+
+					log.groupState.transports.clear();
+				});
+			});
+
+			describe(`enableLevelDefaultConsole`, () => {
+				it(`should add the level to 'console'`, () => {
+					const startingLevel = 0b10101;
+					const addedLevel = 0b00010;
+					const totalLevel = startingLevel | addedLevel;
+
+					log.activateDefaultConsole(startingLevel);
+
+					log.enableLevelDefaultConsole(addedLevel);
+
+					const transport = log.getTransport('console')!;
+					const result = transport.level.get();
+
+					expect(result).toBe(totalLevel);
+					log.groupState.transports.clear();
+				});
+			});
+
+			describe(`disableLevelDefaultConsole`, () => {
+				it(`should remove the level from 'console'`, () => {
+					const startingLevel = 0b10101;
+					const removedLevel = 0b00100;
+					const totalLevel = startingLevel ^ removedLevel;
+
+					log.activateDefaultConsole(startingLevel);
+
+					log.disableLevelDefaultConsole(removedLevel);
+
+					const transport = log.getTransport('console')!;
+					const result = transport.level.get();
+
+					expect(result).toBe(totalLevel);
+					log.groupState.transports.clear();
+				});
 			});
 		});
 
@@ -105,150 +175,172 @@ describe('Log', () => {
 			});
 		});
 
-		describe('addTransport', () => {
-			it('should not add the same transport more than once', () => {
-				log.addTransport(TRANSPORT);
+		describe(`Transports`, () => {
+			describe('addTransport', () => {
+				it('should not add the same transport more than once', () => {
+					log.addTransport(TRANSPORT);
 
-				for (let i = 0; i < 5; i++) {
-					expect(log.addTransport(TRANSPORT)).toBe(false);
-				}
+					for (let i = 0; i < 5; i++) {
+						expect(log.addTransport(TRANSPORT)).toBe(false);
+					}
 
-				log.clear();
+					log.clear();
+				});
+
+				it('should return false and should not add a transport when transport arg is undefined', () => {
+					expect(log.groupState.transports.size).toBe(0);
+
+					expect(log.addTransport(undefined as any)).toBe(false);
+
+					expect(log.groupState.transports.size).toBe(0);
+				});
+
+				it('should return false and should not add a transport when transport arg is null', () => {
+					expect(log.groupState.transports.size).toBe(0);
+
+					expect(log.addTransport(null as any)).toBe(false);
+
+					expect(log.groupState.transports.size).toBe(0);
+				});
+
+				it(`should add transport to group`, () => {
+					const transport = new Transport('11097141', Levels.ALL, ACTION);
+					expect(log.groupState.transports.size).toBe(0);
+
+					log.addTransport(transport);
+
+					expect(log.groupState.transports.size).toBe(1);
+					log.clear();
+				});
 			});
 
-			it('should return false and should not add a transport when transport arg is undefined', () => {
-				expect(log.groupState.transports.size).toBe(0);
+			describe(`getTransport`, () => {
+				it(`should return transport if one matching transportId exists`, () => {
+					log.addTransport(TRANSPORT);
 
-				expect(log.addTransport(undefined as any)).toBe(false);
+					const result = log.getTransport(TRANSPORT.id);
 
-				expect(log.groupState.transports.size).toBe(0);
+					expect(result).toBe(TRANSPORT);
+
+					log.groupState.transports.clear();
+				});
+
+				it(`should return null if no matching transport exists`, () => {
+					expect(log.groupState.transports.has(TRANSPORT)).toBe(false);
+
+					const result = log.getTransport(TRANSPORT.id);
+
+					expect(result).toBeNull();
+				});
 			});
 
-			it('should return false and should not add a transport when transport arg is null', () => {
-				expect(log.groupState.transports.size).toBe(0);
+			describe('removeTransport', () => {
+				it('should return false when transport does not exist in group', () => {
+					expect(log.removeTransport(TRANSPORT)).toBe(false);
+				});
 
-				expect(log.addTransport(null as any)).toBe(false);
+				it('should return false when transport arg is undefined', () => {
+					expect(log.removeTransport(undefined as any)).toBe(false);
+				});
 
-				expect(log.groupState.transports.size).toBe(0);
+				it('should remove transport group', () => {
+					expect(log.groupState.transports.size).toBe(0);
+					log.addTransport(TRANSPORT);
+					expect(log.groupState.transports.size).toBe(1);
+					log.removeTransport(TRANSPORT);
+					expect(log.groupState.transports.size).toBe(0);
+				});
+
+				it('should return true when transport is removed', () => {
+					expect(log.groupState.transports.size).toBe(0);
+					log.addTransport(TRANSPORT);
+					expect(log.groupState.transports.size).toBe(1);
+					const result = log.removeTransport(TRANSPORT);
+					expect(log.groupState.transports.size).toBe(0);
+					expect(result).toBe(true);
+				});
 			});
 
-			it(`should add transport to group`, () => {
-				const transport = new Transport('11097141', Levels.ALL, ACTION);
-				expect(log.groupState.transports.size).toBe(0);
+			describe('removeTransportById', () => {
+				it('should remove transport from group', () => {
+					const transport = new Transport('id', Levels.ALL, ACTION);
+					expect(log.groupState.transports.size).toBe(0);
+					log.addTransport(transport);
+					expect(log.groupState.transports.size).toBe(1);
+					const result = log.removeTransportById('id');
+					expect(log.groupState.transports.size).toBe(0);
+					expect(result).toBeTruthy();
+				});
 
-				log.addTransport(transport);
-
-				expect(log.groupState.transports.size).toBe(1);
-				log.clear();
-			});
-		});
-
-		describe('removeTransport', () => {
-			it('should return false when transport does not exist in group', () => {
-				expect(log.removeTransport(TRANSPORT)).toBe(false);
-			});
-
-			it('should return false when transport arg is undefined', () => {
-				expect(log.removeTransport(undefined as any)).toBe(false);
-			});
-
-			it('should remove transport group', () => {
-				expect(log.groupState.transports.size).toBe(0);
-				log.addTransport(TRANSPORT);
-				expect(log.groupState.transports.size).toBe(1);
-				log.removeTransport(TRANSPORT);
-				expect(log.groupState.transports.size).toBe(0);
+				it('should return false if no transports are removed', () => {
+					const transport = new Transport('id', Levels.ALL, ACTION);
+					expect(log.groupState.transports.size).toBe(0);
+					log.addTransport(transport);
+					expect(log.groupState.transports.size).toBe(1);
+					const result = log.removeTransportById('id2');
+					expect(log.groupState.transports.size).toBe(1);
+					expect(result).toBeFalsy();
+				});
 			});
 
-			it('should return true when transport is removed', () => {
-				expect(log.groupState.transports.size).toBe(0);
-				log.addTransport(TRANSPORT);
-				expect(log.groupState.transports.size).toBe(1);
-				const result = log.removeTransport(TRANSPORT);
-				expect(log.groupState.transports.size).toBe(0);
-				expect(result).toBe(true);
-			});
-		});
+			describe('removeTransports', () => {
+				it('should return false when transports is not an array', () => {
+					const result = log.removeTransports(null as any);
 
-		describe('removeTransportById', () => {
-			it('should remove transport from group', () => {
-				const transport = new Transport('id', Levels.ALL, ACTION);
-				expect(log.groupState.transports.size).toBe(0);
-				log.addTransport(transport);
-				expect(log.groupState.transports.size).toBe(1);
-				const result = log.removeTransportById('id');
-				expect(log.groupState.transports.size).toBe(0);
-				expect(result).toBeTruthy();
-			});
+					expect(result).toBe(false);
+				});
 
-			it('should return false if no transports are removed', () => {
-				const transport = new Transport('id', Levels.ALL, ACTION);
-				expect(log.groupState.transports.size).toBe(0);
-				log.addTransport(transport);
-				expect(log.groupState.transports.size).toBe(1);
-				const result = log.removeTransportById('id2');
-				expect(log.groupState.transports.size).toBe(1);
-				expect(result).toBeFalsy();
-			});
-		});
+				it('should return false when no transports are removed', () => {
+					const result = log.removeTransports([TRANSPORT]);
 
-		describe('removeTransports', () => {
-			it('should return false when transports is not an array', () => {
-				const result = log.removeTransports(null as any);
+					expect(result).toBe(false);
+				});
 
-				expect(result).toBe(false);
+				it('should return true when a transport is removed', () => {
+					log.clear();
+					expect(log.groupState.transports.size).toBe(0);
+					log.addTransport(TRANSPORT);
+					expect(log.groupState.transports.size).toBe(1);
+
+					const result = log.removeTransports([TRANSPORT]);
+
+					expect(result).toBe(true);
+					expect(log.groupState.transports.size).toBe(0);
+				});
 			});
 
-			it('should return false when no transports are removed', () => {
-				const result = log.removeTransports([TRANSPORT]);
+			describe('removeTransportEverywhere', () => {
+				it('should return false when transport is undefined', () => {
+					expect(log.removeTransportEverywhere(undefined as any)).toBe(false);
+				});
 
-				expect(result).toBe(false);
-			});
+				it('should return false when transport is null', () => {
+					expect(log.removeTransportEverywhere(null as any)).toBe(false);
+				});
 
-			it('should return true when a transport is removed', () => {
-				log.clear();
-				expect(log.groupState.transports.size).toBe(0);
-				log.addTransport(TRANSPORT);
-				expect(log.groupState.transports.size).toBe(1);
+				it('should return false when transport arg is provided but is not a Transport', () => {
+					expect(log.removeTransportEverywhere(141971 as any)).toBe(false);
+				});
 
-				const result = log.removeTransports([TRANSPORT]);
+				it('should remove transport from all groups', () => {
+					const group1 = log.makeLog('14971497_7d7AKHF');
+					const group2 = log.makeLog('149719971_f7f7AA');
+					const group3 = log.makeLog('778910891_KHF8M4');
 
-				expect(result).toBe(true);
-				expect(log.groupState.transports.size).toBe(0);
-			});
-		});
+					group1.addTransport(TRANSPORT);
+					group2.addTransport(TRANSPORT);
+					group3.addTransport(TRANSPORT);
 
-		describe('removeTransportEverywhere', () => {
-			it('should return false when transport is undefined', () => {
-				expect(log.removeTransportEverywhere(undefined as any)).toBe(false);
-			});
+					expect(group1.groupState.transports.size).toBe(1);
+					expect(group2.groupState.transports.size).toBe(1);
+					expect(group3.groupState.transports.size).toBe(1);
 
-			it('should return false when transport is null', () => {
-				expect(log.removeTransportEverywhere(null as any)).toBe(false);
-			});
+					log.removeTransportEverywhere(TRANSPORT);
 
-			it('should return false when transport arg is provided but is not a Transport', () => {
-				expect(log.removeTransportEverywhere(141971 as any)).toBe(false);
-			});
-
-			it('should remove transport from all groups', () => {
-				const group1 = log.makeLog('14971497_7d7AKHF');
-				const group2 = log.makeLog('149719971_f7f7AA');
-				const group3 = log.makeLog('778910891_KHF8M4');
-
-				group1.addTransport(TRANSPORT);
-				group2.addTransport(TRANSPORT);
-				group3.addTransport(TRANSPORT);
-
-				expect(group1.groupState.transports.size).toBe(1);
-				expect(group2.groupState.transports.size).toBe(1);
-				expect(group3.groupState.transports.size).toBe(1);
-
-				log.removeTransportEverywhere(TRANSPORT);
-
-				expect(group1.groupState.transports.size).toBe(0);
-				expect(group2.groupState.transports.size).toBe(0);
-				expect(group3.groupState.transports.size).toBe(0);
+					expect(group1.groupState.transports.size).toBe(0);
+					expect(group2.groupState.transports.size).toBe(0);
+					expect(group3.groupState.transports.size).toBe(0);
+				});
 			});
 		});
 

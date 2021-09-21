@@ -54,18 +54,58 @@ export class Log {
 	 * Enable global console logging for development and debugging.
 	 */
 	public activateDefaultConsole(level?: number): void {
-		level = level ?? this.globalState.globalLevel.get();
+		level = level ?? this.groupState.level.get();
 		const transport = new Transport('console', level, logToConsole);
 		this.addTransport(transport);
+	}
+
+	public deactivateDefaultConsole(): void {
+		this.removeTransportById('console');
+	}
+
+	/**
+	 * Sets the level of the default console to the level
+	 * of the log.
+	 */
+	public resetLevelDefaultConsole(): void {
+		this.setLevelDefaultConsole(this.groupState.level.get());
+	}
+
+	public setLevelDefaultConsole(level: number): void {
+		const console = this.getTransport('console');
+
+		if (!console) {
+			return;
+		}
+
+		console.level.set(level);
+	}
+
+	public enableLevelDefaultConsole(level: number): void {
+		const console = this.getTransport('console');
+
+		if (!console) {
+			return;
+		}
+
+		console.level.enableLevel(level);
+	}
+
+	public disableLevelDefaultConsole(level: number): void {
+		const console = this.getTransport('console');
+
+		if (!console) {
+			return;
+		}
+
+		console.level.disableLevel(level);
 	}
 
 	/**
 	 * Attempt to make new log group with target id. Does not
 	 * overwrite existing groups.
-	 * @param group 		target log group to create.
-	 * @returns 			Whether make group operation was successful. `false` when
-	 * 						group already exists or failed. `true` when group with target
-	 * 						id is created successfully.
+	 * @param id	 		id of new log.
+	 * @returns 			The new log if successful or null if it fails.
 	 */
 	public makeLog(id: '', options?: MakeLogOptions): null;
 	public makeLog(id: string, options?: MakeLogOptions): Log;
@@ -94,12 +134,8 @@ export class Log {
 	}
 
 	/**
-	 * Add transport to target group.
-	 * @param transport 		Transport to add to target group.
-	 *
-	 * @param id			Target group to add transport to. When null the `default`
-	 * 							group is used. When target is non-null and target group does
-	 * 							not exist, it will be created.
+	 * Add transport to log.
+	 * @param transport 		Transport to add to log.
 	 */
 	public addTransport(transport: Transport): boolean {
 		if (!transport || !(transport instanceof Transport)) {
@@ -115,13 +151,24 @@ export class Log {
 		return true;
 	}
 
+	public getTransport(transportId: string): Transport | null {
+		for (const transport of this.groupState.transports) {
+			// Remove matching transport and exit. Only one
+			// of each transport can be added to a group.
+			if (transport.id === transportId) {
+				return transport;
+			}
+		}
+
+		return null;
+	}
+
 	/**
 	 * Remove transport from target group, or from the 'all' group if
 	 * id is null.
 	 * @param transport
-	 * @param id
 	 */
-	public removeTransport(transport: Transport): boolean {
+	public removeTransport(transport: Transport | null): boolean {
 		if (!transport) {
 			return false;
 		}
@@ -139,19 +186,10 @@ export class Log {
 	 * Remove transport matching target id from target group if
 	 * both the group exists and the transport is in the group.
 	 * @param transportId
-	 * @param id
 	 */
 	public removeTransportById(transportId: string): boolean {
-		for (const transport of this.groupState.transports) {
-			// Remove matching transport and exit. Only one
-			// of each transport can be added to a group.
-			if (transport.id === transportId) {
-				this.groupState.transports.delete(transport);
-				return true;
-			}
-		}
-
-		return false;
+		const transport = this.getTransport(transportId);
+		return this.removeTransport(transport);
 	}
 
 	/**

@@ -65,7 +65,7 @@ export class LogLevel {
 			return false;
 		}
 
-		const result = this.currentLevel ^ level;
+		const result = this.currentLevel & ~level;
 		if (!validLevel(result)) {
 			return false;
 		}

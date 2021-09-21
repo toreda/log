@@ -20,6 +20,16 @@ describe(`LogLevel`, () => {
 			expect(instance.get()).toBe(expected);
 		});
 
+		it(`should add 'level' to the 'obj' when there is overlap`, () => {
+			instance.set(0b10101);
+			const level = 0b00110;
+			const expected = 0b10111;
+
+			instance.enableLevel(level);
+
+			expect(instance.get()).toBe(expected);
+		});
+
 		it.each(invalidLevels)(`should not change the 'obj' when 'level' is %p`, (level) => {
 			const expected = 0;
 			instance.set(0);
@@ -55,6 +65,16 @@ describe(`LogLevel`, () => {
 			instance.set(0b101);
 			const level = 0b100;
 			const expected = 0b001;
+
+			instance.disableLevel(level);
+
+			expect(instance.get()).toBe(expected);
+		});
+
+		it(`should remove 'level' from the 'obj' when a bit does not overlap`, () => {
+			instance.set(0b10101);
+			const level = 0b00110;
+			const expected = 0b10001;
 
 			instance.disableLevel(level);
 

@@ -1,6 +1,6 @@
 {
 	"name": "@toreda/log",
-	"version": "0.6.3",
+	"version": "0.6.4",
 	"description": "Lightweight TypeScript logger with flexible custom transports.",
 	"main": "./dist/index.js",
 	"typings": "./dist/index.d.ts",
