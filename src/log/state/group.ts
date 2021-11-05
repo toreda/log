@@ -9,7 +9,6 @@ import {validLevel} from '../../valid/level';
 
 type KeysExludedFromOptions = 'state';
 type Options = Omit<LogOptionsGroup, KeysExludedFromOptions>;
-type KeysExludedFromState = KeysExludedFromOptions | 'parent';
 
 export class LogStateGroup {
 	public readonly id: string;

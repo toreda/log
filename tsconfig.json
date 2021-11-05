@@ -1,27 +1,31 @@
 {
-	"exclude": ["node_modules", "**/*.spec.ts", "tests", "dist/**"],
+	"exclude": ["node_modules", "**/*.spec.ts", "tests", "dist/**", "./gulpfile.ts"],
 	"include": ["**/src/index.ts", "./src/**.ts"],
 	"filesGlob": ["./src/**.ts", "!./node_modules/**"],
 	"compilerOptions": {
-		"baseUrl": ".",
 		"allowUnreachableCode": false,
 		"alwaysStrict": true,
+		"baseUrl": ".",
 		"declaration": true,
 		"esModuleInterop": true,
 		"isolatedModules": false,
 		"lib": ["es6", "ES2015", "ES2017.TypedArrays"],
 		"module": "commonjs",
 		"moduleResolution": "node",
+		"noImplicitOverride": true,
+		"noImplicitReturns": true,
 		"noImplicitUseStrict": false,
 		"outDir": "./dist",
 		"preserveConstEnums": true,
 		"removeComments": false,
 		"rootDir": "./src",
 		"strictBindCallApply": true,
+		"strictFunctionTypes": true,
 		"strictNullChecks": true,
 		"strictPropertyInitialization": true,
 		"target": "es2015",
-		"traceResolution": false
+		"traceResolution": false,
+		"useUnknownInCatchVariables": true
 	},
 	"ts-node": {
 		"module": "commonjs"
