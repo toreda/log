@@ -499,19 +499,13 @@ describe('Log', () => {
 			const ceLog = log.makeLog('canExecute', {level: LogLevel});
 
 			it('should return false when transport arg is undefined', () => {
-				const result = ceLog['canExecute'](undefined as any, Levels.ALL);
+				const result = ceLog['canExecute'](ceLog, undefined as any, Levels.ALL);
 
 				expect(result).toBe(false);
 			});
 
 			it('should return false when transport arg is null', () => {
-				const result = ceLog['canExecute'](null as any, Levels.ALL);
-
-				expect(result).toBe(false);
-			});
-
-			it('should return false when transport arg is not a Transport', () => {
-				const result = ceLog['canExecute'](ceLog as any, Levels.ALL);
+				const result = ceLog['canExecute'](ceLog, null as any, Levels.ALL);
 
 				expect(result).toBe(false);
 			});
@@ -519,7 +513,7 @@ describe('Log', () => {
 			it('should return false when group is not enabled', () => {
 				ceLog.groupState.enabled = false;
 
-				const result = ceLog['canExecute'](TRANSPORT.level.get(), Levels.ALL);
+				const result = ceLog['canExecute'](ceLog, TRANSPORT.level.get(), Levels.ALL);
 				ceLog.groupState.enabled = true;
 
 				expect(result).toBe(false);
@@ -527,7 +521,7 @@ describe('Log', () => {
 
 			const BadMsgLevels: any[] = [-1, 0, 0.5, 5.7, '1'];
 			it.each(BadMsgLevels)(`should return false: msgLevel '%p' not a positive integer`, (level) => {
-				const result = ceLog['canExecute'](TRANSPORT.level.get(), level);
+				const result = ceLog['canExecute'](ceLog, TRANSPORT.level.get(), level);
 
 				expect(result).toBe(false);
 			});
@@ -536,7 +530,7 @@ describe('Log', () => {
 				ceLog.setGlobalLevel(0);
 				ceLog.setGroupLevel(0);
 
-				const result = ceLog['canExecute'](TRANSPORT.level.get(), Levels.ALL);
+				const result = ceLog['canExecute'](ceLog, TRANSPORT.level.get(), Levels.ALL);
 
 				expect(result).toBe(false);
 			});
@@ -545,7 +539,7 @@ describe('Log', () => {
 				TRANSPORT.level.set(0b0001);
 				expect(TRANSPORT.level.get() & ceLog.groupState.level.get()).toBe(0);
 
-				const result = ceLog['canExecute'](TRANSPORT.level.get(), Levels.ALL);
+				const result = ceLog['canExecute'](ceLog, TRANSPORT.level.get(), Levels.ALL);
 				TRANSPORT.level.set(Levels.ALL);
 
 				expect(result).toBe(false);
@@ -555,7 +549,7 @@ describe('Log', () => {
 				const msgLevel = Levels.ALL_CUSTOM;
 				expect(TRANSPORT.level.get() & msgLevel).toBe(0);
 
-				const result = ceLog['canExecute'](TRANSPORT.level.get(), msgLevel);
+				const result = ceLog['canExecute'](ceLog, TRANSPORT.level.get(), msgLevel);
 
 				expect(result).toBe(false);
 			});
@@ -565,7 +559,7 @@ describe('Log', () => {
 				const msgLevel = Levels.WARN;
 				expect(msgLevel & TRANSPORT.level.get() & ceLog.groupState.level.get()).toBeGreaterThan(0);
 
-				const result = ceLog['canExecute'](TRANSPORT.level.get(), msgLevel);
+				const result = ceLog['canExecute'](ceLog, TRANSPORT.level.get(), msgLevel);
 
 				expect(result).toBe(true);
 			});

@@ -54,7 +54,7 @@ export class Log {
 	 * Enable global console logging for development and debugging.
 	 */
 	public activateDefaultConsole(level?: number): void {
-		level = level ?? this.groupState.level.get();
+		level = level ?? Levels.ALL_EXTENDED;
 		const transport = new Transport('console', level, logToConsole);
 		this.addTransport(transport);
 	}
@@ -359,12 +359,12 @@ export class Log {
 	 * @param globalLevel
 	 * @param msgLevel
 	 */
-	private canExecute(transportLevel: number, msgLevel: number): boolean {
+	private canExecute(group: Log, transportLevel: number, msgLevel: number): boolean {
 		if (this.globalState.forceDisabled) {
 			return false;
 		}
 
-		if (!this.globalState.forceEnabled && !this.groupState.enabled) {
+		if (!this.globalState.forceEnabled && !group.groupState.enabled) {
 			return false;
 		}
 
@@ -376,7 +376,7 @@ export class Log {
 			return false;
 		}
 
-		const activeMask = this.globalState.globalLevel.get() | this.groupState.level.get();
+		const activeMask = this.globalState.globalLevel.get() | group.groupState.level.get();
 
 		return (activeMask & transportLevel & msgLevel) > 0;
 	}
@@ -402,21 +402,21 @@ export class Log {
 		const message: Message = this.createMessage(msgLevel, this.groupState.path.slice(), ...msg);
 		const actions: LogActionResult[] = [];
 
-		const transports: Map<string, Transport> = new Map();
+		const transports: Map<string, {group: Log; transport: Transport}> = new Map();
 		let group = this as Log | null;
 
 		while (group) {
 			for (const transport of group.groupState.transports) {
 				if (!transports.has(transport.id)) {
-					transports.set(transport.id, transport);
+					transports.set(transport.id, {group, transport});
 				}
 			}
 
 			group = group.groupState.parent;
 		}
 
-		for (const [id, transport] of transports) {
-			if (this.canExecute(transport.level.get(), msgLevel)) {
+		for (const [id, {group, transport}] of transports) {
+			if (this.canExecute(group, transport.level.get(), msgLevel)) {
 				const result: LogActionResult = transport.execute(message).then((res) => {
 					return [id, res];
 				});
