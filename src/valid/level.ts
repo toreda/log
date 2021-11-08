@@ -11,8 +11,7 @@ export function validLevel(level?: number | null): level is number {
 		return false;
 	}
 
-	// Quick integer test using Bitwise OR.
-	if ((level | 0) !== level) {
+	if (!Number.isSafeInteger(level)) {
 		return false;
 	}
 

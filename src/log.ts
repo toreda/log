@@ -53,8 +53,7 @@ export class Log {
 	/**
 	 * Enable global console logging for development and debugging.
 	 */
-	public activateDefaultConsole(level?: number): void {
-		level = level ?? Levels.ALL_EXTENDED;
+	public activateDefaultConsole(level: number = Levels.ALL_EXTENDED): void {
 		const transport = new Transport('console', level, logToConsole);
 		this.addTransport(transport);
 	}

@@ -1,6 +1,6 @@
 import {validLevel} from '../src/valid/level';
 
-const VALID_LEVELS = [1, 0, 1111, 3981, 888, 9999999];
+const VALID_LEVELS = [1, 0, 1111, 3981, 888, 9999999, Number.MAX_SAFE_INTEGER];
 
 const INVALID_LEVELS = [
 	NaN,
