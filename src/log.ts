@@ -264,6 +264,20 @@ export class Log {
 	}
 
 	/**
+	 * Enable log.
+	 */
+	public enable(): void {
+		this.groupState.enabled = true;
+	}
+
+	/**
+	 * Disable log.
+	 */
+	public disable(): void {
+		this.groupState.enabled = false;
+	}
+
+	/**
 	 * Change global log level. Individual group levels
 	 * are used instead of global level when they are set.
 	 * @param level

@@ -23,8 +23,8 @@ describe(`Demo for bubbling events interactions with enable/disable.`, () => {
 	});
 
 	it(`both disabled & call topLog = {top: false, sub: false}.`, async () => {
-		topLog.groupState.enabled = false;
-		subLog.groupState.enabled = false;
+		topLog.disable();
+		subLog.disable();
 
 		await topLog.info(expect.getState().currentTestName.split('. ')[1]);
 
@@ -33,8 +33,8 @@ describe(`Demo for bubbling events interactions with enable/disable.`, () => {
 	});
 
 	it(`both disabled & call subLog = {top: false, sub: false}.`, async () => {
-		topLog.groupState.enabled = false;
-		subLog.groupState.enabled = false;
+		topLog.disable();
+		subLog.disable();
 
 		await subLog.info(expect.getState().currentTestName.split('. ')[1]);
 
@@ -43,8 +43,8 @@ describe(`Demo for bubbling events interactions with enable/disable.`, () => {
 	});
 
 	it(`only topLog enabled & call topLog = {top: true, sub: false}.`, async () => {
-		topLog.groupState.enabled = true;
-		subLog.groupState.enabled = false;
+		topLog.enable();
+		subLog.disable();
 
 		await topLog.info(expect.getState().currentTestName.split('. ')[1]);
 
@@ -53,8 +53,8 @@ describe(`Demo for bubbling events interactions with enable/disable.`, () => {
 	});
 
 	it(`only topLog enabled & call subLog = {top: true, sub: false}.`, async () => {
-		topLog.groupState.enabled = true;
-		subLog.groupState.enabled = false;
+		topLog.enable();
+		subLog.disable();
 
 		await subLog.info(expect.getState().currentTestName.split('. ')[1]);
 
@@ -63,8 +63,8 @@ describe(`Demo for bubbling events interactions with enable/disable.`, () => {
 	});
 
 	it(`only subLog enabled & call topLog = {top: false, sub: false}.`, async () => {
-		topLog.groupState.enabled = false;
-		subLog.groupState.enabled = true;
+		topLog.disable();
+		subLog.enable();
 
 		await topLog.info(expect.getState().currentTestName.split('. ')[1]);
 
@@ -73,8 +73,8 @@ describe(`Demo for bubbling events interactions with enable/disable.`, () => {
 	});
 
 	it(`only subLog enabled & call subLog = {top: false, sub: true}.`, async () => {
-		topLog.groupState.enabled = false;
-		subLog.groupState.enabled = true;
+		topLog.disable();
+		subLog.enable();
 
 		await subLog.info(expect.getState().currentTestName.split('. ')[1]);
 
@@ -83,8 +83,8 @@ describe(`Demo for bubbling events interactions with enable/disable.`, () => {
 	});
 
 	it(`both enabled & call topLog = {top: true, sub: false}.`, async () => {
-		topLog.groupState.enabled = true;
-		subLog.groupState.enabled = true;
+		topLog.enable();
+		subLog.enable();
 
 		await topLog.info(expect.getState().currentTestName.split('. ')[1]);
 
@@ -93,8 +93,8 @@ describe(`Demo for bubbling events interactions with enable/disable.`, () => {
 	});
 
 	it(`both enabled & call subLog = {top: true, sub: true}.`, async () => {
-		topLog.groupState.enabled = true;
-		subLog.groupState.enabled = true;
+		topLog.enable();
+		subLog.enable();
 
 		await subLog.info(expect.getState().currentTestName.split('. ')[1]);
 
