@@ -390,10 +390,6 @@ export class Log {
 			return Promise.resolve(false);
 		}
 
-		if (!this.groupState.enabled && !this.globalState.forceEnabled) {
-			return Promise.resolve(false);
-		}
-
 		if (!validLevel(msgLevel)) {
 			return Promise.resolve(false);
 		}
@@ -405,9 +401,11 @@ export class Log {
 		let group = this as Log | null;
 
 		while (group) {
-			for (const transport of group.groupState.transports) {
-				if (!transports.has(transport.id)) {
-					transports.set(transport.id, {group, transport});
+			if (group.groupState.enabled || group.globalState.forceEnabled) {
+				for (const transport of group.groupState.transports) {
+					if (!transports.has(transport.id)) {
+						transports.set(transport.id, {group, transport});
+					}
 				}
 			}
 
