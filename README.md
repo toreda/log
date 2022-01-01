@@ -18,6 +18,8 @@ Features:
 * Custom Transport support
 * Works in Browser, Serverless, and Node environments.
 
+&nbsp;
+
 # Contents
 * [**Use Cases**](#use-cases)
 
@@ -30,6 +32,8 @@ Features:
 	-	[Build](#build-from-source)
 	-   [License](#license)
 
+&nbsp;
+
 # Use Cases
 
 ## Custom Transports
@@ -39,6 +43,8 @@ Features:
 ## Granular Control
 * Leave disabled log messages in prod environments which can be turned on later for debugging without a code push.
 * Set log levels for individual functions, classes, and groups. See debug output from the system you're debugging without seeing app-wide debug spam.
+
+&nbsp;
 
 # Usage
 `@toreda/log` provides simple and straight forward logging for common use cases, and advanced functionality for use in more complicated situations like server-side and remote debugging.
@@ -207,7 +213,6 @@ npm run-script build
 ## License
 [MIT](LICENSE) &copy; Toreda, Inc.
 
-&nbsp;
 
 ## Copyright
 Copyright &copy; 2019 - 2022 Toreda, Inc. All Rights Reserved.
