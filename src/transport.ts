@@ -2,9 +2,19 @@ import {LogLevel} from './log/level';
 import type {Message} from './message';
 import type {TransportAction} from './transport/action';
 
+/**
+ * Executes user-provided callback once for each message received.
+ * Only receives messages matching user-configured log levels and
+ * additional filters.
+ *
+ * @category Transports
+ */
 export class Transport {
+	/** Globally unique identifier for transport. */
 	public readonly id: string;
+	/** Action executed once for each received matching msg. */
 	public readonly action: TransportAction;
+	/** Active log levels transport receives msgs for. */
 	public readonly level: LogLevel;
 
 	constructor(id: string, level: number, action: TransportAction) {

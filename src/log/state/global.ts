@@ -1,17 +1,18 @@
 import {Levels} from '../../levels';
 import type {Log} from '../../log';
 import {LogLevel} from '../level';
-import type {LogOptionsGlobal} from '../options';
+import type {LogOptionsGlobal} from '../options/global';
 import {LogState} from '../../log/state';
-import {validLevel} from '../../valid/level';
+import {checkLevel} from '../../check/level';
 
 type KeysExludedFromOptions = 'state' | 'path';
 type Options = Omit<LogOptionsGlobal, KeysExludedFromOptions>;
 /**
  * Internal state data, settings, and log groups for a
  * single log instance.
+ *
+ * @category State
  */
-
 export class LogStateGlobal implements LogState {
 	public groupsStartEnabled: boolean;
 	public globalLevel: LogLevel;
@@ -29,7 +30,7 @@ export class LogStateGlobal implements LogState {
 
 		// Starting Global log level
 		const defaultLevel = Levels.ALL & ~Levels.DEBUG & ~Levels.TRACE;
-		const logLevel = validLevel(options.globalLevel) ? options.globalLevel : defaultLevel;
+		const logLevel = checkLevel(options.globalLevel) ? options.globalLevel : defaultLevel;
 
 		this.globalLevel = new LogLevel(logLevel);
 

@@ -1,11 +1,15 @@
+![Toreda](https://content.toreda.com/logo/toreda-logo.png)
+
+[![CI](https://img.shields.io/github/workflow/status/toreda/log/CI?style=for-the-badge)](https://github.com/toreda/log/actions) [![Coverage](https://img.shields.io/sonar/coverage/toreda_log?server=https%3A%2F%2Fsonarcloud.io&style=for-the-badge)](https://sonarcloud.io/dashboard?id=toreda_log) ![Sonar Quality Gate](https://img.shields.io/sonar/quality_gate/toreda_log?server=https%3A%2F%2Fsonarcloud.io&style=for-the-badge)
+
+![GitHub package.json version (branch)](https://img.shields.io/github/package-json/v/toreda/log/master?style=for-the-badge) ![GitHub Release Date](https://img.shields.io/github/release-date/toreda/log?style=for-the-badge) [![GitHub issues](https://img.shields.io/github/issues/toreda/log?style=for-the-badge)](https://github.com/toreda/log/issues)
+
+ ![license](https://img.shields.io/github/license/toreda/log?style=for-the-badge)
+
 
 # `@toreda/log` - Dynamic Logger
 
-![Toreda](https://content.toreda.com/logo/toreda-logo.png)
-
-![CI](https://github.com/toreda/log/workflows/CI/badge.svg?branch=master) [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=toreda_log&metric=coverage)](https://sonarcloud.io/dashboard?id=toreda_log) [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=toreda_log&metric=alert_status)](https://sonarcloud.io/dashboard?id=toreda_log)
-
-Light TypeScript logger for node, web, and serverless environments. 
+Light TypeScript logger for node, web, and serverless environments.
 
 Features:
 * Small footprint
@@ -31,7 +35,7 @@ Features:
 ## Custom Transports
 * Configure transports to receive all log events, or only a filtered subset based on class, group, and log level.
 * Custom transports can filter and receive structured log data for specific events you care about. Get the exact functionality you need without writing a whole library.
- 
+
 ## Granular Control
 * Leave disabled log messages in prod environments which can be turned on later for debugging without a code push.
 * Set log levels for individual functions, classes, and groups. See debug output from the system you're debugging without seeing app-wide debug spam.
@@ -74,7 +78,7 @@ log.error('my', 'message', 'here');
 // Multple
 log.log(Levels.ERROR & Levels.TRACE, 'trace and error message here');
 // Custom
-const customLevel = 
+const customLevel =
 log.log(0b0010_0000_0000, 'custom logging level');
 ```
 
@@ -153,18 +157,17 @@ log.removeTransport(transport);
 log.removeTransportById('tid1');
 ```
 
+&nbsp;
 
-# Package
-
-## Install
+# Install
 Install `@toreda/log` directly from NPM.
 
-### Install with Yarn (preferred)
+## Install with Yarn (preferred)
 ```bash
 yarn add @toreda/log --dev
 ```
 
-### Install using NPM
+## Install using NPM
 ```bash
 npm install @toreda/log --save-dev
 ```
@@ -179,6 +182,8 @@ Installing jest is not required after project dependencies are installed ([see a
 ```bash
 yarn test
 ```
+
+&nbsp;
 
 # Build from source
 
@@ -196,6 +201,15 @@ yarn build
 npm run-script build
 ```
 
-# License
+&nbsp;
+# Legal
 
+## License
 [MIT](LICENSE) &copy; Toreda, Inc.
+
+&nbsp;
+
+## Copyright
+Copyright &copy; 2019 - 2022 Toreda, Inc. All Rights Reserved.
+
+https://www.toreda.com

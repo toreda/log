@@ -1,4 +1,4 @@
-import {validLevel} from '../src/valid/level';
+import {checkLevel} from '../src/check/level';
 
 const VALID_LEVELS = [1, 0, 1111, 3981, 888, 9999999, Number.MAX_SAFE_INTEGER];
 
@@ -20,11 +20,11 @@ const INVALID_LEVELS = [
 	['a', 'b', 'c']
 ];
 
-describe('validLevel', () => {
+describe('checkLevel', () => {
 	describe('Valid Levels', () => {
 		for (const level of VALID_LEVELS) {
 			it(`should return true for valid level '${level}'`, () => {
-				expect(validLevel(level)).toBe(true);
+				expect(checkLevel(level)).toBe(true);
 			});
 		}
 	});
@@ -32,7 +32,7 @@ describe('validLevel', () => {
 	describe('Invalid Levels', () => {
 		for (const level of INVALID_LEVELS) {
 			it(`should return false for invalid level '${level}'`, () => {
-				expect(validLevel(level as any)).toBe(false);
+				expect(checkLevel(level as any)).toBe(false);
 			});
 		}
 	});

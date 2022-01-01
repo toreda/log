@@ -1,4 +1,4 @@
-export function validId(input?: string | null): input is string {
+export function checkId(input?: string | null): input is string {
 	if (typeof input !== 'string') {
 		return false;
 	}

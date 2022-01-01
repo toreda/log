@@ -1,5 +1,8 @@
 import {LogLevel} from './level';
 
+/**
+ * @category State
+ */
 export interface LogState {
 	groupsStartEnabled: boolean;
 	consoleEnabled: boolean;

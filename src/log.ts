@@ -1,13 +1,13 @@
-import type {LogOptions, LogOptionsGroup} from './log/options';
-
 import type {Expand} from '@toreda/types';
 import {Levels} from './levels';
+import type {LogOptions} from './log/options';
+import type {LogOptionsGroup} from './log/options/group';
 import {LogStateGlobal} from './log/state/global';
 import {LogStateGroup} from './log/state/group';
 import type {Message} from './message';
 import {Transport} from './transport';
+import {checkLevel} from './check/level';
 import {logToConsole} from './console';
-import {validLevel} from './valid/level';
 
 /**
  * Main log class holding attached transports and internal state
@@ -123,7 +123,7 @@ export class Log {
 		}
 
 		const level =
-			options && validLevel(options.level) ? options.level : this.globalState.globalLevel.get();
+			options && checkLevel(options.level) ? options.level : this.globalState.globalLevel.get();
 		const enabled = options?.enabled ?? this.globalState.groupsStartEnabled;
 
 		const group = new Log({state: this.globalState, id: groupId, parent: this, path, level, enabled});
@@ -381,11 +381,11 @@ export class Log {
 			return false;
 		}
 
-		if (!validLevel(transportLevel)) {
+		if (!checkLevel(transportLevel)) {
 			return false;
 		}
 
-		if (!validLevel(msgLevel)) {
+		if (!checkLevel(msgLevel)) {
 			return false;
 		}
 
@@ -404,7 +404,7 @@ export class Log {
 			return Promise.resolve(false);
 		}
 
-		if (!validLevel(msgLevel)) {
+		if (!checkLevel(msgLevel)) {
 			return Promise.resolve(false);
 		}
 

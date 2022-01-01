@@ -1,5 +1,7 @@
 /**
  * Bitmasks for each log level.
+ *
+ * @category Log Level
  */
 export enum Levels {
 	/**

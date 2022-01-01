@@ -1,11 +1,14 @@
 import {Defaults} from '../defaults';
-import {validLevel} from '../valid/level';
+import {checkLevel} from '../check/level';
 
+/**
+ * @category Log Level
+ */
 export class LogLevel {
 	private currentLevel: number;
 
 	constructor(initial?: number) {
-		if (validLevel(initial)) {
+		if (checkLevel(initial)) {
 			this.currentLevel = initial;
 		} else {
 			this.currentLevel = 0x0;
@@ -13,7 +16,7 @@ export class LogLevel {
 	}
 
 	public set(level?: number | null): boolean {
-		if (!validLevel(level)) {
+		if (!checkLevel(level)) {
 			return false;
 		}
 
@@ -22,7 +25,7 @@ export class LogLevel {
 	}
 
 	public get(): number {
-		if (!validLevel(this.currentLevel)) {
+		if (!checkLevel(this.currentLevel)) {
 			return Defaults.GlobalLogLevel;
 		}
 
@@ -30,12 +33,12 @@ export class LogLevel {
 	}
 
 	public enableLevel(level: number): boolean {
-		if (!validLevel(level)) {
+		if (!checkLevel(level)) {
 			return false;
 		}
 
 		const result = this.currentLevel | level;
-		if (!validLevel(result)) {
+		if (!checkLevel(result)) {
 			return false;
 		}
 
@@ -61,12 +64,12 @@ export class LogLevel {
 	}
 
 	public disableLevel(level: number): boolean {
-		if (!validLevel(level)) {
+		if (!checkLevel(level)) {
 			return false;
 		}
 
 		const result = this.currentLevel & ~level;
-		if (!validLevel(result)) {
+		if (!checkLevel(result)) {
 			return false;
 		}
 
