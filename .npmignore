@@ -3,3 +3,12 @@ node_modules
 tests
 docs
 *.code-workspace
+.npmignore
+.gitignore
+.eslintrc.js
+sonar-project.properties
+src
+coverage
+.github
+jest.config.js
+test-report.xml
