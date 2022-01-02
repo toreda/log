@@ -16,8 +16,8 @@
 			"**/.gitignore": true,
 			".gitattributes": true,
 			"coverage": true,
-			"**/dist": true
-
+			"dist": true,
+			"docs/**": true
 		},
 		"workspace.isHidden": false
 	}
