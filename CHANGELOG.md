@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.11] - 2022-01-03
+### Updated
+- All direct NPM dependencies updated to latest.
+
 ## [0.5.0] - 2021-07-02
 ### Added
 - `Log` class is the main access point. Directs the logging.

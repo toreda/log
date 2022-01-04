@@ -1,6 +1,6 @@
 {
 	"name": "@toreda/log",
-	"version": "0.6.10",
+	"version": "0.6.11",
 	"description": "Lightweight TypeScript logger with flexible custom transports.",
 	"main": "./dist/index.js",
 	"typings": "./dist/index.d.ts",
@@ -18,14 +18,13 @@
 		"url": "git+https://github.com/toreda/log.git"
 	},
 	"keywords": [
-		"toreda",
-		"logging",
 		"enterprise",
+		"lightweight",
 		"logger",
-		"typescript",
+		"logging",
 		"serverless",
-		"web",
-		"lightweight"
+		"toreda",
+		"typescript"
 	],
 	"author": "Toreda, Inc.",
 	"license": "MIT",
@@ -37,13 +36,13 @@
 		"@babel/core": "^7.16.7",
 		"@toreda/eslint-config": "^2.2.0",
 		"@toreda/prettier-config": "^1.0.1",
-		"@toreda/types": "^2.5.0",
+		"@toreda/types": "^2.6.0",
 		"@types/jest": "^27.4.0",
-		"@types/node": "^17.0.5",
+		"@types/node": "^17.0.7",
 		"@types/webpack": "^5.28.0",
-		"@typescript-eslint/eslint-plugin": "^5.8.1",
-		"@typescript-eslint/parser": "^5.8.1",
-		"@typescript-eslint/typescript-estree": "^5.8.1",
+		"@typescript-eslint/eslint-plugin": "^5.9.0",
+		"@typescript-eslint/parser": "^5.9.0",
+		"@typescript-eslint/typescript-estree": "^5.9.0",
 		"babel-jest": "^27.4.5",
 		"canvas": "^2.8.0",
 		"del": "^6.0.0",
@@ -66,6 +65,11 @@
 		"typescript": "^4.5.4",
 		"utf-8-validate": "^5.0.7",
 		"webpack": "^5.65.0"
+	},
+	"resolutions": {
+		"tmpl": "^1.0.5",
+		"glob-parent": "^5.1.2",
+		"ws": "^7.4.6"
 	},
 	"dependencies": {},
 	"prettier": "@toreda/prettier-config"
