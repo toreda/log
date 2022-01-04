@@ -1,29 +1,30 @@
 {
 	"name": "@toreda/log",
-	"version": "0.5.0",
+	"version": "0.6.11",
 	"description": "Lightweight TypeScript logger with flexible custom transports.",
 	"main": "./dist/index.js",
+	"typings": "./dist/index.d.ts",
 	"public": true,
 	"scripts": {
-		"build": "yarn lint && yarn tsc",
-		"lint": "yarn eslint src/**",
 		"test": "yarn jest --coverage",
-		"make:docs": "yarn typedoc docs --categorizeByGroup --entryPoints ./src/index.ts"
+		"make:docs": "yarn typedoc docs --categorizeByGroup --entryPoints ./src/index.ts",
+		"lint": "yarn lint:nofix",
+		"lint:nofix": "yarn eslint src/**.{js,ts} --quiet",
+		"lint:fix": "yarn eslint src/**/*.{js,ts,tsx} --quiet --fix",
+		"build": "yarn lint && yarn gulp"
 	},
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/toreda/log.git"
 	},
 	"keywords": [
-		"Toreda",
-		"logging",
 		"enterprise",
+		"lightweight",
 		"logger",
-		"typescript",
+		"logging",
 		"serverless",
-		"web",
-		"stable",
-		"lightweight"
+		"toreda",
+		"typescript"
 	],
 	"author": "Toreda, Inc.",
 	"license": "MIT",
@@ -32,28 +33,44 @@
 	},
 	"homepage": "https://github.com/toreda/log#readme",
 	"devDependencies": {
+		"@babel/core": "^7.16.7",
 		"@toreda/eslint-config": "^2.2.0",
 		"@toreda/prettier-config": "^1.0.1",
-		"@types/jest": "^26.0.20",
-		"@types/node": "^14.14.31",
-		"@typescript-eslint/eslint-plugin": "^4.16.1",
-		"@typescript-eslint/parser": "^4.16.1",
-		"eslint": "^7.21.0",
-		"eslint-config-prettier": "^6.12.0",
-		"eslint-plugin-prettier": "^3.1.4",
-		"jest": "^26.6.3",
+		"@toreda/types": "^2.6.0",
+		"@types/jest": "^27.4.0",
+		"@types/node": "^17.0.7",
+		"@types/webpack": "^5.28.0",
+		"@typescript-eslint/eslint-plugin": "^5.9.0",
+		"@typescript-eslint/parser": "^5.9.0",
+		"@typescript-eslint/typescript-estree": "^5.9.0",
+		"babel-jest": "^27.4.5",
+		"canvas": "^2.8.0",
+		"del": "^6.0.0",
+		"eslint": "^8.6.0",
+		"eslint-config-prettier": "^8.3.0",
+		"eslint-plugin-prettier": "^4.0.0",
+		"gulp": "^4.0.2",
+		"gulp-typescript": "^6.0.0-alpha.1",
+		"jest": "^27.4.5",
+		"jest-cli": "^27.4.5",
+		"jest-environment-jsdom": "^27.4.4",
 		"jest-sonar-reporter": "^2.0.0",
-		"prettier": "^2.2.1",
-		"ts-jest": "^26.5.2",
-		"ts-loader": "^8.0.17",
-		"ts-node": "^9.1.1",
+		"jsdom": "^19.0.0",
+		"prettier": "^2.5.1",
+		"ts-jest": "^27.1.2",
+		"ts-loader": "^9.2.6",
+		"ts-node": "^10.4.0",
 		"ts-register": "^0.1.0",
-		"typedoc": "^0.20.28",
-		"typescript": "^4.2.2"
+		"typedoc": "^0.22.10",
+		"typescript": "^4.5.4",
+		"utf-8-validate": "^5.0.7",
+		"webpack": "^5.65.0"
 	},
-	"dependencies": {
-		"@toreda/strong-types": "^0.11.2",
-		"@toreda/types": "^0.0.3"
+	"resolutions": {
+		"tmpl": "^1.0.5",
+		"glob-parent": "^5.1.2",
+		"ws": "^7.4.6"
 	},
+	"dependencies": {},
 	"prettier": "@toreda/prettier-config"
 }

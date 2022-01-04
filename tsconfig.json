@@ -1,18 +1,7 @@
 {
-	"exclude": [
-		"node_modules",
-		"**/*.spec.ts",
-		"tests",
-		"dist/**"
-	],
-	"include": [
-		"**/src/index.ts"
-	],
-	"filesGlob": [
-		"./src/**/*.ts",
-		"!./node_modules/**"
-	],
-	"rootDir": ".",
+	"exclude": ["node_modules", "**/*.spec.ts", "tests", "dist/**", "./gulpfile.ts"],
+	"include": ["**/src/index.ts", "./src/**.ts"],
+	"filesGlob": ["./src/**.ts", "!./node_modules/**"],
 	"compilerOptions": {
 		"allowUnreachableCode": false,
 		"alwaysStrict": true,
@@ -20,18 +9,28 @@
 		"declaration": true,
 		"esModuleInterop": true,
 		"isolatedModules": false,
-		"lib": ["es6", "dom"],
+		"lib": ["es6", "ES2015", "ES2017.TypedArrays"],
 		"module": "commonjs",
 		"moduleResolution": "node",
+		"noImplicitOverride": true,
+		"noImplicitReturns": true,
 		"noImplicitUseStrict": false,
 		"outDir": "./dist",
 		"preserveConstEnums": true,
-		"removeComments": true,
-		"sourceMap": true,
+		"removeComments": false,
+		"rootDir": "./src",
 		"strictBindCallApply": true,
+		"strictFunctionTypes": true,
 		"strictNullChecks": true,
 		"strictPropertyInitialization": true,
-		"target": "es6",
+		"target": "es2015",
 		"traceResolution": false,
+		"useUnknownInCatchVariables": true
+	},
+	"ts-node": {
+		"module": "commonjs"
+	},
+	"ts-jest": {
+		"module": "commonjs"
 	}
 }

@@ -1,12 +1,21 @@
-import {StrongString, makeString} from '@toreda/strong-types';
-import {TransportAction} from './transport/action';
-import {Message} from './message';
-import {StrongLevel, makeLevel} from './strong-level';
+import {LogLevel} from './log/level';
+import type {Message} from './message';
+import type {TransportAction} from './transport/action';
 
+/**
+ * Executes user-provided callback once for each message received.
+ * Only receives messages matching user-configured log levels and
+ * additional filters.
+ *
+ * @category Transports
+ */
 export class Transport {
-	public readonly id: StrongString;
+	/** Globally unique identifier for transport. */
+	public readonly id: string;
+	/** Action executed once for each received matching msg. */
 	public readonly action: TransportAction;
-	public readonly level: StrongLevel;
+	/** Active log levels transport receives msgs for. */
+	public readonly level: LogLevel;
 
 	constructor(id: string, level: number, action: TransportAction) {
 		if (!id && typeof id !== 'string') {
@@ -25,9 +34,9 @@ export class Transport {
 			throw new Error(`[logtr:${id}] Init failure - action arg must be a function.`);
 		}
 
-		this.id = makeString(id);
+		this.id = id;
 		this.action = action;
-		this.level = makeLevel(level);
+		this.level = new LogLevel(level);
 	}
 
 	public execute(msg: Message): Promise<boolean | Error> {

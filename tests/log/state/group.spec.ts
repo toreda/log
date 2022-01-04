@@ -11,7 +11,7 @@ describe('LogStateGroup', () => {
 					id: undefined as any
 				});
 
-				expect(custom.id()).toBe(defaultValue);
+				expect(custom.id).toBe(defaultValue);
 			});
 
 			it(`should set id to 'custom' when option.id is 'custom'`, () => {
@@ -21,7 +21,7 @@ describe('LogStateGroup', () => {
 					id: expected
 				});
 
-				expect(custom.id()).toBe(expected);
+				expect(custom.id).toBe(expected);
 			});
 
 			it(`should set id to defaultValue when option.id is not a string`, () => {
@@ -29,7 +29,7 @@ describe('LogStateGroup', () => {
 					id: 123 as any
 				});
 
-				expect(custom.id()).toBe(defaultValue);
+				expect(custom.id).toBe(defaultValue);
 			});
 		});
 
@@ -41,7 +41,7 @@ describe('LogStateGroup', () => {
 					id: 'custom'
 				});
 
-				expect(custom.enabled()).toBe(defaultValue);
+				expect(custom.enabled).toBe(defaultValue);
 			});
 
 			it(`should set enabled to true when option.enabled is true`, () => {
@@ -52,7 +52,7 @@ describe('LogStateGroup', () => {
 					enabled: true
 				});
 
-				expect(custom.enabled()).toBe(expected);
+				expect(custom.enabled).toBe(expected);
 			});
 
 			it(`should set enabled to false when option.enabled is false`, () => {
@@ -63,7 +63,7 @@ describe('LogStateGroup', () => {
 					enabled: false
 				});
 
-				expect(custom.enabled()).toBe(expected);
+				expect(custom.enabled).toBe(expected);
 			});
 
 			it(`should set enabled to defaultValue when option.enabled is non-boolean truthy `, () => {
@@ -72,7 +72,7 @@ describe('LogStateGroup', () => {
 					enabled: 14971 as any
 				});
 
-				expect(custom.enabled()).toBe(defaultValue);
+				expect(custom.enabled).toBe(defaultValue);
 			});
 		});
 
@@ -84,7 +84,7 @@ describe('LogStateGroup', () => {
 					id: 'custom'
 				});
 
-				expect(custom.level()).toBe(defaultValue);
+				expect(custom.level.get()).toBe(defaultValue);
 			});
 
 			it(`should set level to '111' when option.level is '111'`, () => {
@@ -95,7 +95,7 @@ describe('LogStateGroup', () => {
 					level: expected
 				});
 
-				expect(custom.level()).toBe(expected);
+				expect(custom.level.get()).toBe(expected);
 			});
 
 			it(`should set level to defaultValue when option.level is NaN `, () => {
@@ -104,7 +104,7 @@ describe('LogStateGroup', () => {
 					level: NaN
 				});
 
-				expect(custom.level()).toBe(defaultValue);
+				expect(custom.level.get()).toBe(defaultValue);
 			});
 
 			it(`should set level to defaultValue when option.level is a string `, () => {
@@ -113,7 +113,7 @@ describe('LogStateGroup', () => {
 					level: '14971' as any
 				});
 
-				expect(custom.level()).toBe(defaultValue);
+				expect(custom.level.get()).toBe(defaultValue);
 			});
 
 			it(`should set level to defaultValue when option.level is a negative number `, () => {
@@ -122,7 +122,7 @@ describe('LogStateGroup', () => {
 					level: -145
 				});
 
-				expect(custom.level()).toBe(defaultValue);
+				expect(custom.level.get()).toBe(defaultValue);
 			});
 		});
 
