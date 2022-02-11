@@ -346,22 +346,40 @@ export class Log {
 	 * @param level			Level bitmask msg was logged with.
 	 * @param msg			Msg that was logged.
 	 */
-	private createMessage(level: number, path: string[], ...msg: unknown[]): Message {
+	private createMessage(level: number, path: string[], ...msgs: unknown[]): Message {
 		let message: string;
 
-		if (msg.length > 1) {
-			message = JSON.stringify(msg);
-		} else if (msg.length === 0) {
+		if (msgs.length === 0) {
 			message = '';
-		} else if (typeof msg[0] === 'string') {
-			message = msg[0];
 		} else {
-			message = JSON.stringify(msg[0]);
+			message = msgs
+				.map((msg) => {
+					return this.stringifyMessage(msg);
+				})
+				.join(' , ');
 		}
 
 		const date = Date.now();
 
 		return {date, level, message, path};
+	}
+
+	private stringifyMessage(msg: unknown): string {
+		if (typeof msg === 'string') {
+			return msg;
+		}
+
+		if (msg instanceof Error) {
+			return `\n${msg.stack}`;
+		}
+
+		const mightBeToStringableMsg = msg as {toString: () => string};
+
+		if (typeof mightBeToStringableMsg.toString === 'function') {
+			return mightBeToStringableMsg.toString();
+		}
+
+		return JSON.stringify(msg);
 	}
 
 	/**

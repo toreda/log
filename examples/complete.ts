@@ -1,4 +1,6 @@
-import {Levels, Log, Transport} from '@toreda/log';
+import {Levels} from '../src/levels';
+import {Log} from '../src/log';
+import {Transport} from '../src/transport';
 import {appendFileSync} from 'fs';
 
 // Create a new Logger
