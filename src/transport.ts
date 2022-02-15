@@ -1,6 +1,6 @@
 import {LogLevel} from './log/level';
-import type {Message} from './message';
-import type {TransportAction} from './transport/action';
+import {Message} from './message';
+import {TransportAction} from './transport/action';
 
 /**
  * Executes user-provided callback once for each message received.

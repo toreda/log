@@ -1,13 +1,13 @@
-import type {Expand} from '@toreda/types';
+import {Expand} from '@toreda/types';
 import {Levels} from './levels';
-import type {LogOptions} from './log/options';
-import type {LogOptionsGroup} from './log/options/group';
+import {isLogOptionsGroup, LogOptionsGroup} from './log/options/group';
 import {LogStateGlobal} from './log/state/global';
 import {LogStateGroup} from './log/state/group';
-import type {Message} from './message';
+import {Message} from './message';
 import {Transport} from './transport';
 import {checkLevel} from './check/level';
 import {logToConsole} from './console';
+import {isLogOptionsGlobal, LogOptionsGlobal} from './log/options/global';
 
 /**
  * Main log class holding attached transports and internal state
@@ -19,25 +19,29 @@ export class Log {
 	/** Serializable internal state data */
 	public readonly groupState: LogStateGroup;
 
-	public constructor(options?: LogOptions) {
+	public constructor(options: LogOptionsGroup | LogOptionsGlobal = {}) {
 		let enabled: boolean;
 		let level: number;
 		let parent: Log | undefined;
 		let path: string[];
 
-		if (!options?.state) {
+		if (isLogOptionsGlobal(options)) {
 			path = options?.id ? [options.id] : [];
 			this.globalState = new LogStateGlobal(options);
 			this.globalState.groups.set(options?.id ?? 'default', this);
 			level = this.globalState.globalLevel.get();
 			this.globalState.globalLevel.set(level);
 			enabled = this.globalState.groupsStartEnabled;
-		} else if (options.state instanceof LogStateGlobal) {
+
+			for (const groupOptions of options.startingGroups ?? []) {
+				this.makeLog(groupOptions.id, groupOptions);
+			}
+		} else if (isLogOptionsGroup(options)) {
 			this.globalState = options.state;
 			parent = options.parent;
 			path = options.id.split('.');
-			level = options.level;
-			enabled = options.enabled;
+			level = options.level ?? this.globalState.globalLevel.get();
+			enabled = options.enabled ?? this.globalState.groupsStartEnabled;
 		} else {
 			throw Error(`Bad Log init - 'state' was not an instance of LogStateGlobal.`);
 		}
@@ -47,6 +51,10 @@ export class Log {
 		// Activate console logging if allowed by start options.
 		if (this.globalState.consoleEnabled) {
 			this.activateDefaultConsole();
+		}
+
+		for (const transport of this.globalState.transports) {
+			this.addTransport(transport);
 		}
 	}
 

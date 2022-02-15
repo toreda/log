@@ -1,12 +1,13 @@
-import type {Log} from '../../log';
-import type {LogStateGlobal} from '../state/global';
+import {ANY} from '@toreda/types';
+import {Log} from '../../log';
+import {LogStateGlobal} from '../state/global';
 
 /**
  * Used by makeGroup in a existing Log
  *
  * @category Options
  */
-export interface LogOptionsGroup {
+export type LogOptionsGroup = {
 	state: LogStateGlobal;
 
 	id: string;
@@ -15,4 +16,16 @@ export interface LogOptionsGroup {
 
 	enabled?: boolean;
 	level?: number;
+};
+
+export function isLogOptionsGroup(options: ANY): options is LogOptionsGroup {
+	if (options?.state == null) {
+		return false;
+	}
+
+	if (options.state instanceof LogStateGlobal) {
+		return true;
+	} else {
+		return false;
+	}
 }

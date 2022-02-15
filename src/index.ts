@@ -3,7 +3,6 @@ export {checkLevel} from './check/level';
 export {Levels} from './levels';
 export {Log} from './log';
 export {LogLevel} from './log/level';
-export {LogOptions} from './log/options';
 export {LogOptionsGlobal} from './log/options/global';
 export {LogOptionsGroup} from './log/options/group';
 export {LogStateGlobal} from './log/state/global';

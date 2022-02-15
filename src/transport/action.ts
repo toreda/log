@@ -1,4 +1,4 @@
-import type {Message} from '../message';
+import {Message} from '../message';
 
 /**
  * Custom Action used to create a log transport.
