@@ -58,7 +58,7 @@ describe('Log', () => {
 
 		it(`should throw when 'state' is not a LogStateGlobal`, () => {
 			expect(() => {
-				new Log({state: {} as any});
+				new Log({id: '', state: {} as any});
 			}).toThrow(`Bad Log init - 'state' was not an instance of LogStateGlobal.`);
 		});
 	});
@@ -172,6 +172,13 @@ describe('Log', () => {
 
 				const groupId = result.groupState.id;
 				expect(log.globalState.groups.get(groupId)).toHaveProperty('groupState');
+			});
+
+			it(`should create transports if startingTransports were added`, () => {
+				const baseLog = new Log({id: 'base log', startingTransports: [TRANSPORT]});
+				const testLog = baseLog.makeLog('testLog');
+
+				expect(testLog.groupState.transports.size).toBe(1);
 			});
 		});
 
