@@ -53,7 +53,7 @@ describe('Transport', () => {
 		describe('execute', () => {
 			const sampleMsg: Message = {
 				level: Levels.ERROR | Levels.TRACE,
-				message: 'aaaa 01841 10481048 1444671',
+				message: ['aaaa 01841 10481048 1444671'],
 				date: Date.now(),
 				path: ['one', 'three']
 			};

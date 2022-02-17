@@ -6,6 +6,6 @@ export interface Message {
 	/** UTC Timestamp when log message was originally created. */
 	date: number;
 	level: number;
-	message: string;
+	message: unknown[];
 	path: string[];
 }

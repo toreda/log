@@ -1,13 +1,14 @@
+import {LogOptionsGlobal, isLogOptionsGlobal} from './log/options/global';
+import {LogOptionsGroup, isLogOptionsGroup} from './log/options/group';
+
 import {Expand} from '@toreda/types';
 import {Levels} from './levels';
-import {isLogOptionsGroup, LogOptionsGroup} from './log/options/group';
 import {LogStateGlobal} from './log/state/global';
 import {LogStateGroup} from './log/state/group';
 import {Message} from './message';
 import {Transport} from './transport';
 import {checkLevel} from './check/level';
 import {logToConsole} from './console';
-import {isLogOptionsGlobal, LogOptionsGlobal} from './log/options/global';
 
 /**
  * Main log class holding attached transports and internal state
@@ -354,19 +355,7 @@ export class Log {
 	 * @param level			Level bitmask msg was logged with.
 	 * @param msg			Msg that was logged.
 	 */
-	private createMessage(level: number, path: string[], ...msgs: unknown[]): Message {
-		let message: string;
-
-		if (msgs.length === 0) {
-			message = '';
-		} else {
-			message = msgs
-				.map((msg) => {
-					return this.stringifyMessage(msg);
-				})
-				.join(' , ');
-		}
-
+	private createMessage(level: number, path: string[], ...message: unknown[]): Message {
 		const date = Date.now();
 
 		return {date, level, message, path};

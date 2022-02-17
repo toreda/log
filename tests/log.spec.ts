@@ -473,34 +473,6 @@ describe('Log', () => {
 			});
 		});
 
-		describe(`createMessage`, () => {
-			const level = 1;
-
-			it(`should return with a string message if msg.length > 1`, () => {
-				const result = log['createMessage'](level, ['def'], 1, 2, 3, 4);
-
-				expect(typeof result.message).toBe('string');
-			});
-
-			it(`should return with a string message if msg.length === 0`, () => {
-				const result = log['createMessage'](level, ['def']);
-
-				expect(typeof result.message).toBe('string');
-			});
-
-			it(`should return with a string message if msg is a single string`, () => {
-				const result = log['createMessage'](level, ['def'], 'single string message');
-
-				expect(typeof result.message).toBe('string');
-			});
-
-			it(`should return with a string message if msg is a single non string`, () => {
-				const result = log['createMessage'](level, ['def'], {a: 'b'});
-
-				expect(typeof result.message).toBe('string');
-			});
-		});
-
 		describe('canExecute', () => {
 			const LogLevel = 0b1010;
 			const ceLog = log.makeLog('canExecute', {level: LogLevel});
