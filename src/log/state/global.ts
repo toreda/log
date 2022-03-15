@@ -49,8 +49,7 @@ export class LogStateGlobal {
 			if (transportData instanceof Transport) {
 				transport = transportData;
 			} else {
-				const {id, level, action} = transportData;
-				transport = new Transport(id, level, action);
+				transport = new Transport(transportData);
 			}
 
 			this.transports.push(transport);

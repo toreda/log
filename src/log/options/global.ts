@@ -1,7 +1,6 @@
 import {ANY} from '@toreda/types';
 import {LogOptionsGroup} from './group';
 import {Transport} from '../../transport';
-import {TransportAction} from '../..';
 
 /**
  * Used when creating a brand new Log
@@ -14,7 +13,7 @@ export type LogOptionsGlobal = {
 	globalLevel?: number;
 	groupsStartEnabled?: boolean;
 	startingGroups?: LogOptionsGroup[];
-	startingTransports?: Array<Transport | {id: string; level: number; action: TransportAction}>;
+	startingTransports?: Array<Transport | ConstructorParameters<typeof Transport>[0]>;
 };
 
 export function isLogOptionsGlobal(options: ANY): options is LogOptionsGlobal {

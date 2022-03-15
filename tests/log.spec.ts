@@ -39,8 +39,9 @@ const LOG_METHODS = [
 
 describe('Log', () => {
 	const log = new Log({groupsStartEnabled: true});
+	const ID = 'Test Transport';
 	const ACTION = jest.fn(() => true);
-	const TRANSPORT = new Transport('Test Transport', Levels.ALL, ACTION);
+	const TRANSPORT = new Transport({id: ID, level: Levels.ALL, action: ACTION});
 
 	describe('Constructor', () => {
 		it('should instantiate when no args are given', () => {
@@ -191,6 +192,10 @@ describe('Log', () => {
 						expect(log.addTransport(TRANSPORT)).toBe(false);
 					}
 
+					for (let i = 0; i < 5; i++) {
+						expect(log.addTransport({id: ID, level: Levels.ALL, action: ACTION})).toBe(false);
+					}
+
 					log.clear();
 				});
 
@@ -211,7 +216,7 @@ describe('Log', () => {
 				});
 
 				it(`should add transport to group`, () => {
-					const transport = new Transport('11097141', Levels.ALL, ACTION);
+					const transport = new Transport({id: '11097141', level: Levels.ALL, action: ACTION});
 					expect(log.groupState.transports.size).toBe(0);
 
 					log.addTransport(transport);
@@ -270,7 +275,7 @@ describe('Log', () => {
 
 			describe('removeTransportById', () => {
 				it('should remove transport from group', () => {
-					const transport = new Transport('id', Levels.ALL, ACTION);
+					const transport = new Transport({id: 'id', level: Levels.ALL, action: ACTION});
 					expect(log.groupState.transports.size).toBe(0);
 					log.addTransport(transport);
 					expect(log.groupState.transports.size).toBe(1);
@@ -280,7 +285,7 @@ describe('Log', () => {
 				});
 
 				it('should return false if no transports are removed', () => {
-					const transport = new Transport('id', Levels.ALL, ACTION);
+					const transport = new Transport({id: 'id', level: Levels.ALL, action: ACTION});
 					expect(log.groupState.transports.size).toBe(0);
 					log.addTransport(transport);
 					expect(log.groupState.transports.size).toBe(1);
@@ -580,7 +585,7 @@ describe('Log', () => {
 				TRANSPORT.level.set(Levels.DEBUG);
 				log.setGlobalLevel(Levels.NONE);
 				log.setGroupLevel(Levels.WARN);
-				const oppositeTransport = new Transport('opposite', Levels.WARN, ACTION);
+				const oppositeTransport = new Transport({id: 'opposite', level: Levels.WARN, action: ACTION});
 				log.clear();
 				log.addTransport(TRANSPORT);
 				log.addTransport(oppositeTransport);
@@ -595,11 +600,19 @@ describe('Log', () => {
 
 			it(`should not throw when transport throws`, (done) => {
 				log.enableGroupLevel(1);
-				const transport = new Transport('SyncAction', 1, () => {
-					throw Error('Sync Err');
+				const transport = new Transport({
+					id: 'SyncAction',
+					level: 1,
+					action: () => {
+						throw Error('Sync Err');
+					}
 				});
-				const transportAsync = new Transport('AsyncAction', 1, async () => {
-					throw Error('Async Err');
+				const transportAsync = new Transport({
+					id: 'AsyncAction',
+					level: 1,
+					action: async () => {
+						throw Error('Async Err');
+					}
 				});
 
 				log.addTransport(transportAsync);
@@ -618,11 +631,19 @@ describe('Log', () => {
 			it(`should return list of failures when transports return false`, (done) => {
 				log.enableGroupLevel(1);
 				log.clearAll();
-				const transport = new Transport('SyncAction', 1, () => {
-					return false;
+				const transport = new Transport({
+					id: 'SyncAction',
+					level: 1,
+					action: () => {
+						return false;
+					}
 				});
-				const transportAsync = new Transport('AsyncAction', 1, async () => {
-					throw 'err';
+				const transportAsync = new Transport({
+					id: 'AsyncAction',
+					level: 1,
+					action: async () => {
+						throw 'err';
+					}
 				});
 
 				log.addTransport(transportAsync);
@@ -648,11 +669,19 @@ describe('Log', () => {
 			it(`should return true when transports return true`, (done) => {
 				log.enableGroupLevel(1);
 				log.clearAll();
-				const transport = new Transport('SyncAction', 1, () => {
-					return true;
+				const transport = new Transport({
+					id: 'SyncAction',
+					level: 1,
+					action: () => {
+						return true;
+					}
 				});
-				const transportAsync = new Transport('AsyncAction', 1, async () => {
-					return true;
+				const transportAsync = new Transport({
+					id: 'AsyncAction',
+					level: 1,
+					action: async () => {
+						return true;
+					}
 				});
 
 				log.addTransport(transportAsync);

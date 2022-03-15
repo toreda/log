@@ -17,7 +17,7 @@ export class Transport {
 	/** Active log levels transport receives msgs for. */
 	public readonly level: LogLevel;
 
-	constructor(id: string, level: number, action: TransportAction) {
+	constructor({id, level, action}: {id: string; level: number; action: TransportAction}) {
 		if (!id && typeof id !== 'string') {
 			throw new Error('Transport init failure - id arg is missing.');
 		}

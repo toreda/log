@@ -7,8 +7,8 @@ const action: TransportAction = function (_logData) {
 	logResult[this.id] = true;
 	return true;
 };
-const topTransport = new Transport('top', 0xffff, action);
-const subTransport = new Transport('sub', 0xffff, action);
+const topTransport = new Transport({id: 'top', level: 0xffff, action});
+const subTransport = new Transport({id: 'sub', level: 0xffff, action});
 const logResult = {top: false, sub: false};
 
 describe(`Demo for bubbling events interactions with enable/disable.`, () => {

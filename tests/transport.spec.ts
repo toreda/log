@@ -20,31 +20,31 @@ describe('Transport', () => {
 	describe('Constructor', () => {
 		it('should throw when id arg is undefined', () => {
 			expect(() => {
-				new Transport(undefined as any, level, action);
+				new Transport({id: undefined as any, level, action});
 			}).toThrow('Transport init failure - id arg is missing.');
 		});
 
 		it('should throw when id arg is null', () => {
 			expect(() => {
-				new Transport(null as any, level, action);
+				new Transport({id: null as any, level, action});
 			}).toThrow('Transport init failure - id arg is missing.');
 		});
 
 		it('should throw when id arg is not a string', () => {
 			expect(() => {
-				new Transport(14081871 as any, level, action);
+				new Transport({id: 14081871 as any, level, action});
 			}).toThrow('Transport init failure - id arg must be a non-empty string.');
 		});
 
 		it('should throw when action arg is undefined', () => {
 			expect(() => {
-				new Transport(MOCK_ID, MOCK_LEVEL, undefined as any);
+				new Transport({id: MOCK_ID, level: MOCK_LEVEL, action: undefined as any});
 			}).toThrow(`[logtr:${MOCK_ID}] Init failure - action arg is missing.`);
 		});
 
 		it('should throw when id action arg is not a function', () => {
 			expect(() => {
-				new Transport(MOCK_ID, level, 1408141 as any);
+				new Transport({id: MOCK_ID, level, action: 1408141 as any});
 			}).toThrow(`[logtr:${MOCK_ID}] Init failure - action arg must be a function.`);
 		});
 	});
@@ -60,7 +60,7 @@ describe('Transport', () => {
 
 			it('should pass msg to action call', async () => {
 				const sampleAction = jest.fn();
-				const custom = new Transport(MOCK_ID, Levels.ALL, sampleAction);
+				const custom = new Transport({id: MOCK_ID, level: Levels.ALL, action: sampleAction});
 				expect(sampleAction).not.toHaveBeenCalled();
 
 				await custom.execute(sampleMsg);

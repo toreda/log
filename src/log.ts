@@ -63,8 +63,7 @@ export class Log {
 	 * Enable global console logging for development and debugging.
 	 */
 	public activateDefaultConsole(level: number = Levels.ALL_EXTENDED): void {
-		const transport = new Transport('console', level, logToConsole);
-		this.addTransport(transport);
+		this.addTransport({id: 'console', level, action: logToConsole});
 	}
 
 	public deactivateDefaultConsole(): void {
@@ -143,12 +142,26 @@ export class Log {
 
 	/**
 	 * Add transport to log.
-	 * @param transport 		Transport to add to log.
+	 * @param transportData		Transport to add to log.
 	 */
-	public addTransport(transport: Transport): boolean {
-		if (!transport || !(transport instanceof Transport)) {
+	public addTransport(transportData: Transport | TransportArgs): boolean {
+		if (transportData == null) {
 			return false;
 		}
+
+		const transport = ((): Transport => {
+			if (transportData instanceof Transport) {
+				return transportData;
+			} else {
+				const transport = this.getTransport(transportData.id);
+
+				if (transport != null) {
+					return transport;
+				}
+
+				return new Transport(transportData);
+			}
+		})();
 
 		if (this.groupState.transports.has(transport)) {
 			return false;
@@ -549,3 +562,4 @@ export class Log {
 type LogResult = Record<string, boolean | Error>;
 type LogActionResult = Promise<[string, boolean | Error]>;
 type MakeLogOptions = Expand<Omit<LogOptionsGroup, 'state' | 'id' | 'parent' | 'path'>>;
+type TransportArgs = ConstructorParameters<typeof Transport>[0];
