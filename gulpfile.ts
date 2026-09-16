@@ -25,14 +25,17 @@
 
 import gulp, {dest, series, src} from 'gulp';
 
+import {rm, writeFile} from 'node:fs/promises';
+
 import {ESLint} from 'eslint';
-import {rm} from 'node:fs/promises';
+import {replaceTscAliasPaths} from 'tsc-alias';
 import ts from 'gulp-typescript';
 
 const eslint = new ESLint();
 
 const srcPatterns = ['src/**.ts', 'src/**/*.ts'];
-const tsc = ts.createProject('tsconfig.json');
+const tscCjs = ts.createProject('tsconfig.json');
+const tscEsm = ts.createProject('tsconfig.esm.json');
 
 async function linter() {
 	const result = await eslint.lintFiles(srcPatterns);
@@ -59,11 +62,29 @@ async function cleanDist() {
 	});
 }
 
-function buildSrc() {
-	// Build typescript sources and output them in './dist'.
+function buildCjs() {
+	// Build typescript sources as CommonJS and output them in './dist'.
 	// NOTE: In other projects this task is handled by `@toreda/build-tools`, however
 	// we cannot use it here because this package is a dependency of build-tools.
-	return src(srcPatterns).pipe(tsc()).pipe(dest('dist'));
+	return src(srcPatterns).pipe(tscCjs()).pipe(dest('dist'));
 }
 
-exports.default = series(createDist, cleanDist, linter, buildSrc);
+function buildEsm() {
+	// Build typescript sources as ESM and output them in './dist/esm'.
+	return src(srcPatterns).pipe(tscEsm()).pipe(dest('dist/esm'));
+}
+
+async function finalizeEsm() {
+	// tsc emits relative imports without extensions, which Node's ESM loader
+	// rejects. Rewrite them to explicit './x.js' specifiers in js + d.ts output.
+	await replaceTscAliasPaths({
+		configFile: 'tsconfig.esm.json',
+		resolveFullPaths: true
+	});
+
+	// Mark everything under dist/esm as ESM. The package root has no "type"
+	// field, so dist/*.js stays CommonJS.
+	await writeFile('./dist/esm/package.json', JSON.stringify({type: 'module'}, null, '\t') + '\n');
+}
+
+exports.default = series(createDist, cleanDist, linter, buildCjs, buildEsm, finalizeEsm);

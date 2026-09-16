@@ -11,7 +11,7 @@
 		"isolatedModules": false,
 		"lib": ["es2022"],
 		"module": "esnext",
-		"moduleResolution": "node",
+		"moduleResolution": "bundler",
 		"outDir": "./dist/esm",
 		"preserveConstEnums": true,
 		"removeComments": false,
@@ -26,6 +26,6 @@
 		"target": "es2022",
 		"traceResolution": false,
 		"paths": {},
-		"types": ["@types/jest"]
+		"types": ["jest", "node"]
 	}
 }
