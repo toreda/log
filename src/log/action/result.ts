@@ -1,0 +1,1 @@
+export type LogActionResult = Promise<[string, boolean | Error]>;

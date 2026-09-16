@@ -13,6 +13,9 @@ import {checkId} from './check/id';
 import {checkLevel} from './check/level';
 import {levelMask} from './level/mask';
 import {logToConsole} from './console';
+import type {LogResult} from './log/result';
+import type {LogActionResult} from './log/action/result';
+import type {TransportArgs} from './transport/args';
 
 /**
  * Main log class holding attached transports and internal state
@@ -627,7 +630,4 @@ export class Log {
 	}
 }
 
-type LogResult = Record<string, boolean | Error>;
-type LogActionResult = Promise<[string, boolean | Error]>;
 type MakeLogOptions = Expand<Omit<LogOptionsGroup, 'state' | 'id' | 'parent' | 'path'>>;
-type TransportArgs = ConstructorParameters<typeof Transport>[0];
