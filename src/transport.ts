@@ -1,6 +1,6 @@
 import {LogLevel} from './log/level';
-import {Message} from './message';
-import {TransportAction} from './transport/action';
+import type {Message} from './message';
+import type {TransportAction} from './transport/action';
 import {checkLevel} from './check/level';
 
 /**

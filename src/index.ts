@@ -11,3 +11,5 @@ export {logToConsole} from './console';
 export {Message} from './message';
 export {Transport} from './transport';
 export {TransportAction} from './transport/action';
+export {TransportAddErrorCode} from './transport/add/error/code';
+export {TransportAddResult} from './transport/add/result';

@@ -12,6 +12,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Headlines
 * Added dual esm/cjs output to support ESM consumers.
 
+### Changed
+* `Log.addTransport` now returns a `TransportAddResult` object (`{ok, errorCode?, errors?}`) instead of a boolean, and never throws. Transport construction failures are reported with `errorCode: 'transport_init_failed'` and the thrown error in `errors`.
+* `Transport` ctor now throws when `level` is not a valid log level instead of silently defaulting to `Levels.NONE`.
+
 ### Fixed
 * startingGroups now runs at the end of the Log ctor and no longer throws when provided.
 

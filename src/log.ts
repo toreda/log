@@ -7,6 +7,7 @@ import {LogStateGlobal} from './log/state/global';
 import {LogStateGroup} from './log/state/group';
 import type {Message} from './message';
 import {Transport} from './transport';
+import type {TransportAddResult} from './transport/add/result';
 import {checkLevel} from './check/level';
 import {logToConsole} from './console';
 
@@ -144,35 +145,41 @@ export class Log {
 	}
 
 	/**
-	 * Add transport to log.
-	 * @param transportData		Transport to add to log.
+	 * Add transport to log. Never throws: a transport that cannot be
+	 * constructed from args is reported via the returned errorCode.
+	 * @param transportData		Transport instance or ctor args to add to log.
+	 * @returns					Result with ok flag and failure details.
 	 */
-	public addTransport(transportData: Transport | TransportArgs): boolean {
+	public addTransport(transportData: Transport | TransportArgs): TransportAddResult {
 		if (transportData == null) {
-			return false;
+			return {ok: false, errorCode: 'transport_missing'};
 		}
 
-		const transport = ((): Transport => {
-			if (transportData instanceof Transport) {
-				return transportData;
-			} else {
-				const transport = this.getTransport(transportData.id);
+		let transport: Transport;
 
-				if (transport != null) {
-					return transport;
-				}
+		if (transportData instanceof Transport) {
+			transport = transportData;
+		} else {
+			const existing = this.getTransport(transportData.id);
 
-				return new Transport(transportData);
+			if (existing != null) {
+				return {ok: false, errorCode: 'transport_duplicate'};
 			}
-		})();
+
+			try {
+				transport = new Transport(transportData);
+			} catch (err) {
+				return {ok: false, errorCode: 'transport_init_failed', errors: [err]};
+			}
+		}
 
 		if (this.groupState.transports.has(transport)) {
-			return false;
+			return {ok: false, errorCode: 'transport_duplicate'};
 		}
 
 		this.groupState.transports.add(transport);
 
-		return true;
+		return {ok: true, errorCode: null};
 	}
 
 	public getTransport(transportId: string): Transport | null {

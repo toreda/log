@@ -57,7 +57,9 @@ describe('Log', () => {
 		});
 
 		it('should create startingGroups', () => {
-			const root = new Log({startingGroups: [{id: 'alpha'}, {id: 'beta', level: Levels.DEBUG, enabled: false}]});
+			const root = new Log({
+				startingGroups: [{id: 'alpha'}, {id: 'beta', level: Levels.DEBUG, enabled: false}]
+			});
 
 			const alpha = root.globalState.groups.get('alpha');
 			const beta = root.globalState.groups.get('beta');
@@ -233,29 +235,62 @@ describe('Log', () => {
 					log.addTransport(TRANSPORT);
 
 					for (let i = 0; i < 5; i++) {
-						expect(log.addTransport(TRANSPORT)).toBe(false);
+						expect(log.addTransport(TRANSPORT)).toEqual({
+							ok: false,
+							errorCode: 'transport_duplicate'
+						});
 					}
 
 					for (let i = 0; i < 5; i++) {
-						expect(log.addTransport({id: ID, level: Levels.ALL, action: ACTION})).toBe(false);
+						expect(log.addTransport({id: ID, level: Levels.ALL, action: ACTION})).toEqual({
+							ok: false,
+							errorCode: 'transport_duplicate'
+						});
 					}
 
 					log.clear();
 				});
 
-				it('should return false and should not add a transport when transport arg is undefined', () => {
+				it('should return transport_missing and should not add a transport when transport arg is undefined', () => {
 					expect(log.groupState.transports.size).toBe(0);
 
-					expect(log.addTransport(undefined as any)).toBe(false);
+					expect(log.addTransport(undefined as any)).toEqual({
+						ok: false,
+						errorCode: 'transport_missing'
+					});
 
 					expect(log.groupState.transports.size).toBe(0);
 				});
 
-				it('should return false and should not add a transport when transport arg is null', () => {
+				it('should return transport_missing and should not add a transport when transport arg is null', () => {
 					expect(log.groupState.transports.size).toBe(0);
 
-					expect(log.addTransport(null as any)).toBe(false);
+					expect(log.addTransport(null as any)).toEqual({
+						ok: false,
+						errorCode: 'transport_missing'
+					});
 
+					expect(log.groupState.transports.size).toBe(0);
+				});
+
+				it('should return ok when transport is added', () => {
+					expect(log.addTransport(TRANSPORT)).toEqual({ok: true, errorCode: null});
+					expect(log.groupState.transports.has(TRANSPORT)).toBe(true);
+					log.clear();
+				});
+
+				it('should return transport_init_failed with the thrown error when transport args are invalid', () => {
+					expect(log.groupState.transports.size).toBe(0);
+
+					const result = log.addTransport({id: ID, level: -1, action: ACTION});
+
+					expect(result.ok).toBe(false);
+					expect(result.errorCode).toBe('transport_init_failed');
+					expect(result.errors).toHaveLength(1);
+					expect(result.errors?.[0]).toBeInstanceOf(Error);
+					expect((result.errors?.[0] as Error).message).toBe(
+						`[logtr:${ID}] Init failure - level arg must be a valid log level.`
+					);
 					expect(log.groupState.transports.size).toBe(0);
 				});
 
