@@ -1,4 +1,4 @@
-import {ANY} from '@toreda/types';
+import {ANY} from '@toreda/shared-types';
 import {Log} from '../../log';
 import {LogStateGlobal} from '../state/global';
 

@@ -26,12 +26,10 @@
 import gulp, {dest, series, src} from 'gulp';
 
 import {ESLint} from 'eslint';
-import del from 'del';
+import {rm} from 'node:fs/promises';
 import ts from 'gulp-typescript';
 
-const eslint = new ESLint({
-	useEslintrc: true
-});
+const eslint = new ESLint();
 
 const srcPatterns = ['src/**.ts', 'src/**/*.ts'];
 const tsc = ts.createProject('tsconfig.json');
@@ -55,9 +53,9 @@ function createDist() {
 async function cleanDist() {
 	// NOTE: In other projects this task is handled by `@toreda/build-tools`, however
 	// we cannot use it here because this package is a dependency of build-tools.
-	return del(`dist/**`, {
+	await rm('dist', {
 		force: true,
-		dryRun: false
+		recursive: true
 	});
 }
 

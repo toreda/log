@@ -11,7 +11,6 @@
 		"isolatedModules": false,
 		"lib": ["es2022"],
 		"module": "commonjs",
-		"moduleResolution": "node",
 		"outDir": "./dist",
 		"preserveConstEnums": true,
 		"removeComments": false,
@@ -26,7 +25,7 @@
 		"target": "es2022",
 		"traceResolution": false,
 		"paths": {},
-		"types": ["@types/jest"]
+		"types": ["jest", "node"]
 	},
 	"ts-node": {
 		"compilerOptions": {

@@ -1,4 +1,4 @@
-import {ANY} from '@toreda/types';
+import {ANY} from '@toreda/shared-types';
 import {LogOptionsGroup} from './group';
 import {Transport} from '../../transport';
 
