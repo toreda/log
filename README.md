@@ -24,9 +24,8 @@ Features:
 &nbsp;
 
 # Contents
-* [**Use Cases**](#use-cases)
+* [**Features**](#features)
 
-* [**What does it do?**](#what-does-it-do)
 * [**Usage**](#usage)
 
 * [**Package**](#Package)
@@ -37,7 +36,7 @@ Features:
 
 &nbsp;
 
-# Use Cases
+# Features
 
 ## Custom Transports
 * Configure transports to receive all log events, or only a filtered subset based on class, group, and log level.
@@ -53,7 +52,7 @@ Features:
 `@toreda/log` provides simple and straight forward logging for common use cases, and advanced functionality for use in more complicated situations like server-side and remote debugging.
 
 
-**Create Logger**
+**Create Logger** (no options)
 ```typescript
 import {Log} from '@toreda/log';
 const log = new Log();
