@@ -1,7 +1,7 @@
 {
 	"name": "@toreda/log",
 	"version": "1.0.0",
-	"description": "Lightweight TypeScript logger with flexible custom transports.",
+	"description": "TypeScript logger with custom transports, per-group log levels, and ESM + CommonJS builds for Node, browser, and serverless environments.",
 	"main": "./dist/index.js",
 	"module": "./dist/esm/index.js",
 	"typings": "./dist/index.d.ts",
@@ -36,13 +36,21 @@
 		"url": "git+https://github.com/toreda/log.git"
 	},
 	"keywords": [
-		"lightweight",
+		"log",
 		"logger",
 		"logging",
-		"serverless",
-		"toreda",
+		"log-levels",
+		"log-groups",
+		"transport",
+		"transports",
+		"lightweight",
 		"typescript",
-		"transport"
+		"esm",
+		"commonjs",
+		"node",
+		"browser",
+		"serverless",
+		"toreda"
 	],
 	"author": "Toreda, Inc.",
 	"license": "MIT",
