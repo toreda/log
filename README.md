@@ -215,6 +215,6 @@ npm run-script build
 
 
 ## Copyright
-Copyright &copy; 2019 - 2022 Toreda, Inc. All Rights Reserved.
+Copyright &copy; 2019 - 2023 Toreda, Inc. All Rights Reserved.
 
 https://www.toreda.com

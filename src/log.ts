@@ -1,11 +1,11 @@
-import {LogOptionsGlobal, isLogOptionsGlobal} from './log/options/global';
-import {LogOptionsGroup, isLogOptionsGroup} from './log/options/group';
+import {type LogOptionsGlobal, isLogOptionsGlobal} from './log/options/global';
+import {type LogOptionsGroup, isLogOptionsGroup} from './log/options/group';
 
-import {Expand} from '@toreda/types';
+import type {Expand} from '@toreda/shared-types';
 import {Levels} from './levels';
 import {LogStateGlobal} from './log/state/global';
 import {LogStateGroup} from './log/state/group';
-import {Message} from './message';
+import type {Message} from './message';
 import {Transport} from './transport';
 import {checkLevel} from './check/level';
 import {logToConsole} from './console';
@@ -29,14 +29,9 @@ export class Log {
 		if (isLogOptionsGlobal(options)) {
 			path = options?.id ? [options.id] : [];
 			this.globalState = new LogStateGlobal(options);
-			this.globalState.groups.set(options?.id ?? 'default', this);
+			this.globalState.groups.set(path.join('.'), this);
 			level = this.globalState.globalLevel.get();
-			this.globalState.globalLevel.set(level);
 			enabled = this.globalState.groupsStartEnabled;
-
-			for (const groupOptions of options.startingGroups ?? []) {
-				this.makeLog(groupOptions.id, groupOptions);
-			}
 		} else if (isLogOptionsGroup(options)) {
 			this.globalState = options.state;
 			parent = options.parent;
@@ -56,6 +51,14 @@ export class Log {
 
 		for (const transport of this.globalState.transports) {
 			this.addTransport(transport);
+		}
+
+		// Starting groups can only be created once this group's own
+		// state exists, since new groups are built from its path.
+		if (isLogOptionsGlobal(options)) {
+			for (const groupOptions of options.startingGroups ?? []) {
+				this.makeLog(groupOptions.id, groupOptions);
+			}
 		}
 	}
 
@@ -286,14 +289,17 @@ export class Log {
 	}
 
 	/**
-	 * Enable log.
+	 * Enable this group's transports. Messages logged by a group bubble
+	 * up through its parents, and each group's enabled flag only controls
+	 * whether that group's own transports receive them.
 	 */
 	public enable(): void {
 		this.groupState.enabled = true;
 	}
 
 	/**
-	 * Disable log.
+	 * Disable this group's transports. Messages logged by a disabled group
+	 * still bubble up to enabled parent groups and their transports.
 	 */
 	public disable(): void {
 		this.groupState.enabled = false;
@@ -337,9 +343,11 @@ export class Log {
 	}
 
 	/**
-	 * Set log level for target group.
+	 * Set log level for this group. The group level is combined with the
+	 * global level and only filters this group's own transports. Messages
+	 * logged by this group still bubble up to parent groups, which apply
+	 * their own levels.
 	 * @param level
-	 * @param id
 	 */
 	public setGroupLevel(level: number): void {
 		this.groupState.level.set(level);
@@ -423,7 +431,10 @@ export class Log {
 	}
 
 	/**
-	 * Log message to default group.
+	 * Log message to this group and bubble it up to every parent group.
+	 * Each group's enabled flag and level decide whether that group's own
+	 * transports execute; transports are deduplicated by id, with the
+	 * closest group's transport winning.
 	 * @param msgLevel
 	 * @param msg
 	 */
@@ -466,7 +477,7 @@ export class Log {
 		}
 
 		return Promise.all(actions).then((res) => {
-			const result = {};
+			const result: LogResult = {};
 			let failed = false;
 
 			res.forEach((action) => {
@@ -555,7 +566,7 @@ export class Log {
 
 		initialGroup.clear();
 
-		return this.globalState.groups[0];
+		return initialGroup;
 	}
 }
 

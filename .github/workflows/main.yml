@@ -1,33 +1,41 @@
-# This is a basic workflow to help you get started with Actions
-
 name: CI
 
 on:
-  # Trigger analysis when pushing in master or pull requests, and when creating
-  # a pull request.
   push:
     branches:
       - master
       - develop
   pull_request:
-      types: [opened, synchronize, reopened]
+    types: [opened, synchronize, reopened]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
 jobs:
-  build_project:
-     runs-on: ubuntu-latest
-     strategy:
-       matrix:
-         node-version: [12.x]
-     steps:
-       - uses: actions/checkout@v2
-       - name: Use Node.JS ${{ matrix.node-version }}
-         uses: actions/setup-node@v1
-         with:
-           node-version: ${{ matrix.node-version }}
-       - run: yarn install
-       - run: yarn test --coverage
-       - run: yarn build
-       - name: Sonarcloud
-         uses: sonarsource/sonarcloud-github-action@master
-         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SONAR_TOKEN: ${{ secrets.SONARCLOUD_OSS_TOKEN }}
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: [20.x, 22.x, 24.x]
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v5
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run lint
+      - run: pnpm run test:ci
+      - run: pnpm run build

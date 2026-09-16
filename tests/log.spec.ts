@@ -48,6 +48,26 @@ describe('Log', () => {
 			expect(new Log()).toBeInstanceOf(Log);
 		});
 
+		it('should register root group under its own group id', () => {
+			const root = new Log();
+			expect(root.globalState.groups.get(root.groupState.id)).toBe(root);
+
+			const named = new Log({id: 'named'});
+			expect(named.globalState.groups.get('named')).toBe(named);
+		});
+
+		it('should create startingGroups', () => {
+			const root = new Log({startingGroups: [{id: 'alpha'}, {id: 'beta', level: Levels.DEBUG, enabled: false}]});
+
+			const alpha = root.globalState.groups.get('alpha');
+			const beta = root.globalState.groups.get('beta');
+
+			expect(alpha).toBeInstanceOf(Log);
+			expect(alpha?.groupState.parent).toBe(root);
+			expect(beta?.groupState.level.get()).toBe(Levels.DEBUG);
+			expect(beta?.groupState.enabled).toBe(false);
+		});
+
 		it(`should class 'activateDefaultConsole' if 'consoleEnabled' is true`, () => {
 			const spy = jest.spyOn(Log.prototype, 'activateDefaultConsole');
 			expect(spy).not.toHaveBeenCalled();
@@ -75,7 +95,7 @@ describe('Log', () => {
 					log.activateDefaultConsole(level);
 
 					expect(log.groupState.transports.size).toBe(1);
-					expect(log.groupState.transports.values().next().value.level.get()).toBe(level);
+					expect(log.groupState.transports.values().next().value?.level.get()).toBe(level);
 					log.reset();
 				});
 			});
@@ -154,6 +174,14 @@ describe('Log', () => {
 				expect(log.makeLog(EMPTY_STRING, {level: Levels.DEBUG})).toBeNull();
 			});
 
+			it(`should create a child named 'default' instead of returning the root`, () => {
+				const root = new Log();
+				const child = root.makeLog('default');
+
+				expect(child).not.toBe(root);
+				expect(child.groupState.parent).toBe(root);
+			});
+
 			it('should return group when id already exists', () => {
 				const id = '194714_8841978AF';
 				const expected = log.makeLog(id, {level: Levels.DEBUG});
@@ -180,6 +208,22 @@ describe('Log', () => {
 				const testLog = baseLog.makeLog('testLog');
 
 				expect(testLog.groupState.transports.size).toBe(1);
+			});
+		});
+
+		describe('reset', () => {
+			it('should remove all groups except the initial group and return it', () => {
+				const root = new Log();
+				root.addTransport(TRANSPORT);
+				root.makeLog('one');
+				root.makeLog('two');
+				expect(root.globalState.groups.size).toBe(3);
+
+				const result = root.reset();
+
+				expect(result).toBe(root);
+				expect(root.globalState.groups.size).toBe(1);
+				expect(root.groupState.transports.size).toBe(0);
 			});
 		});
 
@@ -385,38 +429,38 @@ describe('Log', () => {
 
 			it(`should call enableLogLevel`, () => {
 				const spy = jest.spyOn(log.globalState.globalLevel, 'enableLevel');
-				expect(spy).not.toBeCalled();
+				expect(spy).not.toHaveBeenCalled();
 
 				log.enableGlobalLevel(1);
 
-				expect(spy).toBeCalled();
+				expect(spy).toHaveBeenCalled();
 			});
 
 			it(`should call enableMultipleLevels`, () => {
 				const spy = jest.spyOn(log.globalState.globalLevel, 'enableLevels');
-				expect(spy).not.toBeCalled();
+				expect(spy).not.toHaveBeenCalled();
 
 				log.enableGlobalLevels([1]);
 
-				expect(spy).toBeCalled();
+				expect(spy).toHaveBeenCalled();
 			});
 
 			it(`should call disableLogLevel`, () => {
 				const spy = jest.spyOn(log.globalState.globalLevel, 'disableLevel');
-				expect(spy).not.toBeCalled();
+				expect(spy).not.toHaveBeenCalled();
 
 				log.disableGlobalLevel(1);
 
-				expect(spy).toBeCalled();
+				expect(spy).toHaveBeenCalled();
 			});
 
 			it(`should call disableMultipleLevels`, () => {
 				const spy = jest.spyOn(log.globalState.globalLevel, 'disableLevels');
-				expect(spy).not.toBeCalled();
+				expect(spy).not.toHaveBeenCalled();
 
 				log.disableGlobalLevels([1]);
 
-				expect(spy).toBeCalled();
+				expect(spy).toHaveBeenCalled();
 			});
 		});
 
@@ -443,38 +487,38 @@ describe('Log', () => {
 
 			it(`should call enableLogLevel`, () => {
 				const spy = jest.spyOn(log.groupState.level, 'enableLevel');
-				expect(spy).not.toBeCalled();
+				expect(spy).not.toHaveBeenCalled();
 
 				log.enableGroupLevel(1);
 
-				expect(spy).toBeCalled();
+				expect(spy).toHaveBeenCalled();
 			});
 
 			it(`should call enableMultipleLevels`, () => {
 				const spy = jest.spyOn(log.groupState.level, 'enableLevels');
-				expect(spy).not.toBeCalled();
+				expect(spy).not.toHaveBeenCalled();
 
 				log.enableGroupLevels([1]);
 
-				expect(spy).toBeCalled();
+				expect(spy).toHaveBeenCalled();
 			});
 
 			it(`should call disableLogLevel`, () => {
 				const spy = jest.spyOn(log.groupState.level, 'disableLevel');
-				expect(spy).not.toBeCalled();
+				expect(spy).not.toHaveBeenCalled();
 
 				log.disableGroupLevel(1);
 
-				expect(spy).toBeCalled();
+				expect(spy).toHaveBeenCalled();
 			});
 
 			it(`should call disableMultipleLevels`, () => {
 				const spy = jest.spyOn(log.groupState.level, 'disableLevels');
-				expect(spy).not.toBeCalled();
+				expect(spy).not.toHaveBeenCalled();
 
 				log.disableGroupLevels([1]);
 
-				expect(spy).toBeCalled();
+				expect(spy).toHaveBeenCalled();
 			});
 		});
 
@@ -598,7 +642,7 @@ describe('Log', () => {
 				TRANSPORT.level.set(Levels.ALL);
 			});
 
-			it(`should not throw when transport throws`, (done) => {
+			it(`should not throw when transport throws`, async () => {
 				log.enableGroupLevel(1);
 				const transport = new Transport({
 					id: 'SyncAction',
@@ -618,17 +662,14 @@ describe('Log', () => {
 				log.addTransport(transportAsync);
 				log.addTransport(transport);
 
-				log.log(1, 'throw')
-					.catch((err) => {
-						fail(err);
-					})
-					.finally(() => {
-						log.clearAll();
-						done();
-					});
+				try {
+					await expect(log.log(1, 'throw')).resolves.toBeDefined();
+				} finally {
+					log.clearAll();
+				}
 			});
 
-			it(`should return list of failures when transports return false`, (done) => {
+			it(`should return list of failures when transports return false`, async () => {
 				log.enableGroupLevel(1);
 				log.clearAll();
 				const transport = new Transport({
@@ -649,24 +690,21 @@ describe('Log', () => {
 				log.addTransport(transportAsync);
 				log.addTransport(transport);
 
-				log.log(1, 'fails')
-					.then((res) => {
-						const expected = {
+				try {
+					const res = await log.log(1, 'fails');
+					expect(res).toEqual(
+						expect.objectContaining({
 							SyncAction: false,
-							AsyncAction: 'err'
-						};
-						expect(res).toEqual(expect.objectContaining(expected));
-					})
-					.catch((err) => {
-						fail(err);
-					})
-					.finally(() => {
-						log.clearAll();
-						done();
-					});
+							AsyncAction: expect.any(Error)
+						})
+					);
+					expect((res as Record<string, Error>).AsyncAction.message).toBe('err');
+				} finally {
+					log.clearAll();
+				}
 			});
 
-			it(`should return true when transports return true`, (done) => {
+			it(`should return true when transports return true`, async () => {
 				log.enableGroupLevel(1);
 				log.clearAll();
 				const transport = new Transport({
@@ -687,17 +725,11 @@ describe('Log', () => {
 				log.addTransport(transportAsync);
 				log.addTransport(transport);
 
-				log.log(1, 'works')
-					.then((res) => {
-						expect(res).toBe(true);
-					})
-					.catch((err) => {
-						fail(err);
-					})
-					.finally(() => {
-						log.clearAll();
-						done();
-					});
+				try {
+					await expect(log.log(1, 'works')).resolves.toBe(true);
+				} finally {
+					log.clearAll();
+				}
 			});
 
 			it(`should call parent tranports`, async () => {

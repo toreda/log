@@ -21,19 +21,25 @@ describe('Transport', () => {
 		it('should throw when id arg is undefined', () => {
 			expect(() => {
 				new Transport({id: undefined as any, level, action});
-			}).toThrow('Transport init failure - id arg is missing.');
+			}).toThrow('[logtr] Init failure - id arg is missing.');
 		});
 
 		it('should throw when id arg is null', () => {
 			expect(() => {
 				new Transport({id: null as any, level, action});
-			}).toThrow('Transport init failure - id arg is missing.');
+			}).toThrow('[logtr] Init failure - id arg is missing.');
 		});
 
 		it('should throw when id arg is not a string', () => {
 			expect(() => {
 				new Transport({id: 14081871 as any, level, action});
-			}).toThrow('Transport init failure - id arg must be a non-empty string.');
+			}).toThrow('[logtr] Init failure - id arg must be a non-empty string.');
+		});
+
+		it('should throw when id arg is an empty string', () => {
+			expect(() => {
+				new Transport({id: '', level, action});
+			}).toThrow('[logtr] Init failure - id arg must be a non-empty string.');
 		});
 
 		it('should throw when action arg is undefined', () => {
@@ -42,10 +48,52 @@ describe('Transport', () => {
 			}).toThrow(`[logtr:${MOCK_ID}] Init failure - action arg is missing.`);
 		});
 
-		it('should throw when id action arg is not a function', () => {
+		it('should throw when action arg is null', () => {
+			expect(() => {
+				new Transport({id: MOCK_ID, level, action: null as any});
+			}).toThrow(`[logtr:${MOCK_ID}] Init failure - action arg is missing.`);
+		});
+
+		it('should throw when action arg is not a function', () => {
 			expect(() => {
 				new Transport({id: MOCK_ID, level, action: 1408141 as any});
 			}).toThrow(`[logtr:${MOCK_ID}] Init failure - action arg must be a function.`);
+		});
+
+		it('should report falsy non-function action as not a function', () => {
+			expect(() => {
+				new Transport({id: MOCK_ID, level, action: 0 as any});
+			}).toThrow(`[logtr:${MOCK_ID}] Init failure - action arg must be a function.`);
+		});
+
+		it('should throw when level arg is undefined', () => {
+			expect(() => {
+				new Transport({id: MOCK_ID, level: undefined as any, action});
+			}).toThrow(`[logtr:${MOCK_ID}] Init failure - level arg must be a valid log level.`);
+		});
+
+		it('should throw when level arg is negative', () => {
+			expect(() => {
+				new Transport({id: MOCK_ID, level: -1, action});
+			}).toThrow(`[logtr:${MOCK_ID}] Init failure - level arg must be a valid log level.`);
+		});
+
+		it('should throw when level arg is NaN', () => {
+			expect(() => {
+				new Transport({id: MOCK_ID, level: NaN, action});
+			}).toThrow(`[logtr:${MOCK_ID}] Init failure - level arg must be a valid log level.`);
+		});
+
+		it('should accept Levels.NONE as a valid level', () => {
+			const custom = new Transport({id: MOCK_ID, level: Levels.NONE, action});
+			expect(custom.level.get()).toBe(Levels.NONE);
+		});
+
+		it('should set id, action, and level', () => {
+			const custom = new Transport({id: MOCK_ID, level: MOCK_LEVEL, action});
+			expect(custom.id).toBe(MOCK_ID);
+			expect(custom.action).toBe(action);
+			expect(custom.level.get()).toBe(MOCK_LEVEL);
 		});
 	});
 
@@ -66,6 +114,51 @@ describe('Transport', () => {
 				await custom.execute(sampleMsg);
 				expect(sampleAction).toHaveBeenCalledTimes(1);
 				expect(sampleAction).toHaveBeenLastCalledWith(sampleMsg);
+			});
+
+			it('should resolve with sync action return value', async () => {
+				const custom = new Transport({id: MOCK_ID, level: Levels.ALL, action: () => true});
+				await expect(custom.execute(sampleMsg)).resolves.toBe(true);
+			});
+
+			it('should resolve with async action return value', async () => {
+				const custom = new Transport({id: MOCK_ID, level: Levels.ALL, action: async () => false});
+				await expect(custom.execute(sampleMsg)).resolves.toBe(false);
+			});
+
+			it('should resolve with error when action throws', async () => {
+				const err = new Error('sync failure');
+				const custom = new Transport({
+					id: MOCK_ID,
+					level: Levels.ALL,
+					action: () => {
+						throw err;
+					}
+				});
+				await expect(custom.execute(sampleMsg)).resolves.toBe(err);
+			});
+
+			it('should resolve with error when action rejects', async () => {
+				const err = new Error('async failure');
+				const custom = new Transport({
+					id: MOCK_ID,
+					level: Levels.ALL,
+					action: () => Promise.reject(err)
+				});
+				await expect(custom.execute(sampleMsg)).resolves.toBe(err);
+			});
+
+			it('should wrap non-error throw values in an Error', async () => {
+				const custom = new Transport({
+					id: MOCK_ID,
+					level: Levels.ALL,
+					action: () => {
+						throw 'string failure';
+					}
+				});
+				const result = await custom.execute(sampleMsg);
+				expect(result).toBeInstanceOf(Error);
+				expect((result as Error).message).toBe('string failure');
 			});
 		});
 	});

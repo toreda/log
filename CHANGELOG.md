@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-09-16
+
+### Headlines
+* Added dual esm/cjs output to support ESM consumers.
+
+### Fixed
+* startingGroups now runs at the end of the Log ctor and no longer throws when provided.
+
 ## [0.6.11] - 2022-01-03
 ### Updated
 - All direct NPM dependencies updated to latest.

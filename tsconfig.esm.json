@@ -10,9 +10,9 @@
 		"esModuleInterop": true,
 		"isolatedModules": false,
 		"lib": ["es2022"],
-		"module": "commonjs",
+		"module": "esnext",
 		"moduleResolution": "node",
-		"outDir": "./dist",
+		"outDir": "./dist/esm",
 		"preserveConstEnums": true,
 		"removeComments": false,
 		"resolveJsonModule": true,
@@ -27,10 +27,5 @@
 		"traceResolution": false,
 		"paths": {},
 		"types": ["@types/jest"]
-	},
-	"ts-node": {
-		"compilerOptions": {
-			"module": "commonjs"
-		}
 	}
 }

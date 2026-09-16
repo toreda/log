@@ -12,7 +12,7 @@ export type LogOptionsGlobal = {
 	consoleEnabled?: boolean;
 	globalLevel?: number;
 	groupsStartEnabled?: boolean;
-	startingGroups?: LogOptionsGroup[];
+	startingGroups?: Array<Pick<LogOptionsGroup, 'id' | 'enabled' | 'level'>>;
 	startingTransports?: Array<Transport | ConstructorParameters<typeof Transport>[0]>;
 };
 
