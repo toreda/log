@@ -12,7 +12,7 @@ const log = new Log({
 log.activateDefaultConsole();
 
 // Create a log that extends the old log
-const classLog = log.makeLog('className');
+const classLog = log.make('className');
 
 const fsTransport = new Transport('logFile', Levels.ERROR, (logMessage) => {
 	return new Promise((resolve, reject) => {

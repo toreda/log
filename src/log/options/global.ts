@@ -1,4 +1,5 @@
 import {ANY} from '@toreda/shared-types';
+import type {LevelInput} from '../../level/input';
 import {LogOptionsGroup} from './group';
 import {Transport} from '../../transport';
 
@@ -10,7 +11,8 @@ import {Transport} from '../../transport';
 export type LogOptionsGlobal = {
 	id?: string;
 	consoleEnabled?: boolean;
-	globalLevel?: number;
+	/** Starting global level as a bitmask, level key, or array of either. */
+	globalLevel?: LevelInput | LevelInput[];
 	groupsStartEnabled?: boolean;
 	startingGroups?: Array<Pick<LogOptionsGroup, 'id' | 'enabled' | 'level'>>;
 	startingTransports?: Array<Transport | ConstructorParameters<typeof Transport>[0]>;

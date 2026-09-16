@@ -1,4 +1,5 @@
 import {ANY} from '@toreda/shared-types';
+import type {LevelInput} from '../../level/input';
 import {Log} from '../../log';
 import {LogStateGlobal} from '../state/global';
 
@@ -15,7 +16,8 @@ export type LogOptionsGroup = {
 	path?: string[];
 
 	enabled?: boolean;
-	level?: number;
+	/** Starting group level as a bitmask, level key, or array of either. */
+	level?: LevelInput | LevelInput[];
 };
 
 export function isLogOptionsGroup(options: ANY): options is LogOptionsGroup {

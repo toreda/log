@@ -95,6 +95,28 @@ describe('Transport', () => {
 			expect(custom.action).toBe(action);
 			expect(custom.level.get()).toBe(MOCK_LEVEL);
 		});
+
+		it('should accept a level key', () => {
+			const custom = new Transport({id: MOCK_ID, level: 'error', action});
+			expect(custom.level.get()).toBe(Levels.ERROR);
+		});
+
+		it('should combine an array of level keys and bitmasks', () => {
+			const custom = new Transport({id: MOCK_ID, level: ['error', Levels.TRACE], action});
+			expect(custom.level.get()).toBe(Levels.ERROR | Levels.TRACE);
+		});
+
+		it('should throw when level arg is an unknown key', () => {
+			expect(() => {
+				new Transport({id: MOCK_ID, level: 'fatal' as any, action});
+			}).toThrow(`[logtr:${MOCK_ID}] Init failure - level arg must be a valid log level.`);
+		});
+
+		it('should throw when level arg is an empty array', () => {
+			expect(() => {
+				new Transport({id: MOCK_ID, level: [], action});
+			}).toThrow(`[logtr:${MOCK_ID}] Init failure - level arg must be a valid log level.`);
+		});
 	});
 
 	describe('Implementation', () => {

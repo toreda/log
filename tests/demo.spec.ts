@@ -13,7 +13,7 @@ const logResult = {top: false, sub: false};
 
 describe(`Demo for bubbling events interactions with enable/disable.`, () => {
 	const topLog = new Log({id: 'top', groupsStartEnabled: false});
-	const subLog = topLog.makeLog('sub');
+	const subLog = topLog.make('sub');
 	topLog.addTransport(topTransport);
 	subLog.addTransport(subTransport);
 
@@ -105,7 +105,7 @@ describe(`Demo for bubbling events interactions with enable/disable.`, () => {
 
 describe(`Demo for bubbling events interactions with levels.`, () => {
 	const topLog = new Log({id: 'top', groupsStartEnabled: true, globalLevel: 0});
-	const subLog = topLog.makeLog('sub');
+	const subLog = topLog.make('sub');
 	topLog.addTransport(topTransport);
 	subLog.addTransport(subTransport);
 

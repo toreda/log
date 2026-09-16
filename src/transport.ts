@@ -1,7 +1,8 @@
+import type {LevelInput} from './level/input';
 import {LogLevel} from './log/level';
 import type {Message} from './message';
 import type {TransportAction} from './transport/action';
-import {checkLevel} from './check/level';
+import {levelMask} from './level/mask';
 
 /**
  * Executes user-provided callback once for each message received.
@@ -18,7 +19,19 @@ export class Transport {
 	/** Active log levels transport receives msgs for. */
 	public readonly level: LogLevel;
 
-	constructor({id, level, action}: {id: string; level: number; action: TransportAction}) {
+	/**
+	 * @param level		Level bitmask, level key, or array of either
+	 * 					combined into the transport's starting level.
+	 */
+	constructor({
+		id,
+		level,
+		action
+	}: {
+		id: string;
+		level: LevelInput | LevelInput[];
+		action: TransportAction;
+	}) {
 		if (id == null) {
 			throw new Error('[logtr] Init failure - id arg is missing.');
 		}
@@ -35,13 +48,15 @@ export class Transport {
 			throw new Error(`[logtr:${id}] Init failure - action arg must be a function.`);
 		}
 
-		if (!checkLevel(level)) {
+		const mask = levelMask(level);
+
+		if (mask === null) {
 			throw new Error(`[logtr:${id}] Init failure - level arg must be a valid log level.`);
 		}
 
 		this.id = id;
 		this.action = action;
-		this.level = new LogLevel(level);
+		this.level = new LogLevel(mask);
 	}
 
 	/**

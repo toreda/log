@@ -3,7 +3,7 @@ import {Log} from '../../log';
 import {LogLevel} from '../level';
 import {LogOptionsGlobal} from '../options/global';
 import {Transport} from '../../transport';
-import {checkLevel} from '../../check/level';
+import {levelMask} from '../../level/mask';
 
 /**
  * Internal state data, settings, and log groups for a
@@ -29,7 +29,7 @@ export class LogStateGlobal {
 
 		// Starting Global log level
 		const defaultLevel = Levels.ALL & ~Levels.DEBUG & ~Levels.TRACE;
-		const logLevel = checkLevel(options.globalLevel) ? options.globalLevel : defaultLevel;
+		const logLevel = levelMask(options.globalLevel) ?? defaultLevel;
 
 		this.globalLevel = new LogLevel(logLevel);
 

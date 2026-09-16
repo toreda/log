@@ -98,6 +98,33 @@ describe('LogStateGroup', () => {
 				expect(custom.level.get()).toBe(expected);
 			});
 
+			it(`should resolve level when option.level is level key 'debug'`, () => {
+				const custom = new LogStateGroup({
+					id: 'custom',
+					level: 'debug'
+				});
+
+				expect(custom.level.get()).toBe(Levels.DEBUG);
+			});
+
+			it(`should combine level when option.level is an array of level keys`, () => {
+				const custom = new LogStateGroup({
+					id: 'custom',
+					level: ['error', 'trace']
+				});
+
+				expect(custom.level.get()).toBe(Levels.ERROR | Levels.TRACE);
+			});
+
+			it(`should set level to defaultValue when option.level is an unknown key`, () => {
+				const custom = new LogStateGroup({
+					id: 'custom',
+					level: 'fatal' as any
+				});
+
+				expect(custom.level.get()).toBe(defaultValue);
+			});
+
 			it(`should set level to defaultValue when option.level is NaN `, () => {
 				const custom = new LogStateGroup({
 					id: 'custom',

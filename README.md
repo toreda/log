@@ -1,22 +1,25 @@
 ![Toreda](https://content.toreda.com/logo/toreda-logo.png)
 
-[![CI](https://img.shields.io/github/workflow/status/toreda/log/CI?style=for-the-badge)](https://github.com/toreda/log/actions) [![Coverage](https://img.shields.io/sonar/coverage/toreda_log?server=https%3A%2F%2Fsonarcloud.io&style=for-the-badge)](https://sonarcloud.io/dashboard?id=toreda_log) ![Sonar Quality Gate](https://img.shields.io/sonar/quality_gate/toreda_log?server=https%3A%2F%2Fsonarcloud.io&style=for-the-badge)
-
-![GitHub package.json version (branch)](https://img.shields.io/github/package-json/v/toreda/log/master?style=for-the-badge) ![GitHub Release Date](https://img.shields.io/github/release-date/toreda/log?style=for-the-badge) [![GitHub issues](https://img.shields.io/github/issues/toreda/log?style=for-the-badge)](https://github.com/toreda/log/issues)
-
- ![license](https://img.shields.io/github/license/toreda/log?style=for-the-badge)
+[![CI](https://img.shields.io/github/actions/workflow/status/toreda/log/main.yml?branch=master&style=for-the-badge)](https://github.com/toreda/log/actions) [![GitHub issues](https://img.shields.io/github/issues/toreda/log?style=for-the-badge)](https://github.com/toreda/log/issues)
 
 
-# `@toreda/log` - Dynamic Logger
+[![GitHub package.json version (branch)](https://img.shields.io/github/package-json/v/toreda/log/master?style=for-the-badge)](https://github.com/toreda/log/releases/latest)
+[![GitHub Release Date](https://img.shields.io/github/release-date/toreda/log?style=for-the-badge)](https://github.com/toreda/log/releases/latest)
 
-Light TypeScript logger for node, web, and serverless environments.
+[![license](https://img.shields.io/github/license/toreda/log?style=for-the-badge)](https://github.com/toreda/log/blob/master/LICENSE)
+
+
+# `@toreda/log` - TypeScript Logger
+
+TypeScript logger with custom transports, per-group log levels, and ESM + CommonJS builds for Node, browser, and serverless environments.
 
 Features:
-* Small footprint
-* Simple to use
-* Fully supports TypeScript
-* Custom Transport support
-* Works in Browser, Serverless, and Node environments.
+* Custom transports receive structured log messages, filtered by log level and group.
+* Per-group log levels, so debug output can be enabled for one system without app-wide noise.
+* Log levels can be changed at runtime without a code push.
+* Ships both ESM and CommonJS builds, with type declarations for each.
+* Written in TypeScript with full type definitions.
+* Works in Node, browser, and serverless environments.
 
 &nbsp;
 
@@ -82,10 +85,38 @@ log.warn('Warn message here');
 // Error
 log.error('my', 'message', 'here');
 // Multple
-log.log(Levels.ERROR & Levels.TRACE, 'trace and error message here');
+log.log(Levels.ERROR | Levels.TRACE, 'trace and error message here');
 // Custom
 const customLevel =
 log.log(0b0010_0000_0000, 'custom logging level');
+```
+
+**Level Keys**
+
+Every level argument also accepts a `LevelKey` string in place of the bitmask, or an array
+mixing keys and bitmasks. Keys map to the `Levels` enum: `'none'`, `'error'`, `'warn'`,
+`'info'`, `'debug'`, `'trace'`, `'all'`, `'all_custom'`, `'all_extended'`. Levels are still
+stored as bitmasks internally, so keys and bitmasks can be used interchangeably.
+```typescript
+import {Log, Levels, levelMask} from '@toreda/log';
+const log = new Log({globalLevel: 'debug'});
+// Same as log.setGlobalLevel(Levels.ALL)
+log.setGlobalLevel('all');
+// Disable a single level by key
+log.disableGlobalLevel('trace');
+// Arrays are applied one item at a time, in order. Keys and bitmasks can be mixed.
+log.disableGlobalLevel(['debug', Levels.INFO]);
+log.enableGlobalLevels(['trace', 'info']);
+// set and log combine an array into a single bitmask
+log.setGroupLevel(['error', 'warn']);
+log.log(['error', 'trace'], 'trace and error message here');
+// Transports and groups accept keys too
+log.addTransport({id: 'errors', level: 'error', action});
+const subLog = log.make('sublog', {level: ['warn', 'error']});
+// Translate a key, bitmask, or array to its bitmask. Returns null when invalid.
+levelMask('debug'); // Levels.DEBUG
+levelMask(['error', 'warn']); // Levels.ERROR | Levels.WARN
+levelMask('fatal'); // null
 ```
 
 **Groups**
@@ -94,7 +125,7 @@ the log that created them and have an id that tracks the origin of of the log.
 ```typescript
 import {Log} from '@toreda/log';
 const log = new Log({id: 'ClassLog'});
-const subLog = log.makeLog('FunctionLog');
+const subLog = log.make('FunctionLog');
 
 // Message has id 'ClassLog'
 log.info('Class constructor started.');
@@ -112,7 +143,7 @@ A default transport that logs to console can be actived when creating the log.
 ```typescript
 import {Log} from '@toreda/log';
 const log = new Log({consoleEnabled: true});
-const sublog = log.makeLog('sublog');
+const sublog = log.make('sublog');
 
 // Logs to the console
 log.info('Info Message');
@@ -125,7 +156,7 @@ It can also be activated later
 import {Log} from '@toreda/log';
 const log = new Log();
 log.activateDefaultConsole();
-const sublog = log.makeLog('sublog');
+const sublog = log.make('sublog');
 
 // Logs to the console
 log.info('Info Message');

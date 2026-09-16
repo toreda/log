@@ -68,6 +68,33 @@ describe('LogStateGlobal', () => {
 				expect(custom.globalLevel.get()).toBe(expected);
 			});
 
+			it(`should resolve globalLevel when option.globalLevel is level key 'debug'`, () => {
+				const custom = new LogStateGlobal({
+					id: 'custom',
+					globalLevel: 'debug'
+				});
+
+				expect(custom.globalLevel.get()).toBe(Levels.DEBUG);
+			});
+
+			it(`should combine globalLevel when option.globalLevel is an array of level keys`, () => {
+				const custom = new LogStateGlobal({
+					id: 'custom',
+					globalLevel: ['error', 'trace']
+				});
+
+				expect(custom.globalLevel.get()).toBe(Levels.ERROR | Levels.TRACE);
+			});
+
+			it(`should set globalLevel to defaultValue when option.globalLevel is an unknown key`, () => {
+				const custom = new LogStateGlobal({
+					id: 'custom',
+					globalLevel: 'fatal' as any
+				});
+
+				expect(custom.globalLevel.get()).toBe(defaultValue);
+			});
+
 			it(`should set globalLevel to defaultValue when option.globalLevel is NaN `, () => {
 				const custom = new LogStateGlobal({
 					id: 'custom',

@@ -2,13 +2,16 @@ import {type LogOptionsGlobal, isLogOptionsGlobal} from './log/options/global';
 import {type LogOptionsGroup, isLogOptionsGroup} from './log/options/group';
 
 import type {Expand} from '@toreda/shared-types';
+import type {LevelInput} from './level/input';
 import {Levels} from './levels';
 import {LogStateGlobal} from './log/state/global';
 import {LogStateGroup} from './log/state/group';
 import type {Message} from './message';
 import {Transport} from './transport';
 import type {TransportAddResult} from './transport/add/result';
+import {checkId} from './check/id';
 import {checkLevel} from './check/level';
+import {levelMask} from './level/mask';
 import {logToConsole} from './console';
 
 /**
@@ -23,7 +26,7 @@ export class Log {
 
 	public constructor(options: LogOptionsGroup | LogOptionsGlobal = {}) {
 		let enabled: boolean;
-		let level: number;
+		let level: LevelInput | LevelInput[];
 		let parent: Log | undefined;
 		let path: string[];
 
@@ -36,7 +39,7 @@ export class Log {
 		} else if (isLogOptionsGroup(options)) {
 			this.globalState = options.state;
 			parent = options.parent;
-			path = options.id.split('.');
+			path = options.path ?? options.id.split('.');
 			level = options.level ?? this.globalState.globalLevel.get();
 			enabled = options.enabled ?? this.globalState.groupsStartEnabled;
 		} else {
@@ -58,15 +61,16 @@ export class Log {
 		// state exists, since new groups are built from its path.
 		if (isLogOptionsGlobal(options)) {
 			for (const groupOptions of options.startingGroups ?? []) {
-				this.makeLog(groupOptions.id, groupOptions);
+				this.make(groupOptions.id, groupOptions);
 			}
 		}
 	}
 
 	/**
 	 * Enable global console logging for development and debugging.
+	 * @param level		Level bitmask, level key, or array of either.
 	 */
-	public activateDefaultConsole(level: number = Levels.ALL_EXTENDED): void {
+	public activateDefaultConsole(level: LevelInput | LevelInput[] = Levels.ALL_EXTENDED): void {
 		this.addTransport({id: 'console', level, action: logToConsole});
 	}
 
@@ -82,7 +86,7 @@ export class Log {
 		this.setLevelDefaultConsole(this.groupState.level.get());
 	}
 
-	public setLevelDefaultConsole(level: number): void {
+	public setLevelDefaultConsole(level: LevelInput | LevelInput[]): void {
 		const console = this.getTransport('console');
 
 		if (!console) {
@@ -92,7 +96,7 @@ export class Log {
 		console.level.set(level);
 	}
 
-	public enableLevelDefaultConsole(level: number): void {
+	public enableLevelDefaultConsole(level: LevelInput | LevelInput[]): void {
 		const console = this.getTransport('console');
 
 		if (!console) {
@@ -102,7 +106,7 @@ export class Log {
 		console.level.enableLevel(level);
 	}
 
-	public disableLevelDefaultConsole(level: number): void {
+	public disableLevelDefaultConsole(level: LevelInput | LevelInput[]): void {
 		const console = this.getTransport('console');
 
 		if (!console) {
@@ -113,19 +117,60 @@ export class Log {
 	}
 
 	/**
-	 * Attempt to make new log group with target id. Does not
-	 * overwrite existing groups.
-	 * @param id	 		id of new log.
-	 * @returns 			The new log if successful or null if it fails.
+	 * Get or create the child log group with target id. Each log is
+	 * identified by its full path in the hierarchy, so `root.make('a').make('b')`
+	 * has id `root.a.b` and is a different log than `root.make('b')`.
+	 * Calling make repeatedly with the same id from the same log always
+	 * returns the same instance: a group is only ever created once.
+	 *
+	 * A dotted id walks the hierarchy one segment at a time, so
+	 * `root.make('a.b')` returns the same log as `root.make('a').make('b')`,
+	 * creating any missing intermediate groups with default options.
+	 * @param id	 		id of the child log, relative to this log.
+	 * @param options		Options applied when the final group is created.
+	 * 						Ignored when it already exists.
+	 * @returns 			The child log, or null when id is not a valid id.
+	 */
+	public make(id: '', options?: MakeLogOptions): null;
+	public make(id: string, options?: MakeLogOptions): Log;
+	public make(id: string, options?: MakeLogOptions): Log | null {
+		if (!checkId(id)) {
+			return null;
+		}
+
+		const segments = id.split('.');
+
+		if (!segments.every((segment) => checkId(segment))) {
+			return null;
+		}
+
+		let group = this as Log;
+
+		segments.forEach((segment, index) => {
+			const isLeaf = index === segments.length - 1;
+			group = group.makeChild(segment, isLeaf ? options : undefined);
+		});
+
+		return group;
+	}
+
+	/**
+	 * Alias of {@link Log.make} kept for backwards compatibility.
+	 * @deprecated Use `make` instead.
 	 */
 	public makeLog(id: '', options?: MakeLogOptions): null;
 	public makeLog(id: string, options?: MakeLogOptions): Log;
 	public makeLog(id: string, options?: MakeLogOptions): Log | null {
-		if (!id || typeof id !== 'string') {
-			return null;
-		}
+		return this.make(id, options);
+	}
 
-		const path = this.groupState.path.concat(id);
+	/**
+	 * Get or create the direct child group for a single id segment.
+	 * @param segment		Child id segment, containing no '.' separators.
+	 * @param options		Options applied only when the child is created.
+	 */
+	private makeChild(segment: string, options?: MakeLogOptions): Log {
+		const path = this.groupState.path.concat(segment);
 		const groupId = path.join('.');
 
 		const preexistingGroup = this.globalState.groups.get(groupId);
@@ -134,8 +179,7 @@ export class Log {
 			return preexistingGroup;
 		}
 
-		const level =
-			options && checkLevel(options.level) ? options.level : this.globalState.globalLevel.get();
+		const level = levelMask(options?.level) ?? this.globalState.globalLevel.get();
 		const enabled = options?.enabled ?? this.globalState.groupsStartEnabled;
 
 		const group = new Log({state: this.globalState, id: groupId, parent: this, path, level, enabled});
@@ -315,9 +359,10 @@ export class Log {
 	/**
 	 * Change global log level. Individual group levels
 	 * are used instead of global level when they are set.
-	 * @param level
+	 * @param level		Level bitmask, level key, or array of either
+	 * 					combined into the new level.
 	 */
-	public setGlobalLevel(level: number): void {
+	public setGlobalLevel(level: LevelInput | LevelInput[]): void {
 		this.globalState.globalLevel.set(level);
 	}
 
@@ -325,9 +370,10 @@ export class Log {
 	 * Add a level flag to the global log level without
 	 * affecting other global level flags. Has no effect
 	 * if target level flag is already enabled.
-	 * @param level
+	 * @param level		Level bitmask, level key, or array of either
+	 * 					applied one at a time.
 	 */
-	public enableGlobalLevel(level: number): void {
+	public enableGlobalLevel(level: LevelInput | LevelInput[]): void {
 		this.globalState.globalLevel.enableLevel(level);
 	}
 
@@ -337,15 +383,15 @@ export class Log {
 	 * invalid values.
 	 * @param levels
 	 */
-	public enableGlobalLevels(levels: number[]): void {
+	public enableGlobalLevels(levels: LevelInput[]): void {
 		this.globalState.globalLevel.enableLevels(levels);
 	}
 
-	public disableGlobalLevel(level: number): void {
+	public disableGlobalLevel(level: LevelInput | LevelInput[]): void {
 		this.globalState.globalLevel.disableLevel(level);
 	}
 
-	public disableGlobalLevels(levels: number[]): void {
+	public disableGlobalLevels(levels: LevelInput[]): void {
 		this.globalState.globalLevel.disableLevels(levels);
 	}
 
@@ -354,25 +400,26 @@ export class Log {
 	 * global level and only filters this group's own transports. Messages
 	 * logged by this group still bubble up to parent groups, which apply
 	 * their own levels.
-	 * @param level
+	 * @param level		Level bitmask, level key, or array of either
+	 * 					combined into the new level.
 	 */
-	public setGroupLevel(level: number): void {
+	public setGroupLevel(level: LevelInput | LevelInput[]): void {
 		this.groupState.level.set(level);
 	}
 
-	public enableGroupLevel(level: number): void {
+	public enableGroupLevel(level: LevelInput | LevelInput[]): void {
 		this.groupState.level.enableLevel(level);
 	}
 
-	public enableGroupLevels(levels: number[]): void {
+	public enableGroupLevels(levels: LevelInput[]): void {
 		this.groupState.level.enableLevels(levels);
 	}
 
-	public disableGroupLevel(level: number): void {
+	public disableGroupLevel(level: LevelInput | LevelInput[]): void {
 		this.groupState.level.disableLevel(level);
 	}
 
-	public disableGroupLevels(levels: number[]): void {
+	public disableGroupLevels(levels: LevelInput[]): void {
 		this.groupState.level.disableLevels(levels);
 	}
 
@@ -442,15 +489,18 @@ export class Log {
 	 * Each group's enabled flag and level decide whether that group's own
 	 * transports execute; transports are deduplicated by id, with the
 	 * closest group's transport winning.
-	 * @param msgLevel
+	 * @param level		Level bitmask, level key, or array of either
+	 * 					combined into the message level.
 	 * @param msg
 	 */
-	public log(msgLevel: number, ...msg: unknown[]): Promise<boolean | LogResult> {
+	public log(level: LevelInput | LevelInput[], ...msg: unknown[]): Promise<boolean | LogResult> {
 		if (this.globalState.forceDisabled) {
 			return Promise.resolve(false);
 		}
 
-		if (!checkLevel(msgLevel)) {
+		const msgLevel = levelMask(level);
+
+		if (msgLevel === null) {
 			return Promise.resolve(false);
 		}
 

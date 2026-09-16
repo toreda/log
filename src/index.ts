@@ -1,6 +1,11 @@
 export {checkId} from './check/id';
 export {checkLevel} from './check/level';
+export {checkLevelKey} from './check/level/key';
+export type {LevelInput} from './level/input';
+export type {LevelKey} from './level/key';
+export {LevelKeys} from './level/keys';
 export {Levels} from './levels';
+export {levelMask} from './level/mask';
 export {Log} from './log';
 export {LogLevel} from './log/level';
 export {LogOptionsGlobal} from './log/options/global';
