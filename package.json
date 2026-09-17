@@ -63,7 +63,7 @@
 		"@swc/core": "^1.16.2",
 		"@swc/jest": "^0.2.39",
 		"@swc/register": "^0.1.10",
-		"@toreda/eslint-config": "^3.1.0",
+		"@toreda/eslint-config": "^4.0.0",
 		"@toreda/prettier-config": "^1.0.1",
 		"@types/eslint": "^9.6.1",
 		"@types/gulp": "^4.0.10",
@@ -74,7 +74,7 @@
 		"@typescript-eslint/typescript-estree": "^8.70.0",
 		"canvas": "^3.2.3",
 		"eslint": "^10.10.0",
-		"eslint-config-prettier": "^8.8.0",
+		"eslint-config-prettier": "^10.1.8",
 		"eslint-plugin-prettier": "^5.5.6",
 		"gulp": "^4.0.2",
 		"gulp-typescript": "^6.0.0-alpha.1",
@@ -85,11 +85,11 @@
 		"prettier": "^3.9.6",
 		"ts-node": "^10.9.2",
 		"tsc-alias": "^1.9.5",
-		"typedoc": "^0.24.6",
+		"typedoc": "^0.28.20",
 		"typescript": "^6.0.3"
 	},
 	"engines": {
-		"node": ">=18"
+		"node": "^20.19.0 || ^22.13.0 || >=24"
 	},
 	"prettier": "@toreda/prettier-config",
 	"dependencies": {
