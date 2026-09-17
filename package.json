@@ -54,6 +54,9 @@
 	],
 	"author": "Toreda, Inc.",
 	"license": "MIT",
+	"publishConfig": {
+		"access": "public"
+	},
 	"bugs": {
 		"url": "https://github.com/toreda/log/issues"
 	},
