@@ -1,4 +1,6 @@
-import {Levels, Log, Transport} from '@toreda/log';
+import {Levels} from '../src/levels';
+import {Log} from '../src/log';
+import {Transport} from '../src/transport';
 import {appendFileSync} from 'fs';
 
 // Create a new Logger
@@ -10,7 +12,7 @@ const log = new Log({
 log.activateDefaultConsole();
 
 // Create a log that extends the old log
-const classLog = log.makeLog('className');
+const classLog = log.make('className');
 
 const fsTransport = new Transport('logFile', Levels.ERROR, (logMessage) => {
 	return new Promise((resolve, reject) => {

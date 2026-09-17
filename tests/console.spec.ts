@@ -18,7 +18,7 @@ describe('logToConsole', () => {
 		msg = {
 			date: 0,
 			level: Levels.DEBUG,
-			message: 'msg goes here',
+			message: ['msg goes here'],
 			path: ['home', 'class']
 		};
 

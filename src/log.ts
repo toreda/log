@@ -1,13 +1,21 @@
-import type {Expand} from '@toreda/types';
+import {type LogOptionsGlobal, isLogOptionsGlobal} from './log/options/global';
+import {type LogOptionsGroup, isLogOptionsGroup} from './log/options/group';
+
+import type {Expand} from '@toreda/shared-types';
+import type {LevelInput} from './level/input';
 import {Levels} from './levels';
-import type {LogOptions} from './log/options';
-import type {LogOptionsGroup} from './log/options/group';
 import {LogStateGlobal} from './log/state/global';
 import {LogStateGroup} from './log/state/group';
 import type {Message} from './message';
 import {Transport} from './transport';
+import type {TransportAddResult} from './transport/add/result';
+import {checkId} from './check/id';
 import {checkLevel} from './check/level';
+import {levelMask} from './level/mask';
 import {logToConsole} from './console';
+import type {LogResult} from './log/result';
+import type {LogActionResult} from './log/action/result';
+import type {TransportArgs} from './transport/args';
 
 /**
  * Main log class holding attached transports and internal state
@@ -19,25 +27,24 @@ export class Log {
 	/** Serializable internal state data */
 	public readonly groupState: LogStateGroup;
 
-	public constructor(options?: LogOptions) {
+	public constructor(options: LogOptionsGroup | LogOptionsGlobal = {}) {
 		let enabled: boolean;
-		let level: number;
+		let level: LevelInput | LevelInput[];
 		let parent: Log | undefined;
 		let path: string[];
 
-		if (!options?.state) {
+		if (isLogOptionsGlobal(options)) {
 			path = options?.id ? [options.id] : [];
 			this.globalState = new LogStateGlobal(options);
-			this.globalState.groups.set(options?.id ?? 'default', this);
+			this.globalState.groups.set(path.join('.'), this);
 			level = this.globalState.globalLevel.get();
-			this.globalState.globalLevel.set(level);
 			enabled = this.globalState.groupsStartEnabled;
-		} else if (options.state instanceof LogStateGlobal) {
+		} else if (isLogOptionsGroup(options)) {
 			this.globalState = options.state;
 			parent = options.parent;
-			path = options.id.split('.');
-			level = options.level;
-			enabled = options.enabled;
+			path = options.path ?? options.id.split('.');
+			level = options.level ?? this.globalState.globalLevel.get();
+			enabled = options.enabled ?? this.globalState.groupsStartEnabled;
 		} else {
 			throw Error(`Bad Log init - 'state' was not an instance of LogStateGlobal.`);
 		}
@@ -48,14 +55,26 @@ export class Log {
 		if (this.globalState.consoleEnabled) {
 			this.activateDefaultConsole();
 		}
+
+		for (const transport of this.globalState.transports) {
+			this.addTransport(transport);
+		}
+
+		// Starting groups can only be created once this group's own
+		// state exists, since new groups are built from its path.
+		if (isLogOptionsGlobal(options)) {
+			for (const groupOptions of options.startingGroups ?? []) {
+				this.make(groupOptions.id, groupOptions);
+			}
+		}
 	}
 
 	/**
 	 * Enable global console logging for development and debugging.
+	 * @param level		Level bitmask, level key, or array of either.
 	 */
-	public activateDefaultConsole(level: number = Levels.ALL_EXTENDED): void {
-		const transport = new Transport('console', level, logToConsole);
-		this.addTransport(transport);
+	public activateDefaultConsole(level: LevelInput | LevelInput[] = Levels.ALL_EXTENDED): void {
+		this.addTransport({id: 'console', level, action: logToConsole});
 	}
 
 	public deactivateDefaultConsole(): void {
@@ -70,7 +89,7 @@ export class Log {
 		this.setLevelDefaultConsole(this.groupState.level.get());
 	}
 
-	public setLevelDefaultConsole(level: number): void {
+	public setLevelDefaultConsole(level: LevelInput | LevelInput[]): void {
 		const console = this.getTransport('console');
 
 		if (!console) {
@@ -80,7 +99,7 @@ export class Log {
 		console.level.set(level);
 	}
 
-	public enableLevelDefaultConsole(level: number): void {
+	public enableLevelDefaultConsole(level: LevelInput | LevelInput[]): void {
 		const console = this.getTransport('console');
 
 		if (!console) {
@@ -90,7 +109,7 @@ export class Log {
 		console.level.enableLevel(level);
 	}
 
-	public disableLevelDefaultConsole(level: number): void {
+	public disableLevelDefaultConsole(level: LevelInput | LevelInput[]): void {
 		const console = this.getTransport('console');
 
 		if (!console) {
@@ -101,19 +120,60 @@ export class Log {
 	}
 
 	/**
-	 * Attempt to make new log group with target id. Does not
-	 * overwrite existing groups.
-	 * @param id	 		id of new log.
-	 * @returns 			The new log if successful or null if it fails.
+	 * Get or create the child log group with target id. Each log is
+	 * identified by its full path in the hierarchy, so `root.make('a').make('b')`
+	 * has id `root.a.b` and is a different log than `root.make('b')`.
+	 * Calling make repeatedly with the same id from the same log always
+	 * returns the same instance: a group is only ever created once.
+	 *
+	 * A dotted id walks the hierarchy one segment at a time, so
+	 * `root.make('a.b')` returns the same log as `root.make('a').make('b')`,
+	 * creating any missing intermediate groups with default options.
+	 * @param id	 		id of the child log, relative to this log.
+	 * @param options		Options applied when the final group is created.
+	 * 						Ignored when it already exists.
+	 * @returns 			The child log, or null when id is not a valid id.
+	 */
+	public make(id: '', options?: MakeLogOptions): null;
+	public make(id: string, options?: MakeLogOptions): Log;
+	public make(id: string, options?: MakeLogOptions): Log | null {
+		if (!checkId(id)) {
+			return null;
+		}
+
+		const segments = id.split('.');
+
+		if (!segments.every((segment) => checkId(segment))) {
+			return null;
+		}
+
+		let group = this as Log;
+
+		segments.forEach((segment, index) => {
+			const isLeaf = index === segments.length - 1;
+			group = group.makeChild(segment, isLeaf ? options : undefined);
+		});
+
+		return group;
+	}
+
+	/**
+	 * Alias of {@link Log.make} kept for backwards compatibility.
+	 * @deprecated Use `make` instead.
 	 */
 	public makeLog(id: '', options?: MakeLogOptions): null;
 	public makeLog(id: string, options?: MakeLogOptions): Log;
 	public makeLog(id: string, options?: MakeLogOptions): Log | null {
-		if (!id || typeof id !== 'string') {
-			return null;
-		}
+		return this.make(id, options);
+	}
 
-		const path = this.groupState.path.concat(id);
+	/**
+	 * Get or create the direct child group for a single id segment.
+	 * @param segment		Child id segment, containing no '.' separators.
+	 * @param options		Options applied only when the child is created.
+	 */
+	private makeChild(segment: string, options?: MakeLogOptions): Log {
+		const path = this.groupState.path.concat(segment);
 		const groupId = path.join('.');
 
 		const preexistingGroup = this.globalState.groups.get(groupId);
@@ -122,8 +182,7 @@ export class Log {
 			return preexistingGroup;
 		}
 
-		const level =
-			options && checkLevel(options.level) ? options.level : this.globalState.globalLevel.get();
+		const level = levelMask(options?.level) ?? this.globalState.globalLevel.get();
 		const enabled = options?.enabled ?? this.globalState.groupsStartEnabled;
 
 		const group = new Log({state: this.globalState, id: groupId, parent: this, path, level, enabled});
@@ -133,21 +192,41 @@ export class Log {
 	}
 
 	/**
-	 * Add transport to log.
-	 * @param transport 		Transport to add to log.
+	 * Add transport to log. Never throws: a transport that cannot be
+	 * constructed from args is reported via the returned errorCode.
+	 * @param transportData		Transport instance or ctor args to add to log.
+	 * @returns					Result with ok flag and failure details.
 	 */
-	public addTransport(transport: Transport): boolean {
-		if (!transport || !(transport instanceof Transport)) {
-			return false;
+	public addTransport(transportData: Transport | TransportArgs): TransportAddResult {
+		if (transportData == null) {
+			return {ok: false, errorCode: 'transport_missing'};
+		}
+
+		let transport: Transport;
+
+		if (transportData instanceof Transport) {
+			transport = transportData;
+		} else {
+			const existing = this.getTransport(transportData.id);
+
+			if (existing != null) {
+				return {ok: false, errorCode: 'transport_duplicate'};
+			}
+
+			try {
+				transport = new Transport(transportData);
+			} catch (err) {
+				return {ok: false, errorCode: 'transport_init_failed', errors: [err]};
+			}
 		}
 
 		if (this.groupState.transports.has(transport)) {
-			return false;
+			return {ok: false, errorCode: 'transport_duplicate'};
 		}
 
 		this.groupState.transports.add(transport);
 
-		return true;
+		return {ok: true, errorCode: null};
 	}
 
 	public getTransport(transportId: string): Transport | null {
@@ -264,14 +343,17 @@ export class Log {
 	}
 
 	/**
-	 * Enable log.
+	 * Enable this group's transports. Messages logged by a group bubble
+	 * up through its parents, and each group's enabled flag only controls
+	 * whether that group's own transports receive them.
 	 */
 	public enable(): void {
 		this.groupState.enabled = true;
 	}
 
 	/**
-	 * Disable log.
+	 * Disable this group's transports. Messages logged by a disabled group
+	 * still bubble up to enabled parent groups and their transports.
 	 */
 	public disable(): void {
 		this.groupState.enabled = false;
@@ -280,9 +362,10 @@ export class Log {
 	/**
 	 * Change global log level. Individual group levels
 	 * are used instead of global level when they are set.
-	 * @param level
+	 * @param level		Level bitmask, level key, or array of either
+	 * 					combined into the new level.
 	 */
-	public setGlobalLevel(level: number): void {
+	public setGlobalLevel(level: LevelInput | LevelInput[]): void {
 		this.globalState.globalLevel.set(level);
 	}
 
@@ -290,9 +373,10 @@ export class Log {
 	 * Add a level flag to the global log level without
 	 * affecting other global level flags. Has no effect
 	 * if target level flag is already enabled.
-	 * @param level
+	 * @param level		Level bitmask, level key, or array of either
+	 * 					applied one at a time.
 	 */
-	public enableGlobalLevel(level: number): void {
+	public enableGlobalLevel(level: LevelInput | LevelInput[]): void {
 		this.globalState.globalLevel.enableLevel(level);
 	}
 
@@ -302,40 +386,43 @@ export class Log {
 	 * invalid values.
 	 * @param levels
 	 */
-	public enableGlobalLevels(levels: number[]): void {
+	public enableGlobalLevels(levels: LevelInput[]): void {
 		this.globalState.globalLevel.enableLevels(levels);
 	}
 
-	public disableGlobalLevel(level: number): void {
+	public disableGlobalLevel(level: LevelInput | LevelInput[]): void {
 		this.globalState.globalLevel.disableLevel(level);
 	}
 
-	public disableGlobalLevels(levels: number[]): void {
+	public disableGlobalLevels(levels: LevelInput[]): void {
 		this.globalState.globalLevel.disableLevels(levels);
 	}
 
 	/**
-	 * Set log level for target group.
-	 * @param level
-	 * @param id
+	 * Set log level for this group. The group level is combined with the
+	 * global level and only filters this group's own transports. Messages
+	 * logged by this group still bubble up to parent groups, which apply
+	 * their own levels.
+	 * @param level		Level bitmask, level key, or array of either
+	 * 					combined into the new level.
 	 */
-	public setGroupLevel(level: number): void {
+	public setGroupLevel(level: LevelInput | LevelInput[]): void {
 		this.groupState.level.set(level);
 	}
 
-	public enableGroupLevel(level: number): void {
+	public enableGroupLevel(level: LevelInput | LevelInput[]): void {
 		this.groupState.level.enableLevel(level);
 	}
 
-	public enableGroupLevels(levels: number[]): void {
+	public enableGroupLevels(levels: LevelInput[]): void {
 		this.groupState.level.enableLevels(levels);
 	}
 
-	public disableGroupLevel(level: number): void {
+	public disableGroupLevel(level: LevelInput | LevelInput[]): void {
 		this.groupState.level.disableLevel(level);
 	}
 
-	public disableGroupLevels(levels: number[]): void {
+	public disableGroupLevels(levels: LevelInput[]): void {
 		this.groupState.level.disableLevels(levels);
 	}
 
@@ -346,22 +433,28 @@ export class Log {
 	 * @param level			Level bitmask msg was logged with.
 	 * @param msg			Msg that was logged.
 	 */
-	private createMessage(level: number, path: string[], ...msg: unknown[]): Message {
-		let message: string;
-
-		if (msg.length > 1) {
-			message = JSON.stringify(msg);
-		} else if (msg.length === 0) {
-			message = '';
-		} else if (typeof msg[0] === 'string') {
-			message = msg[0];
-		} else {
-			message = JSON.stringify(msg[0]);
-		}
-
+	private createMessage(level: number, path: string[], ...message: unknown[]): Message {
 		const date = Date.now();
 
 		return {date, level, message, path};
+	}
+
+	private stringifyMessage(msg: unknown): string {
+		if (typeof msg === 'string') {
+			return msg;
+		}
+
+		if (msg instanceof Error) {
+			return `\n${msg.stack}`;
+		}
+
+		const mightBeToStringableMsg = msg as {toString: () => string};
+
+		if (typeof mightBeToStringableMsg.toString === 'function') {
+			return mightBeToStringableMsg.toString();
+		}
+
+		return JSON.stringify(msg);
 	}
 
 	/**
@@ -395,16 +488,22 @@ export class Log {
 	}
 
 	/**
-	 * Log message to default group.
-	 * @param msgLevel
+	 * Log message to this group and bubble it up to every parent group.
+	 * Each group's enabled flag and level decide whether that group's own
+	 * transports execute; transports are deduplicated by id, with the
+	 * closest group's transport winning.
+	 * @param level		Level bitmask, level key, or array of either
+	 * 					combined into the message level.
 	 * @param msg
 	 */
-	public log(msgLevel: number, ...msg: unknown[]): Promise<boolean | LogResult> {
+	public log(level: LevelInput | LevelInput[], ...msg: unknown[]): Promise<boolean | LogResult> {
 		if (this.globalState.forceDisabled) {
 			return Promise.resolve(false);
 		}
 
-		if (!checkLevel(msgLevel)) {
+		const msgLevel = levelMask(level);
+
+		if (msgLevel === null) {
 			return Promise.resolve(false);
 		}
 
@@ -438,7 +537,7 @@ export class Log {
 		}
 
 		return Promise.all(actions).then((res) => {
-			const result = {};
+			const result: LogResult = {};
 			let failed = false;
 
 			res.forEach((action) => {
@@ -527,10 +626,8 @@ export class Log {
 
 		initialGroup.clear();
 
-		return this.globalState.groups[0];
+		return initialGroup;
 	}
 }
 
-type LogResult = Record<string, boolean | Error>;
-type LogActionResult = Promise<[string, boolean | Error]>;
 type MakeLogOptions = Expand<Omit<LogOptionsGroup, 'state' | 'id' | 'parent' | 'path'>>;

@@ -1,36 +1,35 @@
 {
-	"exclude": ["node_modules", "**/*.spec.ts", "tests", "dist/**", "./gulpfile.ts"],
-	"include": ["**/src/index.ts", "./src/**.ts"],
-	"filesGlob": ["./src/**.ts", "!./node_modules/**"],
+	"exclude": ["node_modules", "**/*.spec.ts", "tests", "dist/**"],
+	"filesGlob": ["./src/*.ts", "./src/**/*.ts", "!./node_modules/**"],
+	"include": ["./src/index.ts", "./src/"],
+	"rootDir": ".",
 	"compilerOptions": {
 		"allowUnreachableCode": false,
 		"alwaysStrict": true,
-		"baseUrl": ".",
 		"declaration": true,
 		"esModuleInterop": true,
 		"isolatedModules": false,
-		"lib": ["es6", "ES2015", "ES2017.TypedArrays"],
+		"lib": ["es2022"],
 		"module": "commonjs",
-		"moduleResolution": "node",
-		"noImplicitOverride": true,
-		"noImplicitReturns": true,
-		"noImplicitUseStrict": false,
 		"outDir": "./dist",
 		"preserveConstEnums": true,
 		"removeComments": false,
-		"rootDir": "./src",
+		"resolveJsonModule": true,
+		"rootDir": ".",
+		"skipLibCheck": true,
+		"sourceMap": true,
 		"strictBindCallApply": true,
-		"strictFunctionTypes": true,
 		"strictNullChecks": true,
+		"strictFunctionTypes": true,
 		"strictPropertyInitialization": true,
-		"target": "es2015",
+		"target": "es2022",
 		"traceResolution": false,
-		"useUnknownInCatchVariables": true
+		"paths": {},
+		"types": ["jest", "node"]
 	},
 	"ts-node": {
-		"module": "commonjs"
-	},
-	"ts-jest": {
-		"module": "commonjs"
+		"compilerOptions": {
+			"module": "commonjs"
+		}
 	}
 }

@@ -1,4 +1,4 @@
-import type {Levels} from '../levels';
+import {Levels} from '../levels';
 
 /**
  * Check if value is a valid log level.

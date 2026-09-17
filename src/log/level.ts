@@ -1,26 +1,40 @@
 import {Defaults} from '../defaults';
+import type {LevelInput} from '../level/input';
 import {checkLevel} from '../check/level';
+import {levelMask} from '../level/mask';
 
 /**
+ * Bitmask of enabled log levels. Every method accepts a level bitmask
+ * or a {@link LevelKey} string, and the bitmask is used internally.
+ *
  * @category Log Level
  */
 export class LogLevel {
 	private currentLevel: number;
 
-	constructor(initial?: number) {
-		if (checkLevel(initial)) {
-			this.currentLevel = initial;
-		} else {
-			this.currentLevel = 0x0;
-		}
+	/**
+	 * @param initial	Level bitmask, level key, or array of either
+	 * 					combined into the starting mask. Starts at
+	 * 					`Levels.NONE` when invalid.
+	 */
+	constructor(initial?: LevelInput | LevelInput[] | null) {
+		this.currentLevel = levelMask(initial) ?? 0x0;
 	}
 
-	public set(level?: number | null): boolean {
-		if (!checkLevel(level)) {
+	/**
+	 * Replace the current mask. An array is resolved item by item
+	 * and combined with bitwise OR into the new mask.
+	 * @param level		Level bitmask, level key, or array of either.
+	 * @returns			false when level is invalid, leaving the mask unchanged.
+	 */
+	public set(level?: LevelInput | LevelInput[] | null): boolean {
+		const mask = levelMask(level);
+
+		if (mask === null) {
 			return false;
 		}
 
-		this.currentLevel = level;
+		this.currentLevel = mask;
 		return true;
 	}
 
@@ -32,12 +46,25 @@ export class LogLevel {
 		return this.currentLevel;
 	}
 
-	public enableLevel(level: number): boolean {
-		if (!checkLevel(level)) {
+	/**
+	 * Add level flags to the current mask with bitwise OR. An array
+	 * is resolved and applied one item at a time in order.
+	 * @param level		Level bitmask, level key, or array of either.
+	 * @returns			false when any level is invalid. Valid items
+	 * 					of an array are still applied.
+	 */
+	public enableLevel(level: LevelInput | LevelInput[]): boolean {
+		if (Array.isArray(level)) {
+			return this.enableLevels(level);
+		}
+
+		const mask = levelMask(level);
+
+		if (mask === null) {
 			return false;
 		}
 
-		const result = this.currentLevel | level;
+		const result = this.currentLevel | mask;
 		if (!checkLevel(result)) {
 			return false;
 		}
@@ -46,7 +73,7 @@ export class LogLevel {
 		return true;
 	}
 
-	public enableLevels(levels: number[]): boolean {
+	public enableLevels(levels: LevelInput[]): boolean {
 		let success = true;
 
 		if (!Array.isArray(levels)) {
@@ -63,12 +90,25 @@ export class LogLevel {
 		return success;
 	}
 
-	public disableLevel(level: number): boolean {
-		if (!checkLevel(level)) {
+	/**
+	 * Remove level flags from the current mask with bitwise AND NOT.
+	 * An array is resolved and applied one item at a time in order.
+	 * @param level		Level bitmask, level key, or array of either.
+	 * @returns			false when any level is invalid. Valid items
+	 * 					of an array are still applied.
+	 */
+	public disableLevel(level: LevelInput | LevelInput[]): boolean {
+		if (Array.isArray(level)) {
+			return this.disableLevels(level);
+		}
+
+		const mask = levelMask(level);
+
+		if (mask === null) {
 			return false;
 		}
 
-		const result = this.currentLevel & ~level;
+		const result = this.currentLevel & ~mask;
 		if (!checkLevel(result)) {
 			return false;
 		}
@@ -78,7 +118,7 @@ export class LogLevel {
 		return true;
 	}
 
-	public disableLevels(levels: number[]): boolean {
+	public disableLevels(levels: LevelInput[]): boolean {
 		let success = true;
 
 		if (!Array.isArray(levels)) {

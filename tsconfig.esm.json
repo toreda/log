@@ -1,0 +1,31 @@
+{
+	"exclude": ["node_modules", "**/*.spec.ts", "tests", "dist/**"],
+	"filesGlob": ["./src/*.ts", "./src/**/*.ts", "!./node_modules/**"],
+	"include": ["./src/index.ts", "./src/"],
+	"rootDir": ".",
+	"compilerOptions": {
+		"allowUnreachableCode": false,
+		"alwaysStrict": true,
+		"declaration": true,
+		"esModuleInterop": true,
+		"isolatedModules": false,
+		"lib": ["es2022"],
+		"module": "esnext",
+		"moduleResolution": "bundler",
+		"outDir": "./dist/esm",
+		"preserveConstEnums": true,
+		"removeComments": false,
+		"resolveJsonModule": true,
+		"rootDir": ".",
+		"skipLibCheck": true,
+		"sourceMap": true,
+		"strictBindCallApply": true,
+		"strictNullChecks": true,
+		"strictFunctionTypes": true,
+		"strictPropertyInitialization": true,
+		"target": "es2022",
+		"traceResolution": false,
+		"paths": {},
+		"types": ["jest", "node"]
+	}
+}

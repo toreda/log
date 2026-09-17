@@ -7,13 +7,13 @@ const action: TransportAction = function (_logData) {
 	logResult[this.id] = true;
 	return true;
 };
-const topTransport = new Transport('top', 0xffff, action);
-const subTransport = new Transport('sub', 0xffff, action);
+const topTransport = new Transport({id: 'top', level: 0xffff, action});
+const subTransport = new Transport({id: 'sub', level: 0xffff, action});
 const logResult = {top: false, sub: false};
 
 describe(`Demo for bubbling events interactions with enable/disable.`, () => {
 	const topLog = new Log({id: 'top', groupsStartEnabled: false});
-	const subLog = topLog.makeLog('sub');
+	const subLog = topLog.make('sub');
 	topLog.addTransport(topTransport);
 	subLog.addTransport(subTransport);
 
@@ -105,7 +105,7 @@ describe(`Demo for bubbling events interactions with enable/disable.`, () => {
 
 describe(`Demo for bubbling events interactions with levels.`, () => {
 	const topLog = new Log({id: 'top', groupsStartEnabled: true, globalLevel: 0});
-	const subLog = topLog.makeLog('sub');
+	const subLog = topLog.make('sub');
 	topLog.addTransport(topTransport);
 	subLog.addTransport(subTransport);
 
@@ -192,5 +192,35 @@ describe(`Demo for bubbling events interactions with levels.`, () => {
 
 		expect(logResult.top).toBe(true);
 		expect(logResult.sub).toBe(true);
+	});
+});
+
+describe(`Demo for processing different types of msgs`, () => {
+	const log = new Log({id: 'Output'});
+	log.enable();
+	log.activateDefaultConsole();
+
+	it(`plain string`, () => {
+		log.info('plain string');
+	});
+
+	it(`multiple strings`, () => {
+		log.info('multiple', 'strings');
+	});
+
+	it(`array of strings`, () => {
+		log.info(['array', 'of', 'strings']);
+	});
+
+	it(`error message`, () => {
+		log.info(Error('error message'));
+	});
+
+	it(`multiple errors`, () => {
+		log.info(Error('multiple'), Error('errors'));
+	});
+
+	it(`array of errors`, () => {
+		log.info([Error('array'), Error('of'), Error('errors')]);
 	});
 });

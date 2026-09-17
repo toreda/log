@@ -7,7 +7,6 @@ docs
 .gitignore
 .eslintrc.js
 sonar-project.properties
-src
 coverage
 .github
 jest.config.js
